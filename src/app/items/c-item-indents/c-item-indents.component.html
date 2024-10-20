@@ -1,0 +1,91 @@
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body" *ngIf="itemIndentData.length!=0">
+                <double-scroll>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Indent no</th>
+                                <th>Indent from location</th>
+                                <th>Indent to location</th>
+                                <th>IndentType</th>
+                                <th>Narration</th>
+                                <th>Created by</th>
+                                <th>Checked by</th>
+                                <th>Checked date</th>
+                                <th>Approved by</th>
+                                <th>Approved date</th>
+                                <th>Expected date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container  *ngIf="itemIndentData.length!=0">
+                                <tr *ngFor="let indent of itemIndentData">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Indent No">{{indent.IndentNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{indent.IndentFromLocation}}">{{indent.IndentFromLocation}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 120px;">
+                                        <span title="{{indent.IndentToLocation==null?'N/A':indent.IndentToLocation}}">{{indent.IndentToLocation==null?'N/A':indent.IndentToLocation}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="IndentType">{{indent.IndentType}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Narration">{{indent.Narration==null?'N/A':indent.Narration}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Created by">{{indent.CreatedBy}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Checked by">{{indent.CheckedUserName?indent.CheckedUserName:'Not Checked'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span *ngIf="indent.CheckedDate" title="Checked date">{{indent.CheckedDate=='0001-01-01T00:00:00'?'N/A':
+                                            indent.CheckedDate| date: "dd-MM-yyyy"}}</span>                                        
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Approved by">{{indent.ApprovedUserName?indent.ApprovedUserName:'Not approved'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span *ngIf="indent.ApprovedDate" title="Approved date">{{indent.ApprovedDate == '0001-01-01T00:00:00'?'N/A': indent.ApprovedDate| date:'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Expected Date">{{indent.ExpectedDate== '0001-01-01T00:00:00'?'N/A': indent.ExpectedDate | date: "dd-MM-yyyy"}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;"
+                                    [ngClass]="{'text-warning': indent.FromRights=='FromRights', 'text-info': indent.FromRights=='Checked', 'text-success': indent.FromRights=='Approved'}">
+                                        <span title="Status" class="text-info"> {{indent.FromRights}}</span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="itemIndentData.length==0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                <div  class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                        <i class="feather icon-alert-circle fs-2"></i>
+                        <span>No Indents found!</span>
+                    </div>
+                </div>
+                </div>
+            </ng-container>
+            <div class="cartd-footer" *ngIf="itemIndentData.length!=0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

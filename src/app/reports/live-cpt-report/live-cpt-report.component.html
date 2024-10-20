@@ -1,0 +1,194 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">Live CPT Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body pb-0">
+                <!-- <h6 class="card-title">Location Details</h6> -->
+                <form *ngIf="!shimmerVisible">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Center</label>
+                                <ng-select [items]="centerList" [closeOnSelect]="true" [searchable]="true"
+                                    notFoundText="No centers found" bindLabel="CenterName" bindValue="CenterGuid"
+                                    placeholder="Select center" [formControl]="CenterName"
+                                    (change)="ChangeLocation($event)" [inputAttrs]="{maxlength:'60'}">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Test Code</label>
+                                <ng-select [items]="allLiveCptList" [closeOnSelect]="true" [searchable]="true"
+                                    notFoundText="No centers found" bindLabel="TestCode" bindValue="TestCode"
+                                    placeholder="Select center" [formControl]="TestCodes"
+                                    (change)="ChangeTest($event)" [inputAttrs]="{maxlength:'60'}">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">From Date
+                                    <span [ngClass]="{'text-danger': !fromDate}">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                        (dateSelect)="selectFromDate($event)" [maxDate]="calendar.getToday()"
+                                        ngbDatepicker #d1="ngbDatepicker" [formControl]="ClearFromDate" readonly>
+                                    <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">To Date
+                                    <span [ngClass]="{'text-danger': !toDate}">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                        (dateSelect)="selectToDate($event)" ngbDatepicker #d2="ngbDatepicker"
+                                        [formControl]="ClearToDate" [maxDate]="calendar.getToday()"
+                                        [minDate]="selectfromDate" readonly>
+                                    <button class="input-group-text" type="button" (click)="fromDate?d2.toggle():''">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2 text-end">
+                                <button class="btn btn-link btn-sm text-underline p-0" (click)="clearData()"
+                                    *ngIf="fromDate!='' || toDate!='' || locationGuid!='' || this.centerList?.length==1">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="!shimmerVisible">
+                            <div class="col-sm-12 text-end flex-wrap">
+                                <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                                    (click)="getCPTDetails()" [disabled]="isDisabled || noDataFound">Get Report
+                                    Data</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+                </form>
+                <!--Shimmer UI -->
+
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+            <ng-container *ngIf="AllCPTReport.length>0">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-4">
+                    <h6 class="card-title">{{ 'Live CPT Report' | uppercase }}</h6>
+                    <div class="row">
+                        <div class="col-sm-12 text-end">
+                            <button type="button" class="btn btn-outline-primary submit btn-sm me-2 mt-sm-0"
+                                [disabled]="isDisabled || noDataFound" (click)="getCPTDetails('pdf')">Get Report
+                                PDF</button>
+                            <button type="button" class="btn btn-primary submit btn-sm mt-sm-0"
+                                [disabled]="isDisabled || noDataFound" (click)="getCPTDetails('excel')">Get Report
+                                Excel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3 border bg-light mx-4">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <double-scroll>
+                                <div style="max-height: 600px; overflow-y: auto;">
+                                    <div class="table-responsive table bg-white"
+                                        style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap"
+                                            [rows]="AllCPTReport" [loadingIndicator]="loadingIndicator"
+                                            [columnMode]="ColumnMode.force" rowHeight="auto">
+                                            <ngx-datatable-column [width]="50" name="s.No">
+                                                <ng-template ngx-datatable-cell-template let-row="row" let-value="value"
+                                                    let-rowIndex="rowIndex">
+                                                    <span>{{ rowIndex + 1 }}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="150" name="Test Code"
+                                                prop="TestCode"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Test Name"
+                                                prop="TestName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="150" name="Item Name"
+                                                prop="ItemName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="CAT Number"
+                                                prop="ItemName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item Category"
+                                                prop="SubCategoryName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Tests Regostered As per LIS"
+                                                prop="NoOfTests"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Test CPT">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <span>{{ row?.NoOfTestFotItem===0?0: (row.ItemRate /
+                                                        row.NoOfTestFotItem)}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Kit Live CPT" prop="KitLiveCPT">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <span>{{ (row?.ConsumeQty ? (row.ConsumeQty / row.NoOfTests) : 0) *
+                                                        (row?.ItemRate ? (row.ItemRate / row.NoOfTestFotItem) : 0) ||
+                                                        "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="No.Of Times  CPT Increased">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <span>{{((row.NoOfTestFotItem === 0
+                                                        ? 0
+                                                        : (row?.ConsumeQty ? (row.ConsumeQty / row.NoOfTests) : 0) *
+                                                        (row?.ItemRate ? (row.ItemRate / row.NoOfTestFotItem) : 0)) /
+                                                        (row.ItemRate /row.NoOfTestFotItem)) || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                    </div>
+                                </div>
+                            </double-scroll>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="card-footer">
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+    </div>
+</div>

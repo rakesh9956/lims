@@ -1,0 +1,133 @@
+
+<!-- 
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Store master</a></li>
+        <li class="breadcrumb-item active" aria-current="Purchase orders">Purchase orders</li>
+    </ol>
+</nav> -->
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                <h6 class="card-title">
+                    <div class="mb-2 mb-sm-0">PAYMENT HISTORY</div>
+                </h6>
+                <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter  size-18"></i>
+                </button>
+               </div>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div
+                        class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end" *ngIf="totalCount!=0 ">
+                            <span *ngIf="PaymentHistoryList?.length >0"
+                                class="text-muted text-small me-0 me-sm-2 mb-1 mb-sm-0 flex-shrink-0">{{(rowCount*(pageNumber-1))+1}}-{{totalCount>rowCount*pageNumber?rowCount*pageNumber:totalCount}}
+                                of
+                                {{totalCount}} </span>
+                            <!-- <span class="me-2 flex-shrink-0 text-capitalize">Display</span> -->
+                            <select  *ngIf="PaymentHistoryList?.length >0"name="rowLimit" id="rowLimit"
+                                  class="form-control form-select me-0 me-sm-2 h-34 mb-1 mb-sm-0"
+                                  (change)="ChangeEvent($event)">
+                            <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                          </select>
+                            <input type="text" class="form-control form-select-sm me-0 me-sm-2 mb-1 mb-sm-0 minw-200 " placeholder="Search"
+                                [(ngModel)]="Keyword" (ngModelChange)="changeSearch($event)" />
+                        </div>
+                    </div>
+                </div>
+                <double-scroll>
+
+                    <table class="table" #table *ngIf="totalCount>0 && !shimmerVisible" >
+                        <thead>
+                            <tr>
+                                <th>Purchase Order No</th>
+                                <th>Total Due</th>
+                                <th>Mode of Payment</th>
+                                <th>Bank Name</th>
+                                <th>Invoice Number</th>
+                                <th>Cheque / Transaction No</th>
+                                <th>Paid Amount</th>
+                                <th>Due Amount</th>
+                                <th>Remarks</th>
+                                <th>Status</th>
+                                <th>Screenshot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container >
+                                <tr *ngFor="let history of PaymentHistoryList; let i = index" >
+                                    <td>{{history?.PurchaseOrderNo ? history?.PurchaseOrderNo : 'N/A'}}</td>
+                                    <td>{{history?.TotalAmount ? history?.TotalAmount :'N/A'}}</td>
+                                    <td>{{history?.Modeofpayment ? history?.Modeofpayment :'N/A'}}</td>
+                                    <td>{{history?.Bankname ? history?.Bankname : 'N/A'}}</td>
+                                    <td>{{history?.InvoiceNumber ? history?.InvoiceNumber : 'N/A'}}</td>
+                                    <td>{{history?.TransectionID ? history?.TransectionID : 'N/A'}}</td>
+                                    <td>{{history?.PaidAmount ? history?.PaidAmount : 'N/A'}}</td>
+                                    <td>{{history?.DueAmount }}</td>
+                                    <td  title="{{history?.Remarks}}" class="text-truncate mw-250">{{history?.Remarks ? history?.Remarks : 'N/A'}}</td>
+                                    <td>
+                                        <span *ngIf="history?.Status == 'Payment Due'" class="badge text-bg-danger">{{history?.Status}}</span>
+                                        <span *ngIf="history?.Status == 'Partially Paid'" class="badge text-bg-warning">{{history?.Status}}</span>
+                                        <span *ngIf="history?.Status == 'Mostly Paid'" class="badge text-bg-info">{{history?.Status}}</span>
+                                        <span *ngIf="history?.Status == 'Fully Paid'" class="badge text-bg-success">{{history?.Status}}</span>
+                                    </td>
+                                    <!-- Partially Paid -->
+                                    <td><button class="btn btn-secondary btn-xs" type="button" (click)="openBasicModal(paymentModal , history?.ImageUrl);"><i  class="feather icon-eye me-2" ></i>View</button></td>
+
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                    <!--Shimmer UI -->
+                    <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="10"></app-shimmers>
+                </double-scroll>
+            </div>
+            <div class="cartd-footer" *ngIf="PaymentHistoryList?.length != 0 ">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                  <!-- <pagination-controls (pageChange)="GetAllData($event)"></pagination-controls> -->
+                  <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                    [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize" [rotate]="false"
+                    [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                </div>
+              </div>
+            <ng-container *ngIf="(PaymentHistoryList?.length  == 0  || totalCount == 0)&& !shimmerVisible">
+                <div class="minH-500 d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No Payment history found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #paymentModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="recallPurchaseOrder">Payment Screenshot</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss('by: close icon')" aria-label="Close"></button>
+    </div>
+    <!-- <div class="modal-body">
+        <img src="{{displayUrl}}" class="img-fluid" />
+    </div> -->
+    <div class="modal-body">
+        <div class="widget-content">
+            <div class="default-form">
+                <div class="row form">
+                    <ngx-doc-viewer [url]="Document" viewer="url" style="width:100%;height:75vh;">
+                        <div>Loading</div>
+                    </ngx-doc-viewer>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        </div>
+    </div>
+</ng-template>

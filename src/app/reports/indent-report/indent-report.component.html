@@ -1,0 +1,309 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">Indent Report </li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <!-- <h6 class="card-title">Indent From Location Details</h6> -->
+                <div class="row">
+                    <ng-container *ngIf="!shimmerVisible">
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label class="form-label">Centers</label>
+                                <ng-select [items]="centerList" [formControl]="CenterclearControl"
+                                    bindLabel="CenterName" bindValue="CenterGuid" [notFoundText]="'No center found!'"
+                                    placeholder="Select Center" (change)="filterData($event)">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Location</label>
+                                    <ng-select [items]="LocationList" [formControl]="clearControl"
+                                        [notFoundText]="'No location found!'" bindLabel="CenterLocationName"
+                                        bindValue="CenterLocationGuid" placeholder="Select location"
+                                        (change)="filterData($event);">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2">
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label">From
+                                        Date <span [ngClass]="{'text-danger': FromDate == ''}">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                            [formControl]="clearFromControl" (dateSelect)="selectFromDate($event)"
+                                            ngbDatepicker #d="ngbDatepicker" [maxDate]="calender.getToday()">
+                                        <button class="input-group-text" type="button" (click)="d.toggle()">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2">
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label">To
+                                        Date <span [ngClass]="{'text-danger': ToDate == ''}">*</span></label>
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                            [formControl]="cleardateControl" (dateSelect)="selectToDate($event)"
+                                            [minDate]="selectfromDate" ngbDatepicker #d2="ngbDatepicker"
+                                            [maxDate]="calender.getToday()">
+                                        <button class="input-group-text" type="button"
+                                            (click)="FromDate?d2.toggle():''">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-container>
+                            <div class="col-xl-2 align-items-center d-flex">
+                                <div class="align-items-end d-flex me-3 mb-1 mb-sm-0">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" [(ngModel)]="SIfilterActive"
+                                            id="si" (change)="changeSI('SI')">
+                                        <label class="form-check-label" for="si">
+                                            SI
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="align-items-end d-flex mb-1 mb-sm-0">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" [(ngModel)]="PIfilterActive"
+                                            id="pi" (change)="changeSI('SI')">
+                                        <label class="form-check-label" for="pi">
+                                            PI
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div class="mb-2 text-end" *ngIf="ToDate!=''">
+                            <button class="btn btn-link btn-sm text-underline p-0" (click)="Onremove()">Clear
+                                filters</button>
+                        </div>
+                        <div class="row" *ngIf="!shimmerVisible">
+                            <div class="col-sm-12 text-end flex-wrap">
+                                <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                                    (click)="IndentReportData()" [disabled]="isDisable || noDataFound">Get Report
+                                    Data</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </ng-container>
+
+
+
+                    <!--Shimmer UI -->
+                    <ng-container *ngIf="shimmerVisible">
+                        <div class="row">
+                            <!-- <div class="mb-3">
+                        <div class="shimmerBG" style="width:150px;height: 15px;"></div>
+                      </div> -->
+                            <div class="col-sm-6 col-md-3" *ngFor="let dummyLoop of [].constructor(4)">
+                                <div class="mb-3">
+                                    <label class="label mb-1">
+                                        <div class="shimmerBG formLable"></div>
+                                    </label>
+                                    <div class="form-control form-control-sm">
+                                        <div class="shimmerBG formInput"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!--Shimmer UI -->
+                    <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path
+                                    d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                    fill="rgba(234,59,46,1)"></path>
+                            </svg>
+                            <div>
+                                No records found!
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-container *ngIf="indentreport?.length != 0">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="card-title">{{ 'Indent Report' | uppercase }} </h6>
+                            <div class="row">
+                                <div class="col-sm-12 text-end">
+                                    <button type="button" class="btn btn-outline-primary btn-sm me-2 mt-sm-0"
+                                        [disabled]="isDisable||  noDataFound" (click)="IndentReportData('pdf')">Get
+                                        Report
+                                        PDF</button>
+                                    <button type="button" class="btn btn-primary submit btn-sm mt-sm-0"
+                                        [disabled]="isDisable ||  noDataFound" (click)="IndentReportData('excel')">Get
+                                        Report Excel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3 border bg-light">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    <double-scroll>
+                                        <div style="max-height: 600px; overflow-y: auto;">
+                                            <div class="table-responsive table bg-white"
+                                                style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                                <ngx-datatable [scrollbarH]="true" #table class="bootstrap"
+                                                    [rows]="indentreport" [loadingIndicator]="loadingIndicator"
+                                                    [columnMode]="ColumnMode.force" rowHeight="auto">
+                                                    <ngx-datatable-column [width]="50" name="s.No">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                                <span>{{ rowIndex + 1 }}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="IndentNo"
+                                                        prop="IndentNo"></ngx-datatable-column>                                                   
+                                                     <ngx-datatable-column [width]="120" name="ItemName"
+                                                        prop="ItemName"></ngx-datatable-column> 
+                                                        <ngx-datatable-column [width]="120" name="VendorItemName"
+                                                        prop="VendorItemName"></ngx-datatable-column> 
+                                                        <ngx-datatable-column [width]="120" name="ItemCode"
+                                                        prop="ApolloItemCode"></ngx-datatable-column>                                                     
+                                                    <ngx-datatable-column [width]="120" name="CreatedDt"
+                                                        prop="CreatedDt">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.CreatedDt | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="CreatedBy"
+                                                    prop="CreatedBy"></ngx-datatable-column>                                               
+                                                    <ngx-datatable-column [width]="80" name="ItemQty"
+                                                        prop="ItemQty"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="CheckedDate"
+                                                        prop="CheckedDate">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.CheckedDate | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Checked UserName"
+                                                        prop="CheckedUserName">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.CheckedUserName || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="ApprovedDate"
+                                                        prop="ApprovedDate">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.ApprovedDate | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Approved UserName"
+                                                        prop="ApprovedUserName">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.ApprovedUserName || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="ExpectedDate"
+                                                        prop="ExpectedDate">
+                                                        <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.ExpectedDate | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="FromLocation"
+                                                        prop="FromLocation"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="160" name="ToLocation"
+                                                        prop="ToLocation"></ngx-datatable-column>
+                                                </ngx-datatable>
+                                            </div>
+                                        </div>
+                                    </double-scroll>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="card-footer">
+                    <!--Shimmer UI -->
+                    <ng-container *ngIf="shimmerVisible">
+                        <tr *ngFor="let dummyLoop of [].constructor(1)"
+                            class="align-items-end align-self-end d-flex justify-content-end">
+                            <td>
+                                <div class="d-flex text-end">
+                                    <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;">
+                                    </div>
+                                    <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <!--Shimmer UI -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="card mt-4">
+    <div class="card-body">
+        <h6 class="card-title">Indent Reports</h6>
+        <div class="row">
+            <div class="col-12">
+                <double-scroll>    
+                <div class="table-responsive"> 
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>IndentNo</th>
+                                <th>ItemName</th>
+                                <th>RejectQty</th>
+                                <th>RejectReason</th>
+                                <th>RejectBy</th>
+                                <th>Narration</th>
+                                <th>ExpectedDate</th>
+                                <th>IndentType</th>
+                                <th>Rate</th>
+                                <th>NetAmount</th>
+                                <th>VendorStateGSTNNo</th>
+                                <th>Status</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of Locations">
+                                <td>{{data.IndentNo}}</td>
+                                <td>{{data.ItemName}}</td>
+                                <td>{{data.RejectQty}}</td>
+                                <td>{{data.RejectReason}}</td>
+                                <td>{{data.RejectBy}}</td>
+                                <td>{{data.Narration}}</td>
+                                <td>{{data.ExpectedDate}}</td>
+                                <td>{{data.IndentType}}</td>
+                                <td>{{data.Rate}}</td>
+                                <td>{{data.NetAmount}}</td>
+                                <td>{{data.VendorStateGSTNNo}}</td>
+                                 <td>{{data.checker-data.maker}}</td> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div> 
+                </double-scroll>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+       <ngb-pagination class="ms-auto d-lg-table" [collectionSize]="30" [(page)]="paginationRoundedCurrentPage"></ngb-pagination> 
+      <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount"
+                                        [pageSize]="itemsPerPage" [(page)]="PageNumber"
+                                        (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                                        [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+    </div>
+</div> -->

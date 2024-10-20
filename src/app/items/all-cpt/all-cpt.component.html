@@ -1,0 +1,131 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items/all-cpt">Cpt</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Cpt</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>CPT</div>
+                    <div class="d-flex align-items-center text-end flex-column flex-sm-row">
+                        <div  *ngIf=" allCptList?.length>0 " class="align-items-center d-flex flex-column flex-sm-row flex-shrink-0">
+                            <span class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0 ">
+                                {{(rowCount*(pageNumber-1))+1}}-{{TotalCount>rowCount*pageNumber?rowCount*pageNumber:TotalCount}}
+                                of
+                                {{TotalCount}} </span>
+                                <select name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                *ngIf="allCptList?.length > 0" (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                        </div>
+                             <input type="text" class="form-control form-select-sm me-0 me-sm-2 mb-1 mb-sm-0  h-38"
+                                maxlength="50" placeholder="Search" (keyup)="changeSearch($event)"/>
+                            
+                        <button class="btn btn-primary btn-sm  w-100 me-0 me-sm-2"
+                            routerLink="/items/cpt"><span class="feather icon-plus"></span> Add
+                            CPT</button>
+                    </div>
+                </h6>
+                <div class="table-responsive" *ngIf="!shimmerVisible">
+                    <ngx-datatable [scrollbarH]="true" class="bootstrap"  [rows]="allCptList" 
+                        [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" rowHeight="auto">
+                        <ngx-datatable-column name="CPTNo" prop="CPTNo"></ngx-datatable-column>
+                        <ngx-datatable-column name="Test Code" prop="TestCode">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.TestCode ? row.TestCode : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <ngx-datatable-column name="Test Name" prop="TestName">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.TestName ? row.TestName : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <ngx-datatable-column name="Created By" prop="CreatedBy">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.CreatedBy ? row.CreatedBy : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Created Dt" prop="CreatedDt"></ngx-datatable-column>
+                        <ngx-datatable-column name="Test Count" prop="TestCount"></ngx-datatable-column>
+                        <ngx-datatable-column name="Actions" [width]="100" [sortable]="false">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <div ngbDropdown>
+                                    <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom"
+                                        container="body" popoverClass="dataTableActions"
+                                        [ngbPopover]="dataTableActions">Actions <span
+                                            class="feather icon-chevron-down"></span></button>
+                                    <ng-template #dataTableActions>
+                                        <div aria-labelledby="actionsDropdown">
+                                            <!-- <button class="border-bottom" ngbDropdownItem><span
+                                                    class="feather icon-eye"></span> View</button> -->
+                                            <button class="border-bottom" ngbDropdownItem   
+                                                [routerLink]="['/items/cpt',row.CPTGuid]"><span
+                                                    class="feather icon-edit"></span> Edit</button>
+                                                    <button class="border-bottom" ngbDropdownItem 
+                                                    (click)="openBasicModal(deleteManufacture);Delquotation(row)"><span
+                                                        class="feather icon-trash-2"></span> Delete</button>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="6" [rows]="5"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-container *ngIf="IsShow && !shimmerVisible">
+                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                        <div class="py-5 text-muted">
+                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                <i class="feather icon-alert-circle fs-2"></i>
+                                <span>No CPTs found!</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="cartd-footer" *ngIf="TotalCount>0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount"
+                        [pageSize]="itemsPerPage" [(page)]="pageNumber" (pageChange)="GetAllData($event)"
+                        [maxSize]="maxSize" [rotate]="false" [boundaryLinks]="boundaryLinks"
+                        [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>      
+    </div>
+</div>
+
+<ng-template #deleteManufacture let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Manufacturer</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to delete  
+                        <strong>{{this.CPTNO}}</strong> CPT ?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');deleteCPT()">Yes</button>
+    </div>
+</ng-template>
+

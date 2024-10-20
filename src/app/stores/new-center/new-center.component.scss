@@ -1,0 +1,117 @@
+.password-visibility-block {
+    .password-visibility-icon {
+        position: absolute;
+        top: 6px;
+        right: 15px;
+        width: 25px;
+        padding: 0;
+    }
+    .pr-40{
+        padding-right: 40px;
+    }
+}
+
+.form-control.is-valid {
+    background-position: right 50px center !important;
+    // background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2305a34a' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+}
+.pwValidPopover {
+    width: 300px;
+    background-color: #fff;
+    box-shadow: 0px 0px 8px 0px #bdbdbd;
+    border-radius: 10px;
+    position: absolute;
+    top: -270px;
+    z-index: 111;
+    display: none;
+    right: 0;
+
+    @media screen and (max-width: 480px) {
+        width: auto;
+        position: relative;
+        margin-top: 10px;
+        top: unset;
+        right: unset;
+        display: block;
+    }
+
+    &::after {
+        top: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: rgba(255, 255, 255, 0);
+        border-bottom-color: #6571ff;
+        border-width: 10px;
+        margin-left: -10px;
+        transform: rotate(180deg);
+
+        @media screen and (max-width: 480px) {
+            display: none;
+        }
+    }
+
+    &_Header {
+        background-color: #6571ff;
+        color: #fff;
+        width: 100%;
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        line-height: 18px;
+        font-size: 12px;
+        letter-spacing: 0.1px;
+    }
+
+    &_Body {
+        padding: 15px;
+        width: 100%;
+
+        &_list {
+            width: 100%;
+
+            @media screen and (max-width: 480px) {
+                padding-left: 0;
+            }
+
+            li {
+                display: block;
+
+                span {
+                    display: inline-block;
+                    width: 15px;
+                    height: 15px;
+                    border: 2px solid #ccc;
+                    background-color: #fff;
+                    border-radius: 50px;
+                }
+
+                &.active {
+
+                    span {
+                        border: 2px solid #28a745;
+                        background-color: #28a745;
+                    }
+                }
+            }
+        }
+    }
+}
+#password {
+    &:focus {
+        &~.pwValidPopover {
+            display: block;
+        }
+    }
+
+    &~.pwValidPopover {
+        @media screen and (max-width: 480px) {
+            display: block;
+        }
+    }
+}
+

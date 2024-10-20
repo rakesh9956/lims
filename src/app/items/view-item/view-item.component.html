@@ -1,0 +1,129 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" *ngIf="authService.LoggedInUser.STORE==true || authService.LoggedInUser.STORE=='true'"><a routerLink="/items">Items</a></li>
+        <li class="breadcrumb-item active" aria-current="page">View Item</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-12 grid-margin">
+        <div class="bg-transparent card shadow-none border-0">
+            <div class="d-flex justify-content-between align-items-center mt-2 w-100">
+                <div>
+                    <span class="h4 text-dark">{{this.ItemData?this.ItemData[0]?.ItemName:''}}</span>
+                </div>
+                <!-- <div class="d-flex align-items-center text-end flex-column flex-sm-row">
+                    <button class="btn btn-outline-primary btn-icon-text me-2 mb-2 mb-sm-0" (click)="goBack()">
+                        <i class="feather icon-corner-down-left btn-icon-prepend"></i> Go back
+                    </button> -->
+                <!-- <button class="btn btn-primary btn-icon-text">
+                        <i class="feather icon-edit btn-icon-prepend"></i> Edit item
+                    </button> -->
+                <!-- </div> -->
+            </div>
+            <hr class="mt-2 mb-0">
+
+
+
+            <div class="d-flex justify-content-center p-3 mt-0 rounded-bottom ">
+                <ul class="d-flex align-items-left align-items-md-center m-0 p-0 flex-wrap">
+                    <li class="d-flex align-items-center ps-3 ps-sm-0 my-2 my-md-0" [ngClass]="{'active': detailsTab}"
+                        (click)="gotoTab('details')">
+                        <i class="feather icon-info me-1 icon-md" [ngClass]="{'text-primary': detailsTab}"></i>
+                        <a class="pt-1px" [ngClass]="detailsTab ? 'text-primary' : 'text-body'"
+                            routerLink=".">Details</a>
+                    </li>
+                    <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                        [ngClass]="{'active': siTab}" (click)="gotoTab('si')">
+                        <i class="feather icon-file me-1 icon-md" [ngClass]="{'text-primary': siTab}"></i>
+                        <a class="pt-1px" [ngClass]="siTab ? 'text-primary' : 'text-body'" routerLink=".">SI <span
+                                class="text-muted tx-10 badge bg-secondary textWhite">{{itemSIDetails?.length}}</span></a>
+                    </li>
+                    <ng-container
+                        *ngIf="authService.LoggedInUser.STORE==true || authService.LoggedInUser.STORE=='true'">
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': suppliersTab}" (click)="gotoTab('suppliers')">
+                            <i class="feather icon-file me-1 icon-md" [ngClass]="{'text-primary': suppliersTab}"></i>
+                            <a class="pt-1px" [ngClass]="suppliersTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">Suppliers <span
+                                    class="text-muted tx-10 badge bg-secondary textWhite">{{this.Supplierslist.length}}</span></a>
+                        </li>
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': quotationsTab}" (click)="gotoTab('quotations')">
+                            <i class="feather icon-file me-1 icon-md" [ngClass]="{'text-primary': quotationsTab}"></i>
+                            <a class="pt-1px" [ngClass]="quotationsTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">Quotations <span
+                                    class="text-muted tx-10 badge bg-secondary textWhite">{{itemQuotationData.length}}</span></a>
+                        </li>
+
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': indentsTab}" (click)="gotoTab('indents')">
+                            <i class="feather icon-file me-1 icon-md" [ngClass]="{'text-primary': indentsTab}"></i>
+                            <a class="pt-1px" [ngClass]="indentsTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">Indents
+                                <span
+                                    class="text-muted tx-10 badge bg-secondary textWhite">{{itemIndentData.length}}</span></a>
+                        </li>
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': purchaseOrderTab}" (click)="gotoTab('purchaseOrder')">
+                            <i class="feather icon-book me-1 icon-md"
+                                [ngClass]="{'text-primary': purchaseOrderTab}"></i>
+                            <a class="pt-1px" [ngClass]="purchaseOrderTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">POs
+                                <span
+                                    class="text-muted tx-10 badge bg-secondary textWhite">{{itemPurchaseData.length}}</span></a>
+                        </li>
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': goodsReceiptNoteTab}" (click)="gotoTab('goodsReceiptNote')">
+                            <i class="feather icon-file me-1 icon-md"
+                                [ngClass]="{'text-primary': goodsReceiptNoteTab}"></i>
+                            <a class="pt-1px" [ngClass]="goodsReceiptNoteTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">GRN <span
+                                    class="text-muted tx-10 badge bg-secondary textWhite">{{itemGrntData.length}}</span></a>
+                        </li>
+
+                        <li class="ms-3 ms-0 ps-3 my-2 my-md-0 border-start d-flex align-items-center"
+                            [ngClass]="{'active': activityTab}" (click)="gotoTab('activity')">
+                            <i class="feather icon-activity me-1 icon-md" [ngClass]="{'text-primary': activityTab}"></i>
+                            <a class="pt-1px" [ngClass]="activityTab ? 'text-primary' : 'text-body'"
+                                routerLink=".">Activity
+                                history </a>
+                        </li>
+                    </ng-container>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-container *ngIf="detailsTab">
+    <app-c-item-details [ItemData]="ItemData"></app-c-item-details>
+</ng-container>
+
+<ng-container *ngIf="suppliersTab">
+    <app-c-item-suppliers [Supplierslist]="Supplierslist"></app-c-item-suppliers>
+</ng-container>
+
+<ng-container *ngIf="quotationsTab">
+    <app-c-item-quotations [itemQuotationData]="itemQuotationData"></app-c-item-quotations>
+</ng-container>
+
+<ng-container *ngIf="purchaseOrderTab">
+    <app-c-item-pos [itemPurchaseData]="itemPurchaseData"></app-c-item-pos>
+</ng-container>
+
+<ng-container *ngIf="goodsReceiptNoteTab">
+    <app-c-item-grn [itemGrntData]="itemGrntData"></app-c-item-grn>
+</ng-container>
+
+<ng-container *ngIf="indentsTab">
+    <app-c-item-indents [itemIndentData]="itemIndentData"></app-c-item-indents>
+</ng-container>
+
+<ng-container *ngIf="siTab">
+    <app-c-item-si [itemSIDetails]="itemSIDetails"></app-c-item-si>
+</ng-container>
+
+<ng-container *ngIf="activityTab">
+    <app-c-item-activity [alItemListData]="alItemListData" [Supplierslist]="Supplierslist"></app-c-item-activity>
+</ng-container>

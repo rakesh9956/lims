@@ -1,0 +1,246 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/manufacturers">CPT</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Live CPT</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <h6 class="card-title">{{LiveCptGuid?'Update Live CPT':'New Live CPT'}}</h6>
+                    <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0" *ngIf="!uploadExcel">
+                        <button class="btn-primary btn" type="button" (click)="uploadExcel=true">
+                            <span class="feather icon-file-text"> </span> Upload CPT
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0" *ngIf="uploadExcel">
+                        <button class="btn-primary btn" type="button" (click)="uploadExcel=false">
+                            <span class="feather icon-file-text"> </span> New CPT
+                        </button>
+                    </div>
+
+                </h6>
+                <div class="row" *ngIf="uploadExcel">
+                    <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                        <div class="mb-3">
+                            <label for="itemName" class="form-label">Accepted only excel file</label>
+                            <!-- <span class="text-muted float small">Accepted only excel file.</span> -->
+                            <input #fileInput type="file" id="upload-resume" fileToUpload class="form-control"
+                                (change)="uploadData($event)" placeholder="Enter consumption unit">
+                            <span class="text-muted text-end">You can download sample file from <button
+                                    class="btn btn-link p-0 align-baseline"
+                                    (click)="downloadSampleExcel()">here</button>.</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-xl-3 d-flex align-items-center">
+                        <div class="mb-3">
+                            <button class="btn-primary btn" type="button" (click)="SaveQutaionFromXLData()">
+                                <span class="feather icon-send"> </span> Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <form [formGroup]="CPTForm">
+                    <div class="col-sm-4" *ngIf="!uploadExcel">
+                        <div class="mb-3">
+                            <label class="form-label">Center <span [ngClass]="{'text-danger': !CPTForm.value.CenterGuid}">*</span></label>
+                            <ng-select [closeOnSelect]="true" [searchable]="true" placeholder="Select item type" bindLabel="CenterName" bindValue="CenterGuid"
+                                [notFoundText]="'No centers found!'" [inputAttrs]="{maxlength: '48'}"  [items]="centerList" formControlName="CenterGuid">
+                            </ng-select>
+                            <ng-container>
+                                <span class="invalid-feedback">Test Code is required!</span>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <ng-container formArrayName="LstLIVECPTDetailsUDT">
+                        <ng-container *ngFor="let item of addItemslist.controls; let i = index" [formGroupName]="i">
+                            <ng-container>
+                                <div class="row" *ngIf="!uploadExcel">
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Test Code <span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.TestCode==''}">*</span></label>
+                                            <input type="text" id="testCode" class="form-control"
+                                                [ngClass]="{'is-invalid':item.get('TestCode')?.touched && item.get('TestCode')?.invalid}"
+                                                placeholder="Enter Test Code" formControlName="TestCode" maxlength="50">
+                                            <ng-container>
+                                                <span class="invalid-feedback">Test Code is required!</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Test Name<span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.TestName==''}">*</span></label>
+                                            <input type="text" id="testName" class="form-control"
+                                                placeholder="Enter Test Name" formControlName="TestName" maxlength="50"
+                                                [ngClass]="{'is-invalid':item.get('TestName')?.touched && item.get('TestName')?.invalid}">
+                                            <ng-container>
+                                                <span class="invalid-feedback">Test Name is required!</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Department<span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.Department==''}">*</span></label>
+                                            <input type="text" id="department" class="form-control"
+                                                placeholder="Enter Department" formControlName="Department"
+                                                maxlength="13"
+                                                [ngClass]="{'is-invalid':item.get('Department')?.touched && item.get('Department')?.invalid}">
+                                            <ng-container>
+                                                <span class="invalid-feedback">Department is required!</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">From Date<span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate==''}">*</span></label>
+
+
+                                            <div class="input-group">
+                                                <input class="form-control datepicker" placeholder="dd-mm-yyyy"
+                                                    name="dp" readonly formControlName="FromDate" ngbDatepicker
+                                                    #d="ngbDatepicker"
+                                                    [minDate]="LiveCptGuid&&CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate?CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate:minDate"
+                                                    [ngClass]="{'is-invalid':item.get('FromDate')?.touched && item.get('FromDate')?.invalid}"
+                                                    (click)="d.toggle()">
+                                                <button class="input-group-text" type="button"
+                                                    (click)="CPTForm.get('FromDate')?.markAsTouched();d.toggle()">
+                                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                                </button>
+                                                <span class="invalid-feedback">
+                                                    From date is required!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">To Date<span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.ToDate==''}">*</span></label>
+
+
+                                            <div class="input-group">
+                                                <input class="form-control datepicker" placeholder="dd-mm-yyyy"
+                                                    name="dp"
+                                                    [readonly]="!this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate"
+                                                    formControlName="ToDate" ngbDatepicker #d1="ngbDatepicker"
+                                                    [minDate]="LiveCptGuid&&CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate?CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate:minDate"
+                                                    [ngClass]="{'is-invalid':item.get('ToDate')?.touched && item.get('ToDate')?.invalid}"
+                                                    (click)="d1.toggle()">
+                                                <button class="input-group-text" type="button"
+                                                    (click)="CPTForm.get('ToDate')?.markAsTouched();!this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.FromDate?null:d1.toggle()">
+                                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                                </button>
+                                                <span class="invalid-feedback">
+                                                    To date is required!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">No. Of Tests<span
+                                                    [ngClass]="{'text-danger': this.CPTForm.get('LstLIVECPTDetailsUDT')?.value[i]?.NoOfTests==''}">*</span></label>
+                                            <input type="number" id="noOfTests" class="form-control"
+                                                placeholder="Enter No. Of Tests" formControlName="NoOfTests"
+                                                [ngClass]="{'is-invalid':item.get('NoOfTests')?.touched && item.get('NoOfTests')?.invalid}"
+                                                maxlength="10">
+                                            <ng-container>
+                                                <span class="invalid-feedback">No. Of Tests is required!</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <!-- <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">On Board Stack</label>
+                                            <input type="text" id="onBoardStack" class="form-control"
+                                                placeholder="Enter On Board Stack" formControlName="OnBoardStack"
+                                                maxlength="11">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">On Hand Stack</label>
+                                            <input type="text" id="onHandStack" class="form-control"
+                                                placeholder="Enter On Hand Stack" formControlName="OnHandStack"
+                                                maxlength="40">
+                                        </div>
+                                    </div> -->
+                                    <div class="col-12 mt-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="mb-3" *ngIf="i > 0">
+                                                <button class="btn-danger btn" (click)="removeTestDetail(i,item)">
+                                                    <span class="feather icon-close"> </span> Remove
+                                                    Test
+                                                </button>
+                                            </div>
+
+                                            <div class="mb-3" *ngIf="i == addItemslist.controls.length - 1">
+                                                <button class="btn-primary btn" (click)="addTestDetail()">
+                                                    <span class="feather icon-plus"> </span> Add
+                                                    Test
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <hr>
+                                    </div>
+                                </div>
+
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 text-end">
+                                <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                                    (click)="resetForm()">Reset</button>
+                                <button type="button" class="btn btn-primary submit"
+                                    [disabled]="this.CPTForm.invalid || !FormChanged"
+                                    (click)="SaveCPTDetails()">{{LiveCptGuid?'Edit':'Save'}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Manufacturer -->
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p>Do you want to reset this manufacturer details?</p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')">Yes</button>
+    </div>
+</ng-template>

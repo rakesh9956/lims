@@ -1,0 +1,21 @@
+.h-32 {
+  height: 34px;
+  padding: 0 10px;
+}
+
+.minh-fullscreen {
+  height: calc(100vh - 370px);
+}
+
+[disabled] {
+  cursor: not-allowed;
+}
+
+.all-items-table {
+    datatable-header-cell:last-child, datatable-body-cell:last-child {
+    position: sticky;
+    right: 0;
+    background: #fff;
+    z-index: 11;
+  }
+}

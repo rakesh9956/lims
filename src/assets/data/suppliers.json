@@ -1,0 +1,50 @@
+[
+  {
+    "id": 0,
+    "name": "Ramsey Cummings",
+    "category": "Authorized dealer",
+    "code": 52,
+    "type": "ALL",
+    "address": {
+      "street": "Bergen Street",
+      "state": "South Carolina",
+      "city": "Glendale"
+    },
+    "primaryContact": {
+      "name": "Ramsey Cummings",
+      "phone": "1234567890",
+      "email": "email@domain.com"
+    },
+    "secondaryContact": {
+      "name": "Ramsey Cummings",
+      "phone": "1234567890",
+      "email": "email@domain.com"
+    },
+    "isApproved": true,
+    "isChecked": true
+  },
+  {
+    "id": 1,
+    "name": "Harvey Kent",
+    "category": "Authorized dealer",
+    "code": 52,
+    "type": "ALL",
+    "address": {
+      "street": "Carolina Street",
+      "state": "South Bergen",
+      "city": "Glendale"
+    },
+    "primaryContact": {
+      "name": "Ramsey Cummings",
+      "phone": "1234567890",
+      "email": "email@domain.com"
+    },
+    "secondaryContact": {
+      "name": "Ramsey Cummings",
+      "phone": "1234567890",
+      "email": "email@domain.com"
+    },
+    "isApproved": true,
+    "isChecked": true
+  }
+]

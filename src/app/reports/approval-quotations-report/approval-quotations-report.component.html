@@ -1,0 +1,270 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">Quotations Report</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <!-- <h6 class="card-title">Location Details</h6> -->
+                <form *ngIf="!shimmerVisible">
+                    <div class="row">
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Supplier</label>
+                                    <ng-select [items]="suppliersList" [closeOnSelect]="true" [searchable]="true"
+                                        bindLabel="SupplierName" bindValue="SupplierGuid"
+                                        placeholder="Select supplier name" [formControl]="clearsControl"
+                                        (change)="filterData($event,'supplier')" [notFoundText]="'No supplier found!'">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Center</label>
+                                    <ng-select [items]="centerList" [closeOnSelect]="true" [searchable]="true"
+                                        bindLabel="CenterName" bindValue="CenterGuid" placeholder="Select centers"
+                                        [formControl]="CenterclearControl" (change)="filterData($event,'')"
+                                        [notFoundText]="'No center found!'">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <ng-select [items]="locationsList" [closeOnSelect]="true" [searchable]="true"
+                                    [formControl]="clearControl" bindLabel="CenterLocationName"
+                                    bindValue="CenterLocationGuid" (clear)="Onremove()" placeholder="Select locations"
+                                    (change)="filterData($event,'')" [notFoundText]="'No location found!'">
+                                </ng-select>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">From
+                                    Date <span [ngClass]="{'text-danger': fromDate == ''}">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [formControl]="clearfromdateControl" (dateSelect)="selectFromDate($event)"
+                                        [maxDate]="calendar.getToday()" ngbDatepicker #d="ngbDatepicker">
+                                    <button class="input-group-text" type="button" (click)="d.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label ">To
+                                    Date <span [ngClass]="{'text-danger': toDate == ''}">*</span></label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [formControl]="cleardateControl" (dateSelect)="selectToDate($event)"
+                                        [minDate]="selectfromDate" [(ngModel)]="selectedToDate" ngbDatepicker
+                                        #d2="ngbDatepicker">
+                                    <button class="input-group-text" type="button" (click)="fromDate?d2.toggle():''">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2 text-end">
+                                <button class="btn btn-link btn-sm text-underline p-0" (click)="removeDates()"
+                                    *ngIf="fromDate">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="!shimmerVisible">
+                            <div class="col-sm-12 text-end flex-wrap">
+                                <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                                    (click)="getQuotationApprovalData()" [disabled]="isDisable || noDataFound">Get
+                                    Report Data</button>
+                                <!-- <button type="button" class="btn btn-primary submit mt-2 mt-sm-0" (click)="getStockLedgerReports('excel')"[disabled]="isDisable || noDataFound">Get Report Excel</button> -->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-sm-12">
+                    <hr />
+                </div>
+
+
+
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <!-- No records found! -->
+                <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+                <!-- No records found! -->
+
+                <ng-container *ngIf="quotationApprovalList?.length != 0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="card-title">{{ 'Approved Quotation Report' | uppercase }} </h6>
+                        <div class="row" *ngIf="quotationApprovalList?.length != 0 ">
+                            <div class="col-sm-12 text-end">
+                                <button type="button" class="btn btn-outline-primary btn-sm me-2 mt-2 mt-sm-0"
+                                    [disabled]="isDisable || noDataFound" (click)="getQuotationApprovalData('pdf')">Get
+                                    Report PDF</button>
+                                <button type="button" class="btn btn-primary submit btn-sm mt-2 mt-sm-0"
+                                    [disabled]="isDisable ||  noDataFound"
+                                    (click)="getQuotationApprovalData('excel')">Get Report Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border bg-light">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <double-scroll>
+                                    <div style="max-height: 600px; overflow-y: auto;">
+                                        <div class="table-responsive table bg-white">
+                                            <ngx-datatable [scrollbarH]="true" #table class="bootstrap"
+                                                [rows]="quotationApprovalList" [loadingIndicator]="loadingIndicator"
+                                                [columnMode]="ColumnMode.force" rowHeight="auto">
+                                                <ngx-datatable-column [width]="50" name="s.No">
+                                                    <ng-template ngx-datatable-cell-template let-row="row"
+                                                        let-value="value" let-rowIndex="rowIndex">
+                                                        <span>{{ rowIndex + 1 }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="150" name="QuotationNumber"
+                                                    prop="QuotationNo"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="150" name="ItemCode"
+                                                    prop="ItemCode"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="160" name="ItemName"
+                                                    prop="ItemName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="160" name="VendorItemName"
+                                                    prop="VendorItemName">
+                                                    <ng-template ngx-datatable-cell-template let-row="row">
+                                                        <span>{{row?.VendorItemName ? row.VendorItemName:'N/A'}}</span>
+                                                    </ng-template>
+
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Quantity/Unit"
+                                                    prop="PurchasedUnit"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="ValidUpTo">
+                                                        <ng-template ngx-datatable-cell-template let-row="row">
+                                                            <span>{{row?.ToDate | date: 'dd-MM-yyyy' }}</span>
+                                                        </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Rate"
+                                                    prop="Rate"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="GST Amt"
+                                                    prop="GSTAmount"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Discount Amt"
+                                                    prop="DiscountAmt"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Buy Price"
+                                                    prop="BuyPrice"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Vendor Name"
+                                                    prop="SupplierName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Code"
+                                                    prop="SupplierCode"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Vendor Address"
+                                                    prop="SupplierAddress"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Vendor Location"
+                                                    prop="SupplierStateName"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Createddate"
+                                                    prop="CreateDate"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Approveddate"
+                                                    prop="ApprovedDate"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="ApprovedBy"
+                                                    prop="ApprovedByName"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Remarks"
+                                                    prop="ApproveReason">
+                                                    <ng-template ngx-datatable-cell-template let-row="row">
+                                                        <span>{{row?.ApproveReason ? row.ApproveReason:'N/A'}}</span>
+                                                    </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Checkeddate"
+                                                    prop="CheckedDate"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="CheckedBy"
+                                                    prop="CheckedByName">
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Remarks"
+                                                    prop="CheckedReason">
+                                                    <ng-template ngx-datatable-cell-template let-row="row">
+                                                        <span>{{row?.CheckedReason ? row.CheckedReason:'N/A'}}</span>
+                                                    </ng-template>
+                                                    </ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Createddate"
+                                                    prop="CreateDate"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="CreatedBy"
+                                                    prop="CreatedBy"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="120" name="Status" prop="ApprovalStatus">
+                                                        <ng-template ngx-datatable-cell-template let-row="row">
+                                                            <span>{{row?.ApprovalStatus== "0"
+                                                                ?'Maker':row.ApprovalStatus=="1"?'Checked':row.ApprovalStatus==
+                                                                "2"?'Approved':'' || "N/A"}}</span>
+                                                        </ng-template>
+                                                    </ngx-datatable-column>
+                                                <!-- <ngx-datatable-column [width]="160" name="LocationName"
+                                                    prop="LocationName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="CatalogNum"
+                                                    prop="CatalogNo"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Hsncode" prop="HSNCode">
+                                                    <ng-template ngx-datatable-cell-template let-row="row">
+                                                        <span>{{row?.HSNCode || "N/A" }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                    prop="ManufactureName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Machine" prop="MachineName">
+                                                    <ng-template ngx-datatable-cell-template let-row="row">
+                                                        <span>{{row?.MachineName || "N/A" }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Packsize"
+                                                    prop="PackSize"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Rate"
+                                                    prop="Rate"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Discount"
+                                                    prop="DiscountPer"></ngx-datatable-column> -->
+                                            </ngx-datatable>
+                                        </div>
+                                    </div>
+                                </double-scroll>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="card-footer">
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+    </div>
+</div>

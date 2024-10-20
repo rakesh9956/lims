@@ -1,0 +1,65 @@
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body" *ngIf="itemSIDetails.length!=0">
+                <double-scroll>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>SI Number</th>
+                                <th>ReQuest Location</th>
+                                <th>Indent Location</th>
+                                <th>Request Quantity</th>
+                                <th>Received Quantity</th>
+                                <th>In Hand Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container>
+                                <tr  *ngFor="let si of itemSIDetails">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{si.SINo}}">{{si.SINo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{si.FromLocation}}">{{si.FromLocation}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 180px;">
+                                        <span title="{{si.StoreName}}">{{si.StoreName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 120px;">
+                                        <span title="{{si.RequesteQty}}">{{si.RequesteQty}}</span>
+                                    </td>
+                                        <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{si.ReceiveQty}}">{{si.ReceiveQty}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{si.NewQty}}">{{si.SINewQty - si.InHandQty}}</span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="itemSIDetails.length==0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                <div  class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                        <i class="feather icon-alert-circle fs-2"></i>
+                        <span>No SI found!</span>
+                    </div>
+                </div>
+                </div>
+            </ng-container>
+            <div class="cartd-footer" *ngIf="itemSIDetails.length!=0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

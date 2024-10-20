@@ -1,0 +1,245 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Items</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Pending indents</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <ng-container *ngIf="!shimmerVisible">
+                <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                        <li [ngbNavItem]="1">
+                                <a ngbNavLink (click)="GetSIIndent()">SI pending items</a>
+                            <ng-template ngbNavContent>
+                                <h6 class="card-title d-flex align-items-center justify-content-between">
+                                    <div>SI pending items</div>
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <input type="text" class="form-control form-select-sm me-0 me-sm-2 mb-1 mb-sm-0 minw-200" placeholder="Search" (keyup)="search($event)"/>
+                                        <button class="btn btn-primary btn-sm flex-shrink-0 ms-2" (click)="GetSIpendingExcel('SI')"><span
+                                            class="feather icon-arrow-up"></span>EXPORT SI PENDING ITEMS</button>
+                                    </div>
+                                </h6>
+                                
+                            <double-scroll>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Indent No</th>
+                                                <th>Indent from Location</th>
+                                                <th>Indent to Location</th>
+                                                <th>Status</th>
+                                                <th>Item Count</th>
+                                                <th>Created By</th>
+                                                <th>Created Date</th>
+                                                <th>Checked By</th>
+                                                <th>Checked Date</th>
+                                                <th>Approved By</th>
+                                                <th>Approved Date</th>
+                                                <th>Expected Date</th>
+                                                <th>Actions</th>
+                                              </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let siItems of filterdSIindentList">
+                                                <td class="py-2">{{siItems.IndentNo}}</td>
+                                                <td class="py-2">{{siItems.FromLocation}}</td>
+                                                <td class="py-2">{{siItems.ToLocation}}</td>
+                                                <td class="py-2">
+                                                  <span class="badge bg-success">{{siItems.FromRights}}</span>
+                                                </td>
+                                                <td class="py-2">{{siItems.Count}}</td>
+                                                <td class="py-2">{{siItems.UserName}} </td>
+                                                <td class="py-2">{{siItems.CreatedDt | date: 'dd/MM/yyyy'}}</td>
+                                                <td class="py-2">{{siItems.CheckedUserName}}</td>
+                                                <td class="py-2">{{siItems.CheckedDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td class="py-2">{{siItems.ApprovedUserName}}</td>
+                                                <td class="py-2">{{siItems.ApprovedDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td class="py-2">{{siItems.ExpectedDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>
+                                                    <button type="button"  (click)="openXlModal(xlModal,'xl');selectSI(siItems)"
+                                                        class="btn btn-outline-primary btn-xs me-1">
+                                                        <span class="feather icon-eye"></span>
+                                                        View
+                                                    </button>
+                                                    </td>
+                                                <td class="py-2"></td>
+                                              </tr>
+                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <ng-container *ngIf="filterdSIindentList.length==0">
+                                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                        <div class="py-5 text-muted">
+                                            <div
+                                                class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                <i class="feather icon-alert-circle fs-2"></i>
+                                                <span>No SI indents found!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container> 
+                                <div class="cartd-footer">
+                                    <div class="d-flex justify-content-center my-3 pe-3">
+                                            <ngb-pagination class="ms-auto d-sm-table"
+                                            [collectionSize]="TotalCount" (pageChange)="onPageChange($event,'SI')"
+                                            [maxSize]="maxSize" [rotate]="false" [pageSize]="itemsPerPage" [(page)]="page"
+                                            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                                    </div>
+                                </div>
+                            </double-scroll>
+                        </ng-template>
+                        </li>
+                        <li [ngbNavItem]="2"  *ngIf="this.authservice.LoggedInUser.STORE=='true'">
+                            <a ngbNavLink (click)="GetPIIndent()">PI pending items</a>
+                            <ng-template ngbNavContent>
+                                <h6 class="card-title d-flex align-items-center justify-content-between">
+                                    <div>PI pending items</div>
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <input type="text" class="form-control form-select-sm me-0 me-sm-2 mb-1 mb-sm-0 minw-200" placeholder="Search" (keyup)="searchPI($event)"/>
+                                        <button class="btn btn-primary btn-sm flex-shrink-0 ms-2" (click)="GetSIpendingExcel('PI')"><span
+                                            class="feather icon-arrow-up"></span>EXPORT PI PENDING ITEMS</button>
+                                    </div>
+                                </h6>
+                            <double-scroll>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Indent No</th>
+                                            <th>Indent from Location</th>
+                                            <th>Indent to Location</th>
+                                            <th>Status</th>
+                                            <th>Item Count</th>
+                                            <th>Created By</th>
+                                            <th>Created Date</th>
+                                            <th>Checked By</th>
+                                            <th>Checked Date</th>
+                                            <th>Approved By</th>
+                                            <th>Approved Date</th>
+                                            <th>Expected Date</th>
+                                            <th>Actions</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let siItems of filterdPIindentList">
+                                            <td class="py-2">{{siItems.IndentNo}}</td>
+                                            <td class="py-2">{{siItems.FromLocation}}</td>
+                                            <td class="py-2">{{siItems.ToLocation}}</td>
+                                            <td class="py-2">
+                                              <span class="badge bg-success">{{siItems.FromRights}}</span>
+                                            </td>
+                                            <td class="py-2">{{siItems.Count}}</td>
+                                            <!-- <td class="py-2">10</td>
+                                            <td class="py-2">5</td> -->
+                                            <td class="py-2">{{siItems.UserName}} </td>
+                                            <td class="py-2">{{siItems.CreatedDt | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="py-2">{{siItems.CheckedUserName}}</td>
+                                            <td class="py-2">{{siItems.CheckedDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="py-2">{{siItems.ApprovedUserName}}</td>
+                                            <td class="py-2">{{siItems.ApprovedDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="py-2">{{siItems.ExpectedDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td>
+                                                <button type="button"  (click)="openXlModal(xlModal,'xl');selectPI(siItems)"
+                                                    class="btn btn-outline-primary btn-xs me-1">
+                                                    <span class="feather icon-eye"></span>
+                                                   View
+                                                </button>
+                                                </td>
+                                            <td class="py-2"></td>
+                                          </tr>
+                        
+                                    </tbody>
+                                </table>
+                                <ng-container *ngIf="filterdPIindentList.length==0">
+                                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                        <div class="py-5 text-muted">
+                                            <div
+                                                class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                <i class="feather icon-alert-circle fs-2"></i>
+                                                <span>No PI indents found!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <div class="cartd-footer">
+                                    <div class="d-flex justify-content-center my-3 pe-3">
+                                            <ngb-pagination class="ms-auto d-sm-table"
+                                            [collectionSize]="TotalCountPI" (pageChange)="onPageChange($event,'PI')"
+                                            [maxSize]="maxSize" [rotate]="false" [pageSize]="itemsPerPage" [(page)]="pagePI"
+                                            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                                    </div>
+                                </div>
+                            </double-scroll>
+                        </ng-template>
+                        </li>
+                </ul>
+                <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+            </ng-container>
+               <!--Shimmer UI -->
+               <div class="p-4"><app-shimmers *ngIf="shimmerVisible" [type]="'table'"></app-shimmers></div>
+               <!--Shimmer UI --> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #xlModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Indent Details</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <double-scroll>
+            <!-- <div class="table-responsive"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <th>Indent No</th>
+                        <th>Indent from Location</th>
+                        <th>Indent to Location</th>
+                        <th>Status</th>
+                        <th>Item name</th>
+                        <th>Request Quantity</th>
+                        <th>Pending Quantity</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
+                        <th>Checked By</th>
+                        <th>Checked Date</th>
+                        <th>Approved By</th>
+                        <th>Approved Date</th>
+                        <th>Expected Date</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr *ngFor="let siItems of SIItemDetails; let i=index">
+                        <td class="py-2">{{siItems.IndentNo}}</td>
+                        <td class="py-2">{{siItems.FromLocation}}</td>
+                        <td class="py-2">{{siItems.ToLocation}}</td>
+                        <td class="py-2">
+                          {{siItems.FromRights}}
+                        </td>  
+                        <td>{{siItems.ItemName}}</td>
+                        <td>{{siItems.ReqQty}}</td>
+                        <td *ngIf="type=='SI'">{{(siItems.ReqQty)-(siItems.ReceiveQty)}}</td>
+                        <td *ngIf="type=='PI'">{{(siItems.ReqQty)-(siItems.POQty)}}</td>  
+                        <td class="py-2">{{siItems.UserName}} </td>
+                        <td class="py-2">{{siItems.CreatedDt | date: 'dd/MM/yyyy'}}</td>
+                        <td class="py-2">{{siItems.CheckedUserName}}</td>
+                        <td class="py-2">{{siItems.CheckedDate | date: 'dd/MM/yyyy'}}</td>
+                        <td class="py-2">{{siItems.ApprovedUserName}}</td>
+                        <td class="py-2">{{siItems.ApprovedDate | date: 'dd/MM/yyyy'}}</td>
+                        <td class="py-2">{{siItems.ExpectedDate | date: 'dd/MM/yyyy'}}</td>
+                      </tr>
+                </tbody>
+            </table>
+            <!-- </div> -->
+        </double-scroll>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    </div>
+</ng-template>

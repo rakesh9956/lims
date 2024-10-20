@@ -1,0 +1,103 @@
+
+[
+  {
+    "item-code": 0,
+    "departmentName": "Cardiac Surgery",
+    "batch-code": "78956234",
+    "expiry-date": "08/02/2023",
+    "pending-qty": "1102", 
+    "pending-remarks": "",
+    "region": "Secunderbad",
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 1,
+    "departmentName": "Radiology",
+    "batch-code": "85219512",
+    "expiry-date": "12/10/2023",
+    "pending-qty": "8632",   
+    "pending-remarks": "",
+    "region": "Hyderabad",   
+    "indent-no": "SI-78956234" 
+  },
+  {
+    "item-code": 2,
+    "departmentName": "General Surgery",    
+    "batch-code": "75321598",
+    "expiry-date": "15/03/2023",
+    "pending-qty": "7456",  
+    "pending-remarks": "",
+    "region": "Secunderbad",  
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 3,
+    "departmentName": "Medical Gastroenterology",    
+    "batch-code": "85296341",
+    "expiry-date": "25/05/2023",
+    "pending-qty": "3579",
+    "pending-remarks": "",
+    "region": "Hyderabad",    
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 4,
+    "departmentName": "Electrophysiology",    
+    "batch-code": "96325698",
+    "expiry-date": "15/12/2023",
+    "pending-qty": "9512",
+    "pending-remarks": "",
+    "region": "Secunderbad",    
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 5,
+    "departmentName": "Surgical Gastroenterology",    
+    "batch-code": "74125896",
+    "expiry-date": "31/07/2023",
+    "pending-qty": "7412",  
+    "pending-remarks": "",
+    "region": "Hyderabad",
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 6,
+    "departmentName": "Uro - Oncology",    
+    "batch-code": "09093200",
+    "expiry-date": "09/11/2024",
+    "pending-qty": "9632",  
+    "pending-remarks": "",
+    "region": "Secunderbad",  
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 7,
+    "departmentName": "Orthopaedics",    
+    "batch-code": "36985623",
+    "expiry-date": "17/10/2024",
+    "pending-qty": "1238",
+    "pending-remarks": "",
+    "region": "Hyderabad",    
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 8,
+    "departmentName": "Adult Kidney Transplant",    
+    "batch-code": "12365987",
+    "expiry-date": "10/06/2024",
+    "pending-qty": "7895",
+    "pending-remarks": "",
+    "region": "Secunderabad",    
+    "indent-no": "SI-78956234"
+  },
+  {
+    "item-code": 9,
+    "departmentName": "Diabetology",    
+    "batch-code": "09093200",
+    "expiry-date": "10/12/2025",
+    "pending-qty": "9632",
+    "pending-remarks": "",
+    "region": "Hyderabad",    
+    "indent-no": "SI-78956234"
+  }
+]

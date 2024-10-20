@@ -1,0 +1,21 @@
+.size-18{
+    font-size: 18px;
+    color:#6571ff;
+  }
+  .minH-500{
+    min-height: 500px;
+  }
+  // @media (max-width:683px) {
+  //   .filter-button {
+  //     position: absolute;
+  //     right: 20px;
+  //     top: 20px;
+  //   }
+  // }
+  
+  .PasteContent::before {
+    content: 'Paste image';
+    position: absolute;
+    color: #bdb9b9;
+    pointer-events: none; /* This prevents the pseudo-element from being selected */
+}

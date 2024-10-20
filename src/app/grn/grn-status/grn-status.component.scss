@@ -1,0 +1,41 @@
+.w-75{
+    width: 75px;
+}
+.size-18{
+    font-size: 18px;
+    color:#6571ff;
+  }
+  // @media (max-width:1685px) {
+  //   .filter-button {
+  //     position: absolute;
+  //     right: 20px;
+  //     top: 20px;
+  //   }
+  // }
+
+  .minH-500{
+    min-height: 500px;
+  }
+  .fs-15{
+    font-size: 37px;}
+
+  .mr-2{
+    margin-right: 15px;
+  }
+  .maxw-200 {
+    max-width: 200px;
+}
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px; 
+}
+.freeze-col {
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 2;
+  background: #fff;
+}

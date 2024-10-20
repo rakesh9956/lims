@@ -1,0 +1,694 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items">Items</a></li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="this.getItemData.length == 0">Add Item</li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="this.getItemData.length > 0">Edit Item</li>
+
+    </ol>
+</nav>
+
+
+
+<div class="row">
+        <div class=" col-md-12 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="card-title">Item Details</h6>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary btn-sm" *ngIf="getItemData[0]?.IsDeleted==true &&ItemGuid" 
+                            (click)="clickActivate();">Make Active</button>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="!shimmerVisible">
+                        <form [formGroup]="itemDetailsForm">
+                            <div class="row">
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="categoryType" class="form-label">Category type<span
+                                                [ngClass]="{'text-danger':!itemDetailsForm.value.categoryGuid}">
+                                                *</span></label>
+                                        <ng-select [items]="lstCategoryType" [closeOnSelect]="true" [searchable]="true"
+                                            bindValue="CategoryGuid" [inputAttrs]="{maxlength: '48'}"
+                                            bindLabel="CategoryTypeName"
+                                            [ngClass]="(itemDetailsForm.get('categoryGuid')?.hasError('required')) && itemDetailsForm.get('categoryGuid')?.touched ? 'is-invalid' : ''"
+                                            placeholder="Select category type" formControlName="categoryGuid">
+                                        </ng-select>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('categoryGuid')?.hasError('required') && itemDetailsForm.get('categoryGuid')?.touched">
+                                            Category type is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="departmentType" class="form-label">Department name<span
+                                                [ngClass]="{'text-danger': !itemDetailsForm.value.departmentTypeGuid}">
+                                                *</span>
+                                              </label>
+                                              <ng-container *ngIf="itemDetailsForm.value.categoryGuid">
+                                              <span  class="small text-primary cursor-pointer float" id="addNewManufacturer"
+                                              (click)="openBasicModal(designation);SaveSubcategeorytypeForm.reset();checDepartment=false;">Add
+                                              New</span>
+                                            </ng-container>
+                                        <ng-select [items]="lstDepartmentType" [closeOnSelect]="true" [searchable]="true"
+                                            bindValue="SubCategoryTypeGuid" [inputAttrs]="{maxlength: '48'}"
+                                            bindLabel="SubCategoryTypeName" placeholder="Select department name"
+                                            [ngClass]="(itemDetailsForm.get('departmentTypeGuid')?.hasError('required')) && itemDetailsForm.get('departmentTypeGuid')?.touched ? 'is-invalid' : ''"
+                                            formControlName="departmentTypeGuid">
+                                        </ng-select>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('departmentTypeGuid')?.hasError('required') && itemDetailsForm.get('departmentTypeGuid')?.touched">
+                                            Department name is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="itemType" class="form-label">Item type
+                                            <!-- <span [ngClass]="{'text-danger':!itemDetailsForm.value.itemTypeGuid}">*</span> -->
+                                            </label>
+                                        <ng-select [items]="lstGetItemType" [closeOnSelect]="true" [searchable]="true"
+                                            bindValue="SubCategoryGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="ItemType"
+                                            placeholder="Select item type" formControlName="itemTypeGuid">
+                                        </ng-select>
+                                        <!-- <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('itemTypeGuid')?.hasError('required') && itemDetailsForm.get('itemTypeGuid')?.touched">
+                                            Item type is required!
+                                        </span> -->
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Item name <span
+                                                [ngClass]="{'text-danger': !itemName}">*</span></label>
+                                        <!-- <input type="text" formControlName="itemName" id="txtItemName" class="form-control"
+                                            on-focusout="focusOutFunction()"
+                                            [ngClass]="(itemDetailsForm.get('itemName')?.hasError('required')) && itemDetailsForm.get('itemName')?.touched ? 'is-invalid' : ''"
+                                            placeholder="Enter item name" maxlength="50" (input)="allItems($event)"> -->
+                                        <input type="text" id="itemName" class="form-control autocompleteInput"
+                                            placeholder="Enter item name" autocomplete="on" formControlName="itemName" on-focusout="focusOutFunction()"
+                                            (keyup)="changeItem($event)"
+                                            [ngClass]="(itemDetailsForm.get('itemName')?.hasError('required')) && itemDetailsForm.get('itemName')?.touched || duplicateItem==true? 'is-invalid' : ''">
+                                        <div class="card card-body card-block autocompleteBox p-0 mheight190">
+                                            <div class="border-bottom p-2" *ngFor="let item of allItemsData"
+                                                (click)="allItems(item)">{{item.ItemName}}  -  (CatalogNo - {{item.CatalogNo}})</div>
+                                        </div>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('itemName')?.hasError('required') && itemDetailsForm.get('itemName')?.touched && !duplicateItem==true">
+                                            Item name is required!
+                                        </span>
+                                        <span class="text-danger mt-4px d-block" *ngIf="duplicateItem==true">
+                                            Item already exists!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="itemCode" class="form-label">Item code <span
+                                                [ngClass]="{'text-danger': !itemCode}">*</span></label>
+                                        <input type="text" formControlName="itemCode" id="txtItemCode" class="form-control"
+                                            [ngClass]="(itemDetailsForm.get('itemCode')?.hasError('required')) && itemDetailsForm.get('itemCode')?.touched ? 'is-invalid' : ''"
+                                            placeholder="Enter item code" maxlength="50" readonly>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('itemCode')?.hasError('required') && itemDetailsForm.get('itemCode')?.touched">
+                                            Item code is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="itemHSNCode" class="form-label">Item HSN code 
+                                            <!-- <span [ngClass]="{'text-danger': !hsnCode}">*</span> -->
+                                        </label>
+                                        <input type="text" formControlName="hsnCode" id="txtItemHSNCode" class="form-control"
+                                            (input)="HsnCodeInput($event)"
+                                            min="0" placeholder="Enter item HSN code">
+                                        <!-- <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('hsnCode')?.hasError('required') && itemDetailsForm.get('hsnCode')?.touched">
+                                            Item HSN code is required!
+                                        </span> -->
+                                        <!-- <span class="text-danger mt-4px d-block">
+                                            {{this.errorMessage}}
+                                        </span> -->
+                                    </div>
+                                </div>
+                                <!-- <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label for="itemGSTTax" class="form-label">GST tax % <span
+                                                [ngClass]="{'text-danger': !gstnTax}">*</span></label>
+                                        <input type="number" name="gst" min="0" max="100" class="form-control"
+                                            [ngClass]="(itemDetailsForm.get('gstnTax')?.hasError('required')) && itemDetailsForm.get('gstnTax')?.touched ? 'is-invalid' : ''"
+                                            (input)="validateInput()" formControlName="gstnTax" placeholder="Enter GST">
+                                        <span class="help-block form-error-message"
+                                            *ngIf="itemDetailsForm.get('gstnTax')?.errors &&
+                                             (itemDetailsForm.get('gstnTax')?.touched || itemDetailsForm.get('gstnTax')?.dirty)">
+                                            <span class="text-danger mt-4px d-block"
+                                                *ngIf="itemDetailsForm.get('gstnTax')?.hasError('max')">
+                                                GST tax % is required, value should be less than 100!
+                                            </span>
+                                            <span class="text-danger mt-4px d-block"
+                                                *ngIf="itemDetailsForm.get('gstnTax')?.hasError('required') && itemDetailsForm.get('gstnTax')?.touched ? 'is-invalid' : ''">
+                                                GST tax % is required!
+                                            </span></span>
+                                    </div>
+                                </div> -->
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <label for="temperatureStocks" class="form-label">Temperature<span
+                                            [ngClass]="{'text-danger': !temperatureStock}">
+                                            *</span></label>
+                                        <input type="text" formControlName="temperatureStock" class="form-control" placeholder="Enter temparature"
+                                        [ngClass]="(itemDetailsForm.get('temperatureStock')?.hasError('required')) && itemDetailsForm.get('temperatureStock')?.touched ? 'is-invalid' : ''">
+                                    <span class="text-danger mt-4px d-block"
+                                        *ngIf="itemDetailsForm.get('temperatureStock')?.hasError('required') && itemDetailsForm.get('temperatureStock')?.touched">
+                                        Temperature is required!
+                                    </span>
+                                </div>
+                                <div class="form-group col-12 col-sm-2 col-md-2">
+                                    <div class="mb-3">
+                                        <label for="itemTemperature" class="form-label">Low stock count 
+                                            <!-- <span [ngClass]="{'text-danger':!itemDetailsForm.value.LowStockCount}">*</span> -->
+                                            </label>
+                                        <input type="number" class="form-control" placeholder="Enter low stock count" name="dp"
+                                            formControlName="LowStockCount" (keypress)="restrictCharectors($event)" [min]="0">
+                                        <!-- <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('LowStockCount')?.hasError('required') && itemDetailsForm.get('LowStockCount')?.touched">
+                                            Low stock count is required!
+                                        </span> -->
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('LowStockCount')?.hasError('min') && itemDetailsForm.get('LowStockCount')?.touched">Low
+                                            stock count cannot be negative!</span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-4 col-xl-3 align-items-end d-flex">
+                                    <div class="mb-3 flex-shrink-0">
+                                        <div class="form-check mb-2 flex-shrink-0">
+                                            <input type="checkbox" class="form-check-input" id="txtIsB2BType"
+                                                (change)="IsB2BType()" formControlName="IsB2BType">
+                                            <label class="form-check-label" for="IsB2BType">
+                                                B2B Type
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-12 col-md-12">
+                                    <div class="mb-3">
+                                        <label for="itemDescription" class="form-label">Item description
+                                            <!-- <span
+                                                [ngClass]="{'text-danger':!itemDetailsForm.value.itemDescription}">
+                                                *</span> -->
+                                            </label>
+                                        <textarea class="form-control" id="txtItemDescription" rows="3"
+                                            placeholder="Enter item description" formControlName="itemDescription"
+                                            [ngClass]="(itemDetailsForm.get('itemDescription')?.hasError('required')) && itemDetailsForm.get('itemDescription')?.touched ? 'is-invalid' : ''"
+                                            maxlength="200">
+                                        </textarea>
+                                        <div
+                                            *ngIf="itemDetailsForm.get('itemDescription')?.hasError('required') && itemDetailsForm.get('itemDescription')?.touched">
+                                        </div>
+                                        <span
+                                            *ngIf="itemDetailsForm?.value.itemDescription?.length > 0">{{itemDetailsForm.value.itemDescription.length}}
+                                            /
+                                            200
+                                        </span>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('itemDescription')?.hasError('required') && itemDetailsForm.get('itemDescription')?.touched">
+                                            Item description is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label for="itemSpecialization" class="form-label">Item Specialization</label>
+                                        <input type="text" id="itemSpecialization" class="form-control"
+                                            placeholder="Enter item specializations">
+                                    </div>
+                                </div> -->
+                                <!-- <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label for="itemMakeModel" class="form-label">Make and Model No.</label>
+                                        <input type="text" id="itemMakeModel" class="form-control"
+                                            placeholder="Enter make and model number">
+                                    </div>
+                                </div> -->
+                                <div class="form-group col-12 col-sm-6 col-md-4 col-xl-3">
+                                    <div class="mb-3">
+                                        <!-- <label for="itemExpiryDate" class="form-label d-flex justify-content-between">From date -->
+                                        <div class="d-flex justify-content-between">
+                                            <label for="itemExpiryDate" class="form-label ">From date
+                                                <span
+                                                    [ngClass]="{'text-danger':!itemDetailsForm.value.fromDate}">*</span></label>
+                                            <span><input type="checkbox" class="form-check-input nonExpiry" id="nonExpiryCheck"
+                                                    (change)="nonExpiryItem()" formControlName="IsExpirable">
+                                                <label class="form-check-label ms-1" for="nonExpiryCheck">
+                                                    Non expiry item
+                                                </label></span>
+                                        </div>
+                                        <div class="input-group">
+                                            <input class="form-control" placeholder="dd-mm-yyyy" name="dp" ngbDatepicker
+                                                #d="ngbDatepicker"
+                                                [ngClass]="itemDetailsForm.get('fromDate')?.hasError('required') && itemDetailsForm.get('fromDate')!.touched ? 'is-invalid' : ''"
+                                                formControlName="fromDate" [minDate]="selectedDate" readonly>
+                                            <button class="input-group-text" type="button" (click)="d.toggle()">
+                                                <i class="feather icon-calendar icon-md text-muted"></i>
+                                            </button>
+                                        </div>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('fromDate')?.hasError('required') && itemDetailsForm.get('fromDate')?.touched">
+                                            From date is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-6 col-md-4 col-xl-3">
+                                    <div class="mb-3">
+                                        <label for="itemBarCodeOption" class="form-label">Barcode option <span
+                                                [ngClass]="{'text-danger':!itemDetailsForm.value.barcodeOption}">
+                                                *</span></label>
+                                        <select class="form-select" id="ddlItemBarCodeOption"
+                                            [ngClass]="(itemDetailsForm.get('barcodeOption')?.hasError('required')) && itemDetailsForm.get('barcodeOption')?.touched ? 'is-invalid' : ''"
+                                            formControlName="barcodeOption">
+                                            <option value=null selected disabled>Select option</option>
+                                            <option value="1">Stock wise</option>
+                                            <option value="2">Item wise</option>
+                                        </select>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('barcodeOption')?.hasError('required') && itemDetailsForm.get('barcodeOption')?.touched">
+                                            Barcode option is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-6 col-md-4 col-xl-3">
+                                    <div class="mb-3 flex-shrink-0">
+                                        <label for="itemBarCodeGenOption" class="form-label">Barcode generation option <span
+                                                [ngClass]="{'text-danger':!itemDetailsForm.value.barcodeGenerationOption}">
+                                                *</span></label>
+                                        <select class="form-select" id="txtItemBarCodeGenOption"
+                                            [ngClass]="(itemDetailsForm.get('barcodeGenerationOption')?.hasError('required')) && itemDetailsForm.get('barcodeGenerationOption')?.touched ? 'is-invalid' : ''"
+                                            formControlName="barcodeGenerationOption">
+                                            <option value=null selected disabled>Select option</option>
+                                            <option value="1">System generated</option>
+                                            <option value="2">Self</option>
+                                        </select>
+                                        <span class="text-danger mt-4px d-block"
+                                            *ngIf="itemDetailsForm.get('barcodeGenerationOption')?.hasError('required') && itemDetailsForm.get('barcodeGenerationOption')?.touched">
+                                            Barcode generation option is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-4 col-xl-3 align-items-end d-flex">
+                                    <div class="mb-3 flex-shrink-0">
+                                        <div class="form-check mb-2 flex-shrink-0">
+                                            <input type="checkbox" class="form-check-input" id="txtItemFIFOorder"
+                                                (change)="onFifo()" formControlName="IssueInFIFO">
+                                            <label class="form-check-label" for="itemFIFOorder">
+                                                Issue in FEFO order
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <hr>
+                                </div>
+                            </div>
+                            <h6 class="card-title">Manufacturer Details</h6>
+                            <div class="row">
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <label for="manufacturerName" class="form-label">Manufacturer<span
+                                            [ngClass]="{'text-danger': !itemDetailsForm.value.manufacturerGuid}">
+                                            *</span></label>
+                                    <ng-select [items]="lstManufacturers" [closeOnSelect]="true" [searchable]="true" 
+                                        bindValue="ManufactureGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="ManufactureName" [notFoundText]="'No manufacturer found'"
+                                        [ngClass]="(itemDetailsForm.get('manufacturerGuid')?.hasError('required')) && itemDetailsForm.get('manufacturerGuid')?.touched ? 'is-invalid' : ''"
+                                        placeholder="Select manufacturer" formControlName="manufacturerGuid">
+                                    </ng-select>
+                                    <span class="text-danger form-error-message"
+                                        *ngIf="itemDetailsForm.get('manufacturerGuid')?.hasError('required') && itemDetailsForm.get('manufacturerGuid')?.touched">
+                                        Manufacturer is required!
+                                    </span>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <label for="machineName" class="form-label">Machine<span
+                                            [ngClass]="{'text-danger':!itemDetailsForm.value.machineGuid}"> *</span></label>
+                                            <span class="small text-primary cursor-pointer float" id="addNewManufacturer"
+                                        (click)="openBasicModal(Machine);Machinename=[];DuplicateMachine=[]"> Add
+                                        New</span>
+                                    <ng-select [items]="lstMachines" [closeOnSelect]="true" [searchable]="true" [notFoundText]="'No machine found'"
+                                        bindValue="MachineGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="MachineName"
+                                        [ngClass]="(itemDetailsForm.get('machineGuid')?.hasError('required')) && itemDetailsForm.get('machineGuid')?.touched  ? 'is-invalid' : ''"
+                                        placeholder="Select machine" formControlName="machineGuid">
+                                    </ng-select>
+                                    <span class="text-danger form-error-message"
+                                        *ngIf="itemDetailsForm.get('machineGuid')?.hasError('required') && itemDetailsForm.get('machineGuid')?.touched">
+                                        Machine is required!
+                                    </span>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                                    <div class="mb-3">
+                                        <label for="manufacturerCatalogNo" class="form-label">Catalog number <span
+                                                [ngClass]="{'text-danger': !catalogNumber}">*</span></label>
+                                        <input type="text" formControlName="catalogNumber" id="txtManufacturerCatalogNo" (keyup)="CatlogduplicateCheck($event)"
+                                            [ngClass]="(itemDetailsForm.get('catalogNumber')?.hasError('required')) && itemDetailsForm.get('catalogNumber')?.touched ? 'is-invalid' : ''"
+                                            class="form-control" placeholder="Enter catalog number">
+                                        <span class="text-danger form-error-message"
+                                            *ngIf="itemDetailsForm.get('catalogNumber')?.hasError('required') && itemDetailsForm.get('catalogNumber')?.touched">
+                                            Catalog number is required!
+                                        </span>
+                                       <span class="text-danger form-error-message"
+                                            *ngIf="checkcatloNo && catalogNumber!='' && FormChanged">
+                                            Catalog number already exist!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <label for="purchasedUnit" class="form-label">Purchased unit <span
+                                            [ngClass]="{'text-danger':!itemDetailsForm.value.purchasedUnitGuid}">
+                                            *</span></label>
+                                            <span class="small text-primary cursor-pointer float" id="addNewManufacturer"
+                                        (click)="openBasicModal(CustPurchase);CustomPurchase=[];DuplicateCusPurchase=[]"> Add
+                                        New</span>
+                                    <ng-select [items]="lstUnits" [closeOnSelect]="true" [searchable]="true"
+                                        bindValue="UnitGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="UnitName"
+                                        [ngClass]="(itemDetailsForm.get('purchasedUnitGuid')?.hasError('required')) && itemDetailsForm.get('purchasedUnitGuid')?.touched ? 'is-invalid' : ''"
+                                        placeholder="Select unit" formControlName="purchasedUnitGuid">
+                                    </ng-select>
+                                    <span class="text-danger mt-4px d-block"
+                                        *ngIf="itemDetailsForm.get('purchasedUnitGuid')?.hasError('required') && itemDetailsForm.get('purchasedUnitGuid')?.touched">
+                                        Purchased unit is required!
+                                    </span>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                                    <div class="mb-3">
+                                        <label for="manufacturerConverter" class="form-label">Converter <span
+                                                [ngClass]="{'text-danger': !converter}">*</span></label>
+                                        <input type="text" formControlName="converter" (keypress)="restrictCharectors($event)"
+                                            id="ddlManufacturerConverter" maxlength="6"
+                                            [ngClass]="(itemDetailsForm.get('converter')?.hasError('required')) && itemDetailsForm.get('converter')?.touched ? 'is-invalid' : ''"
+                                            class="form-control" placeholder="Enter converter">
+                                        <span class="text-danger form-error-message"
+                                            *ngIf="itemDetailsForm.get('converter')?.hasError('required') && itemDetailsForm.get('converter')?.touched">
+                                            Converter is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                                    <div class="mb-3">
+                                        <label for="manufacturerPackSize" class="form-label">Pack size
+                                            <span [ngClass]="{'text-danger': !packSize}">*</span></label>
+                                        <input type="text" formControlName="packSize" (keypress)="restrictCharectors($event)"
+                                            id="txtManufacturerPackSize" maxlength="6" 
+                                            [ngClass]="(itemDetailsForm.get('packSize')?.hasError('required')) && itemDetailsForm.get('packSize')?.touched ? 'is-invalid' : ''"
+                                            class="form-control" placeholder="Enter pack size">
+                                        <span class="text-danger form-error-message, position-absolute" 
+                                            *ngIf="itemDetailsForm.get('packSize')?.hasError('required') && itemDetailsForm.get('packSize')?.touched">
+                                            Pack size is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-4 col-md-4">
+                                    <label for="manufacturerConsumptionUnit" class="form-label">Consumption unit <span
+                                            [ngClass]="{'text-danger':!itemDetailsForm.value.consumptionUnitGuid}">
+                                            *</span></label>
+                                    <ng-select [items]="lstUnits" [closeOnSelect]="true" [searchable]="true"
+                                        bindValue="UnitGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="UnitName"
+                                        [ngClass]="(itemDetailsForm.get('consumptionUnitGuid')?.hasError('required')) && itemDetailsForm.get('consumptionUnitGuid')?.touched ? 'is-invalid' : ''"
+                                        placeholder="Select unit" formControlName="consumptionUnitGuid">
+                                    </ng-select>
+                                    <span class="text-danger mt-4px d-block"
+                                        *ngIf="itemDetailsForm.get('consumptionUnitGuid')?.hasError('required') && itemDetailsForm.get('consumptionUnitGuid')?.touched">
+                                        Consumption unit is required!
+                                    </span>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                                    <div class="mb-3">
+                                        <label for="manufacturerIssueMulti" class="form-label">Issue multiplier
+                                            <span [ngClass]="{'text-danger': !issueMultiplier}">*</span></label>
+                                        <input type="text" formControlName="issueMultiplier"
+                                            (keypress)="restrictCharectors($event)" id="txtManufacturerIssueMulti" maxlength="6"
+                                            [ngClass]="(itemDetailsForm.get('issueMultiplier')?.hasError('required')) && itemDetailsForm.get('issueMultiplier')?.touched ? 'is-invalid' : ''"
+                                            class="form-control" placeholder="Enter Issue multiplier">
+                                        <span class="text-danger form-error-message"
+                                            *ngIf="itemDetailsForm.get('issueMultiplier')?.hasError('required') && itemDetailsForm.get('issueMultiplier')?.touched">
+                                            Issue multiplier is required!
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                                    <div class="mb-3">
+                                        <label for="manufacturerIssueMulti" class="form-label">No.of tests</label>
+                                        <input type="text" formControlName="noOfTests"
+                                            (keypress)="restrictCharectors($event)" id="txtnooftests" 
+                                            class="form-control" placeholder="Enter no.of tests">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </ng-container>
+                    <!--Shimmer UI -->
+                    <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                    <!--Shimmer UI -->
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-sm-12 text-end">
+                            <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                                (click)="resetForm()">Reset</button>
+                            <button type="button" class="btn btn-primary submit" 
+                                [disabled]="!FormChanged || itemDetailsForm.invalid || duplicateItem || checkcatloNo"
+                                (click)="onclicksave()">{{ItemGuid?'Update':'Save'}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+
+<!-- Manufacturer -->
+<ng-template #manufacturer let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add manufacturer</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');clearValidations();"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div [formGroup]="ManufactureForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Manufacturer</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter manufacturer name"
+                            formControlName="Manufacturer" (input)="checkManufacturer($event)">
+                        <span class="text-danger mt-4px d-block" *ngIf="duplicateMfg == true">
+                            Manufacturer already exists!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2"
+            (click)="modal.close('by: close icon');clearValidations();">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="duplicateMfg"
+            (click)="manufacturesave();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>
+<!-- Modal -->
+
+<!-- Manufacturer -->
+<ng-template #purchasedUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add purchased unit</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div [formGroup]="PurchaseForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Purchased unit</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter purchased unit"
+                            formControlName="PurchasedUnit">
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]=PurchaseForm.invalid
+            (click)="purchasesave();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>
+<!-- Modal -->
+
+<!-- Manufacturer -->
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add consumption unit</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Consumption unit</label>
+                    <input type="text" id="itemName" class="form-control" placeholder="Enter consumption unit">
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]=itemDetailsForm.invalid
+            (click)="consumptionsave()">Save</button>
+    </div>
+</ng-template>
+
+<!-- Modal -->
+<ng-template #Machine let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add machine </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div >
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="Machine" class="form-label ">Machine </label>
+                            <span [ngClass]="{'text-danger': Machinename=='' || Machinename==undefined }"> *</span>
+                        <input type="text" id="Machine" class="form-control" placeholder="Enter machine name" maxlength="50" [(ngModel)]="Machinename" #name="ngModel"
+                        [ngClass]="(Machinename=='' || Machinename==undefined || DuplicateMachine.length>0)  && name?.touched? 'is-invalid' : ''" (input)="CheckMachineDuplicate($event)">
+                        <ng-container
+                            *ngIf="(Machinename=='' || Machinename==undefined)  && name?.touched?  'is-invalid' : ''">
+                            <span class="text-danger mt-4px d-block">Machine is required!</span>
+                        </ng-container>
+                        <span class="text-danger form-error-message"
+                            *ngIf="DuplicateMachine.length>0 && (Machinename!='' || Machinename!=undefined) &&Machinename.length>0">
+                            Machine already exists!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="(Machinename=='' || Machinename==undefined) || DuplicateMachine.length>0" (click)="SaveMachine();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>
+
+<!-- Designation -->
+<ng-template #designation let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add department </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"
+            ></button>
+    </div>
+    <div class="modal-body">
+        <div>
+            <div class="row">
+                <form [formGroup]="SaveSubcategeorytypeForm">
+                <div class="form-group col-12 col-sm-12 col-md-12">
+                    <!-- <div class="mb-3">                        
+                        <label for="categoryType" class="form-label">Category type
+                            <span [ngClass]="{'text-danger':!SaveSubcategeorytypeForm.value.CategoryTypeGuid}">*</span>
+                        </label>
+                        <ng-select [items]="lstCategoryType" [closeOnSelect]="true" [searchable]="true"
+                            bindValue="CategoryGuid" [inputAttrs]="{maxlength: '48'}"
+                            bindLabel="CategoryTypeName"
+                            [ngClass]="(SaveSubcategeorytypeForm.get('CategoryTypeGuid')?.hasError('required')) && SaveSubcategeorytypeForm.get('CategoryTypeGuid')?.touched ? 'is-invalid' : ''"
+                            placeholder="Select category type" formControlName="CategoryTypeGuid">
+                        </ng-select>
+                        <span class="text-danger mt-4px d-block"
+                            *ngIf="SaveSubcategeorytypeForm.get('CategoryTypeGuid')?.hasError('required') && SaveSubcategeorytypeForm.get('CategoryTypeGuid')?.touched">
+                            Category type is required!
+                        </span>    
+                    </div>   -->
+                </div>
+                <div class="form-group col-12 col-sm-12 col-md-12">
+                    <div class="mb-3">                                
+                        <label for="SubCategoryTypeName" class="form-label">Department name 
+                            <span [ngClass]="{'text-danger': SubCategoryTypeName==''||SubCategoryTypeName==undefined}">*</span>
+                        </label>
+                        <input type="text" (keyup)="DepartmentCheck($event)" formControlName="SubCategoryTypeName" class="form-control" placeholder="Enter department name"
+                        [ngClass]="(SaveSubcategeorytypeForm.get('SubCategoryTypeName')?.hasError('required')) && SaveSubcategeorytypeForm.get('SubCategoryTypeName')?.touched ? 'is-invalid' : ''"> 
+                        <span class="text-danger mt-4px d-block"
+                        *ngIf="SaveSubcategeorytypeForm.get('SubCategoryTypeName')?.hasError('required') && SaveSubcategeorytypeForm.get('SubCategoryTypeName')?.touched">
+                        Department name is required!
+                    </span> 
+                    <ng-container *ngIf="checDepartment">
+                        <span class="text-danger form-error-message">
+                            Department already exists!
+                        </span>
+                    </ng-container>                         
+                    </div>  
+                </div>
+                <div class="form-group col-12 col-sm-12 col-md-12">
+                    <div class="mb-3">
+                        <label for="Code" class="form-label">Department code 
+                        </label>
+                        <input type="text" formControlName="Code" class="form-control" placeholder="Enter department code" >
+                    </div>  
+                </div>
+                <div class="form-group col-12 col-sm-12 col-md-12">
+                    <div class="mb-3">                            
+                        <label for="Description" class="form-label">Description
+                        </label>
+                        <textarea class="form-control" rows="3" placeholder="Enter item description" formControlName="Description" maxlength="200"></textarea>
+                    </div>  
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="(SubCategoryTypeName==''||SubCategoryTypeName==undefined) || checDepartment"
+            (click)="SaveSubcategeorytype();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>
+
+<ng-template #CustPurchase let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add custom purchase item </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div >
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="Purchase unit" class="form-label ">Purchase unit </label>
+                            <span [ngClass]="{'text-danger': CustomPurchase=='' || CustomPurchase==undefined }"> *</span>
+                        <input type="text" id="CustPurchase" class="form-control" placeholder="Enter purchase unit name" maxlength="50" [(ngModel)]="CustomPurchase" #name="ngModel"
+                        [ngClass]="(CustomPurchase=='' || CustomPurchase==undefined)  && name?.touched? 'is-invalid' : ''" (input)="CheckCustomPurchaseDuplicate($event)">
+                        <ng-container
+                            *ngIf="(CustomPurchase=='' || CustomPurchase==undefined)  && name?.touched? 'is-invalid' : ''">
+                            <span class="text-danger mt-4px d-block">Purchase unit is required!</span>
+                        </ng-container>
+                        <span class="text-danger form-error-message"
+                            *ngIf="DuplicateCusPurchase.length>0 && (CustomPurchase!='' || CustomPurchase!=undefined) ">
+                            Purchase unit already exists!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="DuplicateCusPurchase?.length>0 || CustomPurchase==''" (click)="saveCustomPurchase();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>

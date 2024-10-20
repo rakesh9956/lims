@@ -1,0 +1,417 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="items">STOCK RETURN FORM</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-12 stretch-card">
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="example">
+          <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+            <ng-container *ngIf="Store==true || Store=='true'">
+            <li [ngbNavItem]="1">
+              <a ngbNavLink (click)="Keyword='';GetStockRetuns();click()">Store Retun Items</a>
+              <ng-template ngbNavContent>
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                  <div>Store Return Items</div>
+                  <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0">
+                    <!-- Toggle the value of the property when the toggler button is clicked. -->
+                    <button class="ms-auto navbar-toggler filter-button" type="button"
+                      (click)="isMenuCollapsed = !isMenuCollapsed">
+                      <i class="feather icon-filter size-18"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm flex-shrink-0 ms-2" *ngIf="(Roles.toLowerCase().includes('create'.toLowerCase()))"
+                      (click)="click();openModal(StockReturnItem);"><span class="feather icon-plus"></span>Add Return
+                      Item</button>
+                  </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                  <div class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                    <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                      <span *ngIf="IsShow==false" class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0">
+                        {{(RowCount*(pageNumber-1))+1}}-{{TotalCount>RowCount*pageNumber?RowCount*pageNumber:TotalCount}}
+                        of
+                        {{TotalCount}} </span>
+                      <select *ngIf="IsShow==false" name="rowLimit" id="rowLimit" class="form-select form-select-sm mb-1 mb-sm-0"
+                        (change)="ChangeEvent($event)">
+                        <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                      </select>
+                      <input type="text" class="form-control form-select-sm mb-2 mb-sm-0 ms-sm-2 ms-0 mw-200"
+                        placeholder="Search" (keyup)="changeSearch($event)" />
+                    </div>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Return Number</th>
+                        <th>Item Name</th>
+                        <th>Vendor Item Name</th>
+                        <th>Catalog No.</th>
+                        <th>Issue Multiplier</th>
+                        <th>Return Quantity</th>
+                        <th>Request Quantity</th>
+                        <th>Received Quantity</th>
+                        <th>Return By Name</th>
+                        <th>Batch Number</th>
+                        <th>Expiry date</th>
+                        <th>Indent Location</th>
+                        <th>Return Location</th>
+                        <th>Reason</th>
+                        <th *ngIf="(Roles.toLowerCase().includes('approval'.toLowerCase()))">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngIf="!shimmerVisible">
+                        <tr *ngFor="let i of StockReturnItems">
+                          <td>{{i.ReturnNumber?i.ReturnNumber:'N/A'}}</td>
+                          <td>{{i.ItemName}}</td>
+                          <td>{{i.VendorItemName==null?'N/A':i.VendorItemName}}</td>
+                          <td>{{i.CatalogNo}}</td>
+                          <td>{{i.IssueMultiplier}}</td>
+                          <td>{{i.ReturnQuantity}}</td>
+                          <td>{{i.RequestQuantity}}</td>
+                          <td>{{i.RecievedQuantity}}</td>
+                          <td>{{i.UserByName}}</td>
+                          <td>{{i.BatchNumber}}</td>
+                          <td>{{i.ExpiryDate=='0001-01-01T00:00:00'?'N/A':i.ExpiryDate|date: 'dd-MM-yyyy'}}</td>
+                          <td>{{i.IndentLocation}}</td>
+                          <td>{{i.Location}}</td>
+                          <td>{{i.Reason}}</td>
+                          <td *ngIf="(Roles.toLowerCase().includes('approval'.toLowerCase()))">
+                              <button class="btn btn-outline-primary btn-xs me-1" (click)="click();rejectModal(reject);event(i);">
+                                  <span class="feather icon-thumbs-up"></span> Accept / <span class="feather icon-trash-2"></span> Reject
+                              </button>
+                              <!-- <button class="btn btn-danger btn-xs me-1" (click)="click();rejectModal(reject);event(i,'Reject');"> 
+                                  <span class="feather icon-trash-2"></span> 
+                              </button> -->
+                          </td>
+                        </tr>
+                      </ng-container>
+                      <!--Shimmer UI -->
+                      <ng-container *ngIf="shimmerVisible">
+                        <tr *ngFor="let dummyLoop of [].constructor(3)">
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                        </tr>
+                      </ng-container>
+                      <!--Shimmer UI -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="card-footer" *ngIf="!IsShow">
+                  <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="RowCount"
+                      [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize" [rotate]="false"
+                      [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+            </ng-container>
+            <li [ngbNavItem]="tabId">
+              <a ngbNavLink (click)="keyword='';GetDepartStockReturnItems();" >Department Return Items</a>
+              <ng-template ngbNavContent>
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                  <div>Department Return Items</div>
+                  <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0">
+                    <!-- Toggle the value of the property when the toggler button is clicked. -->
+                    <button class="ms-auto navbar-toggler filter-button" type="button"
+                      (click)="isMenuCollapsed = !isMenuCollapsed">
+                      <i class="feather icon-filter size-18"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm flex-shrink-0 ms-2"  *ngIf="(Roles.toLowerCase().includes('create'.toLowerCase()))"
+                      (click)="click();openModal(StockReturnItem);"><span class="feather icon-plus"></span>Add Return
+                      Item</button>
+                  </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                  <div class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                    <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                      <span *ngIf="IsShow==false" class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0">
+                        {{(RowCount*(pageNumber-1))+1}}-{{totalCount>RowCount*pageNumber?RowCount*pageNumber:totalCount}}
+                        of
+                        {{totalCount}} </span>
+                      <select *ngIf="IsShow==false" name="rowLimit" id="rowLimit" class="form-select form-select-sm mb-1 mb-sm-0"
+                        (change)="ChangeRowcount($event)">
+                        <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                      </select>
+                      <input type="text" class="form-control form-select-sm mb-2 mb-sm-0 ms-sm-2 ms-0 mw-200"
+                        placeholder="Search" (keyup)="changeitemSearch($event)" />
+                    </div>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Return Number</th>
+                        <th>Item Name</th>
+                        <th>Vendor Item Name</th>
+                        <th>Catalog No.</th>
+                        <th>Request Quantity</th>
+                        <th>Return Quantity</th>
+                        <th>Reject Quantity</th>
+                        <th>Batch Number</th>
+                        <th>Expiry date</th>
+                        <th>Request Location</th>
+                        <th>Reject Reason</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngIf="!shimmerVisible">
+                        <tr *ngFor="let i of StorestockReturnItems">
+                          <td>{{i.ReturnNumber?i.ReturnNumber:'N/A'}}</td>
+                          <td>{{i.ItemName}}</td>
+                          <td>{{i.VendorItemName==null?'N/A':i.VendorItemName}}</td>
+                          <td>{{i.CatalogNo}}</td>
+                          <td>{{i.RequestQuantity}}</td>
+                          <td>{{i.ReturnQuantity}}</td>
+                          <td>{{i.RejectQuantity}}</td>
+                          <td>{{i.BatchNumber}}</td>
+                          <td>{{i.ExpiryDate=='0001-01-01T00:00:00'?'N/A':i.ExpiryDate|date: 'dd-MM-yyyy'}}</td>
+                          <td>{{i.Location}}</td>
+                          <td>{{i.RejectReason==null?'N/A':i.RejectReason}}</td>
+                          <td>
+                            <span [ngClass]=" i.IsReturn === false ? 'badge bg-danger' :'badge bg-success' ">
+                              {{ i.IsReturn === false ? 'Pending' : 'Aproved' }}
+                            </span>
+                          </td>
+                        </tr>
+                      </ng-container>
+                      <!--Shimmer UI -->
+                      <ng-container *ngIf="shimmerVisible">
+                        <tr *ngFor="let dummyLoop of [].constructor(3)">
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                          <td>
+                            <div class="shimmerBG line"></div>
+                          </td>
+                        </tr>
+                      </ng-container>
+                      <!--Shimmer UI -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="card-footer" *ngIf="!IsShow">
+                  <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="RowCount"
+                      [(page)]="pageNumber" [maxSize]="maxSize" [rotate]="false"
+                      [boundaryLinks]="boundaryLinks" (pageChange)="ChangePage($event)" [size]="size"></ngb-pagination>
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+        </div>  
+      </div>
+      <!-- No records found UI -->
+      <ng-container *ngIf="IsShow">
+        <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+          <div class="py-5 text-muted">
+            <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+              <i class="feather icon-alert-circle fs-2"></i>
+              <span>No Stock Return Items Found!</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #StockReturnItem let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Stock Return Item</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon');StockreturnForm.reset();Reasonshow=false;"
+      aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="StockreturnForm">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+          <div class="mb-3">
+            <label for="location" class="form-label">Locations<span
+                [ngClass]="{'text-danger': StockreturnForm.value.LocationGuid=='' || StockreturnForm.value.LocationGuid==null}"> *</span></label>
+            <ng-select placeholder="Search by Location name" [(ngModel)]="Location" notFoundText="No locations found"
+              bindLabel="LocationName" [items]="CenterLocation" (change)="SelectLocation($event)"
+              bindValue="LocationGuid" formControlName="LocationGuid">
+            </ng-select>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+          <div class="mb-3">
+            <label for="itemName" class="form-label">Items<span
+                [ngClass]="{'text-danger': StockreturnForm.value.ItemGuid=='' || StockreturnForm.value.ItemGuid==null}"> *</span></label>
+            <ng-select placeholder="Search by item name" bindLabel="ItemfullName" [(ngModel)]="Item" bindValue="ItemGuid"
+              [items]="filterItems" (change)="SelectItem($event)" formControlName="ItemGuid">
+              <ng-template ng-option-tmp let-item="item">
+                <span title="{{ item.ItemfullName }}">{{ item.ItemfullName }}</span>
+            </ng-template>
+            </ng-select>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+          <div class="mb-3">
+            <label for="StockReturnQty" class="form-label">Stock Return Qty<span
+                [ngClass]="{'text-danger': !StockreturnForm.value.StockReturnQty}"> *</span></label>
+            <input type="text" [min]="0" [max]="RecivedQuantity" id="StockReturnQty" formControlName="StockReturnQty"
+            (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"
+               (keyup)="ChangeStockReturnQty($event)" class="form-control"
+              placeholder="Stock Return Qty" >
+          </div>
+        </div>
+
+        <!-- <div class="mb-3">
+                        <label for="Reason" class="form-label">Reason<span
+                            [ngClass]="{'text-danger': !StockreturnForm.value.Reason}"> *</span></label>
+                        <input type="text" id="Reason" class="form-control" [readOnly]="!StockreturnForm.value.ItemGuid" placeholder="Enter Reason"
+                        formControlName="Reason"   >
+                    </div>
+                    
+                  </div>
+                </div> -->
+        <div class="col-12 col-sm-6 col-md-6 col-xl-12">
+          <div class="mb-3 position-relative">
+            <label for="location" class="form-label">Reason
+                <span [ngClass]="{'text-danger': StockreturnForm.value.Reason=='' || StockreturnForm.value.Reason==null}"> *</span>
+                <span class="small text-primary cursor-pointer float addNew" (click)="Action()"> Add New</span>
+            </label>
+            <ng-select placeholder="Search by Reason" [(ngModel)]="selectedReason" [items]="lstReason"
+              formControlName="Reason" bindLabel="Reason" bindValue="Reason">
+            </ng-select>
+            <!-- <input type="text" class="form-control" [(ngModel)]="selectedReason" placeholder="Custom Reason" formControlName="Reason" (keyup)="dublicatechecking($event)">
+                      <span class="text-danger">{{ errormessage }}</span>
+                      <button class="btn btn-primary" (click)="SaveStockReturnItemReason()">ADD</button> -->
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-11" *ngIf="Reasonshow">
+          <input type="text" id="reason" (keyup)="reasonevent($event)" class="form-control" placeholder="Enter reason" >
+        </div>
+        <div class="align-self-center col-12 col-md-6 col-sm-6 col-xl-1 d-flex" *ngIf="Reasonshow">
+          <span class="small text-primary cursor-pointer float" [disabale]="IsButtonShow" (click)="SaveStockReturnItemReason()">Save</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');Reasonshow=false">Close</button>
+    <button type="button" class="btn btn-primary submit" [disabled]="StockreturnForm.invalid ||StockreturnForm.value.StockReturnQty==0"
+      (click)="modal.close('by: close icon');SaveReturnItems();Reasonshow=false;">Save</button>
+  </div>
+</ng-template>
+
+
+<ng-template #reject let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Accept/Reject</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon');StockreturnForm.reset();"
+      aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="StockreturnForm">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-xl-6">
+          <div class="mb-3">
+            <label class="form-label">Accept Quantity</label>
+            <input type="text" class="form-control" (keyup)="ChangeQuantity($event)" formControlName="StockAcceptQty"
+            (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46" />
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-xl-6">
+          <div class="mb-3">
+            <label class="form-label">Reject Quantity</label>
+            <input type="text" class="form-control" readonly (ngModelChange)="ChangeQuantity($event)" formControlName="StockReturnQty" 
+            />
+          </div>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-xl-12">
+          <div class="mb-3">
+            <label class="form-label">
+              Reason 
+              <span  [ngClass]="{'text-danger': IsButtonShow}"> *</span>
+            </label>
+            <textarea class="form-control" (keyup)="changeReason($event)" formControlName="Reason"></textarea>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');">Close</button>
+    <button type="button" class="btn btn-primary submit"  
+      (click)="modal.close('by: close icon'); UpdateStockReturn();" [disabled]="IsButtonShow">Save</button>
+  </div>
+</ng-template>

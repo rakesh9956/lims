@@ -1,0 +1,323 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">GRN Report</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+
+            <div class="card-body">
+                <!-- <h6 class="card-title">Location Details</h6> -->
+                <form *ngIf="!shimmerVisible">
+                    <div class="row">
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Center Type</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select center type </option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                                 <ng-select [items]="CenterTypeList" bindValue="CenterTypeGuid" bindLabel="CenterType"
+                                placeholder="Select center type" (change)="ChangeLocation($event)" [searchable]="true"
+                                formControlName="CenterType">
+                                </ng-select>
+                           </div>
+                        </div>  -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Zone</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select zone </option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">State</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select state</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">City</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select city</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Center</label>
+                                <!-- <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select Center</option>
+                                    <option *ngFor="let center of LocationList " value={{center.CenterGuid}}>{{center.CenterName}}</option>                                                   
+                                </select> -->
+                                <ng-select [items]="CenterList" bindLabel="CenterName" bindValue="CenterGuid"
+                                    [closeOnSelect]="true" placeholder="Search by Center"
+                                    (change)="ChangeLocation($event)" [searchable]="true"
+                                    [formControl]="CenterclearControl" [notFoundText]="'No center found!'">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Location</label>
+                                <ng-select [items]="LocationList" bindLabel="CenterLocationName"
+                                    bindValue="CenterLocationGuid" [closeOnSelect]="true"
+                                    placeholder="search by grn location" (change)="ChangeLocation($event)"
+                                    [searchable]="true" [formControl]="clearControl"
+                                    [notFoundText]="'No location found!'">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Filter On</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select date</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Status</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select staus</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+
+
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">From Date
+                                    <span [ngClass]="{'text-danger': FromDate==''}"> *</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                        [formControl]="clearFromdateControl" readonly
+                                        (dateSelect)="selectFromDate($event)" ngbDatepicker #d="ngbDatepicker"
+                                        [maxDate]="calendar.getToday()">
+                                    <button class="input-group-text" type="button" (click)=" d.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">To Date
+                                    <span [ngClass]="{'text-danger': ToDate == '' }"> *</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                        [maxDate]="calendar.getToday()" [formControl]="clearTodateControl"
+                                        [minDate]="selectfromDate" (dateSelect)="selectToDate($event)" ngbDatepicker
+                                        #d2="ngbDatepicker" readonly>
+                                    <button class="input-group-text" type="button" (click)="FromDate?d2.toggle():''">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2 text-end">
+                                <button class="btn btn-link btn-sm text-underline p-0" (click)="removeDates()"
+                                    *ngIf="FromDate">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Report Type In Excel</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select Report type</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+
+
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">GRN Type</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select GRN type</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div>                                            -->
+                    </div>
+                    <div class="row" *ngIf="!shimmerVisible">
+                        <div class="col-sm-12 text-end flex-wrap">
+                            <button type="button" class="btn btn-primary submit mt-2 mt-sm-0"
+                                (click)="getGrnReports()" [disabled]="isDisable || noDataFound">Get Report Data</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                </form>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <!-- No records found! -->
+                <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+
+                <!-- No records found! -->
+
+                <ng-container *ngIf="GrnList?.length != 0">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h6 class="card-title">{{ 'GRN Report' | uppercase }} </h6>
+                        <div class="row" *ngIf="GrnList?.length != 0">
+                            <div class="col-sm-12 text-end">
+                                <button type="button" class="btn btn-outline-primary btn-sm submit me-2 mt-2 mt-sm-0"
+                                    (click)="getGrnReports('pdf')" [disabled]="isDisable || noDataFound">Get Report
+                                    PDF</button>
+                                <button type="button" class="btn btn-primary btn-sm submit mt-2 mt-sm-0"
+                                    (click)="getGrnReports('excel')" [disabled]="isDisable || noDataFound">Get Report
+                                    Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border bg-light">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <double-scroll>
+                                    <div >
+                                        <div class="table-responsive table bg-white">
+                                            <ngx-datatable [scrollbarH]="true" #table class="bootstrap sticky-header" [rows]="GrnList"
+                                                [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                                rowHeight="auto">
+                                                <ngx-datatable-column [width]="50" name="s.No"
+                                                    >
+                                                    <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                            <span>{{ rowIndex + 1 }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="GRN"
+                                                    prop="GRN"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Item Code"
+                                                    prop="ItemCode"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Item Name"
+                                                    prop="ItemName"></ngx-datatable-column>
+                                                    <ngx-datatable-column [width]="80" name="Vendor Item Name"
+                                                    prop="VendorItemName">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" let-value="value" >
+                                                        <span>{{ row?.VendorItemName ? row?.VendorItemName : "N/A" }}</span>
+                                                    </ng-template>
+                                                    </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="ItemQty"
+                                                    prop="ItemQty"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Item Price"
+                                                    prop="ItemPrice"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Name"
+                                                    prop="SupplierName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="Invoice"
+                                                    prop="Invoice"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="PurchaseOrder"
+                                                    prop="PurchaseOrder"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Po Amount"
+                                                    prop="PoAmount"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Pending Item (Amt)"
+                                                    prop="PendingPoAmount"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="GRN"
+                                                    prop="GRNBy">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" >
+                                                             <span>{{ row?.GRNDate == '01-01-0001' || row?.GRNDate == null ? "N/A" : row?.GRNDate }} </span>
+                                                            <br>
+                                                            <span>{{ row.GRNBy || "N/A" }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Checked"
+                                                    prop="ChekedByName">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.ChekedDate == '01-01-0001' || row?.ChekedDate == null ? "N/A" : row?.ChekedDate }} </span>
+                                                            <br>
+                                                            <span>{{ row?.ChekedByName || "N/A" }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Approved"
+                                                    prop="AprovedDate">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" >
+                                                            <span>{{ row?.AprovedDate == '01-01-0001' || row?.AprovedDate == null ? "N/A" : row?.AprovedDate }} </span>
+                                                            <br>
+                                                            <span>{{ row.AprovedByName || "N/A" }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                            </ngx-datatable>
+                                        </div>
+                                    </div>
+                                </double-scroll>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+
+            <div class="card-footer">
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+    </div>
+</div>

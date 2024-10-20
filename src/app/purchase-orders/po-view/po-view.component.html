@@ -1,0 +1,182 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/grn">GRN</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Purchase Order View</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-body">
+            <h6 class="card-title">Purchase Order View</h6>
+            <ngb-accordion *ngIf="listPurchaseOrderDetails && listPurchaseOrderDetails.length" [closeOthers]="true" [activeIds]="activeAccordionIds" (panelChange)="purchasenumber($event)">
+                <ngb-panel *ngFor="let item of listPurchaseOrderDetails; let i = index" [id]="'tab-' + (i + 1)" [title]="item.PurchaseOrderNo">
+                  <ng-template ngbPanelContent>               
+                    <form>
+                        <div class="row">
+                            <div class="col-12 col-md-3 mb-3">
+                                <label for="machineName" class="form-label">Supplier Name</label>
+                                <div class="form-control">
+                                    <span>{{item.SupplierName}}</span>
+                                </div>
+                            </div>                      
+
+                            <!-- <div class="col-12 col-md-4 col-lg-3 mb-3">
+                                <label for="machineName" class="form-label">From Date</label>
+                                <div class="input-group">
+                                    <input container="body" class="form-control"
+                                        placeholder="yyyy-mm-dd" [readOnly]="true"
+                                       name="dpFromDate">
+                                    <button class="input-group-text" type="button">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>                                
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3 mb-3">
+                                <label for="machineName" class="form-label">To Date</label>
+                                <div class="input-group">
+                                    <input container="body" class="form-control"
+                                        placeholder="yyyy-mm-dd" [readOnly]="true"
+                                       name="dpFromDate" >
+                                    <button class="input-group-text" type="button">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div> -->
+                            <!-- <div class="col-12 col-md-4 col-lg-3 mb-3">
+                                <label for="machineName" class="form-label">Indent Number</label>
+                                <input class="form-control"placeholder="Indent Number" type="text" name="IndentNumber">
+                                <span>{{item.IndentNo}}</span>
+                            </div>                            -->
+                            <div class="col-12 col-md-3 mb-3">
+                                <label for="machineName" class="form-label">Location</label>
+                                <div class="form-control">
+                                    <span style="margin-left: 3px;">{{item.LocationName}}</span>
+                            </div>   
+                        </div>                                                    
+                            <!-- <div class="col-12 col-md-4 col-lg-3 mb-3">
+                                <label for="machineName" class="form-label">PI Number <span class="text-danger">*</span></label>
+                                <input class="form-control"placeholder="PI Number" type="text" name="PINumber">
+                                <span>{{item.IndentNo}} </span>
+                            </div>                             -->
+                            <div class="col-sm-12">
+                                <hr/>
+                            </div>
+                            <h6 class="card-title">Item Details</h6>
+                            <div class="card mb-3 border bg-light">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <double-scroll>
+                                            <div style="max-height: 420px; overflow-y: scroll;">
+                                            <table class="table bg-white">
+                                                <thead style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                                    <tr>
+                                                        <!-- <th>
+                                                        <input type="checkbox" [checked]="allcheckbox" (change)="handleCheckboxChange($event)"/>
+                                                            All
+                                                          </th>                                                -->
+                                                        <th>IndentNo</th>
+                                                        <th>Location</th>
+                                                        <th>Item Name</th>
+                                                        <th>Quotations<span style="color:red"> *</span></th>
+                                                        <th>Supplier Name</th>
+                                                        <th>Manufacturer</th>
+                                                        <th>Pack Size</th>
+                                                        <th>Purchase Unit</th>
+                                                        <th>Narration</th>
+                                                        <th>Rate</th>
+                                                        <th>Disc(%)</th>
+                                                        <th>Tax(%)</th>
+                                                        <th>Buy Price</th>
+                                                        <th>Quantity</th>
+                                                        <th>Net AMT.</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ng-container>
+                                                          <tr *ngFor="let poview of listItemDetails">                                                           
+                                                            <!-- <td>
+                                                                <input type="checkbox" [checked]="allcheckbox" (change)="handleCheckboxChange($event)" />
+                                                              </td> -->
+                                                            <td>{{poview.IndentNo}}</td>
+                                                            <td>{{purchaseOrderDetails.CenterLocation}}</td>
+                                                            <td>{{poview.ItemName}}</td>
+                                                            <td>{{poview.QuotationNo}}</td>
+                                                            <td>{{purchaseOrderDetails.SupplierName}}</td>
+                                                            <td>{{poview.ManufactureName}}</td>
+                                                            <td>{{poview.PackSize}}</td>
+                                                            <td>{{poview.MinorUnitName}}</td>
+                                                            <td>{{poview.Narration}}</td>
+                                                            <td>{{poview.Rate}}</td>
+                                                            <td>{{poview.DiscountPer}}</td>
+                                                            <td>{{ poview.Taxper | number: '1.2-2' }}</td>
+                                                            <td>{{poview.UnitPrice}}</td>
+                                                            <td>{{poview.OrderedQty}}</td>
+                                                            <td>{{poview.NetAmount}}</td>
+                                                           <td>
+                                                                <a class="btn btn-outline-primary btn-xs me-1"
+                                                                    target="_blank"
+                                                                    [routerLink]="['/items/view-item',poview.ItemGuid]"><span
+                                                                    class="feather icon-eye"></span> View
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </ng-container>
+                                                </tbody>
+                                            </table>           
+                                            </div>
+                                        </double-scroll>
+                                    </div>
+                                </div>
+                            </div> 
+                         
+                            <h6 class="card-title">TERMS & CONDITIONS
+                            </h6>
+                            <div class="card mb-3 border">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <form>
+                                            <div class="row">
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <label for="machineName" class="form-label">Payment Term
+                                                    </label>
+                                                    <div class="form-control">
+                                                        <span style="margin-left: 3px;">{{item.PaymentTermCondition}}</span>
+                                                </div>
+                                            </div>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <label for="machineName" class="form-label">Delivery term <span>*</span>
+                                                    </label>
+                                                    <div class="form-control">                                                       
+                                                        <span style="margin-left: 3px;">{{item.PaymentDeliveryTerm}}</span>
+                                                </div>
+                                            </div>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <label for="machineName" class="form-label">NFA No.</label>
+                                                    <div class="form-control">                                                       
+                                                        <span style="margin-left: 3px;">{{item.NFANo}}</span>
+                                                </div>
+                                                 </div>
+                                                 <div class="col-12 col-md-12 col-lg-12 mb-3">
+                                                    <label for="termsAndConditions" class="form-label">Terms and Conditions</label>
+                                                    <div class="form-control" style="position: relative; width: 100%; height: 100px; display: flex; align-items: center;">
+                                                        <span style="margin-left: 3px;">{{item.TermandCondition}}</span>
+                                                    </div>
+                                                </div>                                                
+                                                <div class="col-sm-12">
+                                                    <hr />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>                       
+                    </ng-template>
+                </ngb-panel>
+            </ngb-accordion>
+        </div>
+    </div>
+</div>

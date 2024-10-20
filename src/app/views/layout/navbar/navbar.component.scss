@@ -1,0 +1,9 @@
+
+.minw-300{
+    @media screen and (max-width:420px){
+        min-width: 110px;
+    }
+    @media screen and (min-width:556px){
+        min-width: 300px;
+    }
+}

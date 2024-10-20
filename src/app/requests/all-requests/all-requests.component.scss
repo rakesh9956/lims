@@ -1,0 +1,54 @@
+.h-34 {
+  height: 34px;
+}
+
+table {
+  thead {
+    th {
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #585858;
+      font-size: 12px;
+    }
+  }
+
+  tbody {
+    td {
+      //font-size: 12px;
+    }
+  }
+}
+
+.min-height-fullscreen.no-records {
+  min-height: calc(100vh - 400px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-18{
+  font-size: 18px;
+  color:#6571ff;
+}
+// .badge {
+//   display: inline-block;
+//   padding: 0.35em 0.65em;
+//   font-size: .75em;
+//   font-weight: 700;
+//   line-height: 1;
+//   color: #fff;
+//   text-align: center;
+//   white-space: nowrap;
+//   vertical-align: baseline;
+//   border-radius: 0.25rem;
+// }
+.badge-success {
+  background-color: #198754 !important;
+}
+// @media (max-width:374px) {
+//   .filter-button {
+//     position: absolute;
+//     right: 20px;
+//     top: 20px;
+//   }
+// }

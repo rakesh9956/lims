@@ -1,0 +1,182 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items/all-cpt">Cpt</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Cpt</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <form [formGroup]="parentForm">
+
+                <div class="card-body">
+                    <h6 class="card-title">New Cpt</h6>
+                    <div formArrayName="ItemDetailsList" *ngFor="let testForm of forms.controls; let index = index">
+                        <div [formGroupName]="index">
+                            <div class="row" *ngIf="!shimmerVisible">
+                                <div class="col-sm-4">
+                                    <div class="position-relative">
+                                        <label for="itemName" class="form-label">Item<span
+                                                [ngClass]="{'text-danger': this.testForm.get('lstIndentItem')?.value?.itemGuid==null}">*</span></label>
+                                        <input type="text" id="itemName" class="form-control autocompleteInput"
+                                            placeholder="Enter item name" (keyup)="changeSearch($event)"
+                                            formControlName="ItemName" autocomplete="on"
+                                            [ngClass]="{'is-invalid':this.testForm.get('ItemName')?.touched && this.testForm.get('ItemName')?.invalid}">
+                                        <div class="spinLoader" *ngIf="SpinnerCheck">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-danger position-absolute"
+                                            *ngIf="this.testForm.get('ItemName')?.touched && this.testForm.get('ItemName')?.invalid">
+                                            Item is required!</span>
+                                        <div class="card card-body card-block autocompleteBox p-0">
+                                            <div class="border-bottom p-2" *ngFor="let item of allItems"
+                                                (click)="ItemSearch(item,index)">{{item.ItemName}} -
+                                                ({{item.CatalogNo?(item.CatalogNo):'N/A'}})</div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="text-danger position-absolute"
+                                *ngIf="this.indentForm.get('lstIndentItem')?.value[i].DuplicateItemCheck ">
+                                Please
+                                select different item!</div> -->
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label for="itemHSNCode" class="form-label">Department Type</label>
+                                        <ng-select [closeOnSelect]="true" [searchable]="true" [readonly]="true"
+                                            [notFoundText]="'No location found!'" [items]="lstDepartmentType"
+                                            bindValue="SubCategoryTypeGuid" [inputAttrs]="{maxlength: '48'}"
+                                            bindLabel="SubCategoryTypeName" placeholder="Select department name"
+                                            formControlName="departmentTypeGuid">
+                                        </ng-select>
+                                        <ng-container>
+                                            <span class="invalid-feedback">Department is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label for="itemHSNCode" class="form-label">Item Type</label>
+                                        <ng-select [closeOnSelect]="true" [searchable]="true" bindLabel="Location"
+                                            placeholder="Select item type" [notFoundText]="'No location found!'"
+                                            formControlName="itemTypeGuid" [items]="lstGetItemType" [readonly]="true"
+                                            bindValue="SubCategoryGuid" [inputAttrs]="{maxlength: '48'}"
+                                            bindLabel="ItemType">
+                                        </ng-select>
+                                        <ng-container>
+                                            <span class="invalid-feedback">Item Type is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <ng-container formArrayName="lstCPTDetails">
+                                    <ng-container *ngFor="let item of getCPTDetails(index).controls; let j = index">
+                                        <ng-container [formGroupName]="j">
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label for="itemCode" class="form-label">Test Code<span
+                                                            [ngClass]="{'text-danger':item.get('TestCode')?.value=='' || item.get('TestCode')?.value==null}">*</span></label>
+                                                    <input type="text" id="itemCode" class="form-control" [readonly]="item.get('CPTId')?.value && CPTGuid || !testForm.get('itemGuid')?.value"
+                                                        placeholder="Enter Test Code" formControlName="TestCode"
+                                                        maxlength="50" (keyup)="item.get('CPTId')?.value && CPTGuid  ?null:checkDuplicateTest($event,index,j,testForm.get('itemGuid')?.value)"
+                                                        [ngClass]="{'is-invalid':item.get('TestCode')?.touched && item.get('TestCode')?.invalid}">
+                                                    <ng-container>
+                                                        <span class="invalid-feedback">Test Code is required!</span>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="item.get('DuplicateItemCheck')?.value && item.get('TestCode')?.value!=='' || (isTestCodeDuplicate(index, j) )">
+                                                        <span class="text-danger mt-4px d-block">Test Code already
+                                                            exists</span>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-3">
+                                                    <label for="itemHSNCode" class="form-label">Test Name<span
+                                                            [ngClass]="{'text-danger':item.get('TestName')?.value=='' ||item.get('TestName')?.value==null }">*</span></label>
+                                                    <input type="text" id="itemHSNCode" class="form-control"
+                                                        placeholder="Enter Test Name" formControlName="TestName"
+                                                        maxlength="13"
+                                                        [ngClass]="{'is-invalid':item.get('TestName')?.touched && item.get('TestName')?.invalid}">
+                                                    <ng-container>
+                                                        <span class="invalid-feedback">Test Name is required!</span>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <!-- Remove Test and Remove Item Buttons Side by Side -->
+                                                    <div class="mb-3 d-flex gap-3">
+                                                        <button class="btn-danger btn"
+                                                            (click)="removeTest(j,index,item)" *ngIf="j > 0">
+                                                            <span class="feather icon-close"></span> Remove Test
+                                                        </button>
+                                                        <button class="btn-danger btn" (click)="removeItems(index)"
+                                                            *ngIf="index >0 && getCPTDetails(index).controls.length-1 === j">
+                                                            <span class="feather icon-close"></span> Remove Item
+                                                        </button>
+                                                    </div>
+                                                    <!-- Add Test and Add Item Buttons Side by Side -->
+                                                    <div class="mb-3 d-flex gap-3">
+                                                        <button class="btn-primary btn" (click)="addCPTDetail(index)"
+                                                            *ngIf="j == getCPTDetails(index).controls.length - 1">
+                                                            <span class="feather icon-plus"></span> Add Test
+                                                        </button>
+                                                        <button class="btn-primary btn" (click)="addForm()"
+                                                            *ngIf="index == forms.controls.length - 1  && j == getCPTDetails(index).controls.length - 1">
+                                                            <span class="feather icon-plus"></span> Add Item
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                </div>
+            </form>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                            (click)="CPTFormReset()">Reset</button>
+                        <button type="button" class="btn btn-primary submit"
+                            [disabled]="this.parentForm.invalid || !FormChanged || hasDuplicateItems() ||isDuplicate"
+                            (click)="saveCPT()">{{CPTGuid?'Update':'Save'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manufacturer -->
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p>Do you want to reset this manufacturer details?</p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')">Yes</button>
+    </div>
+</ng-template>

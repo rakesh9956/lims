@@ -1,0 +1,207 @@
+<div class="row inbox-wrapper">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 col-sm-5 col-md-4 col-xl-3 border-end-0 border-end-sm order-end-lg min-h-75">
+            <!-- border-bottom pb-3 mb-3 -->
+            <div class="d-flex align-items-center justify-content-between">
+              <button class="navbar-toggle btn btn-icon border d-inline-flex d-none" type="button"
+                aria-controls="asideNav">
+                <i class="feather icon-chevron-down"></i>
+              </button>
+              <div class="order-first">
+                <h4>Settings</h4>
+                <p class="text-muted word-break">{{this.Email }}</p>
+              </div>
+              <hr>
+            </div>
+            <div class="email-aside-nav mt-3 mt-sm-5" id="asideNav">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center" routerLink="/settings/profile-settings">
+                    <i class="feather icon-user icon-lg me-2"></i>
+                    Profile Settings
+                  </a>
+                </li>
+                <li class="nav-item mt-2 active mb-3 mb-sm-0">
+                  <a class="nav-link d-flex align-items-center">
+                    <i class="feather icon-lock icon-lg me-2"></i>
+                    Account Settings
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-12 col-sm-7 col-md-8 col-xl-9">
+            <div class="card shadow-none border-0 h-100">
+              <div class="card-body p-0">
+                <h6 class="card-title">Account Settings</h6>
+                <h6 class="card-title mt-4 mb-2"><small>Change Password</small></h6>
+                <form [formGroup]="confirmForm">
+                  <div class="row">
+                    <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                      <label for="formLabel">Current password<span
+                          [ngClass]="{'text-danger': confirmForm.value.currentPassword.length == 0 }"> *</span></label>
+                      <div class="position-relative password-visibility-block">
+                        <div [ngClass]="{'incorrect-alignment': currentPasswordIncorrect}"></div> 
+                        <input [type]="isCpVisible ? 'text' : 'password'" class="form-control" id="currentPassword"
+                          (input)="errorevent($event)" formControlName="currentPassword"
+                          placeholder="Enter current password"
+                          (focusout)="focusOutFunction()"
+                           maxlength="16"
+                          [ngClass]="{
+                            'is-invalid': (confirmForm.get('currentPassword')?.hasError('required') && confirmForm.get('currentPassword')?.touched) || (confirmForm.value.currentPassword.length < 8 && confirmForm.value.currentPassword !== '' ),
+                            'alignment-class': confirmForm.get('currentPassword')?.invalid  
+                          }">
+                          <span class="text-danger  mt-4px d-block " 
+                           *ngIf="confirmForm.get('currentPassword')?.hasError('required') && confirmForm.get('currentPassword')?.touched">
+                            Current password is required!
+                          </span>      
+                          <button class="btn password-visibility-icon" type="button"
+                            (click)="toggleCpVisibility()">
+                            <ng-container *ngIf="isCpVisible; else isNotVisible">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="none" d="M0 0h24v24H0z" />
+                                <path
+                                  d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                  fill="rgba(143,143,143,1)" />
+                              </svg>
+                            </ng-container>
+                            <ng-template #isNotVisible>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="none" d="M0 0h24v24H0z" />
+                                <path
+                                  d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                  fill="rgba(143,143,143,1)" />
+                              </svg>
+                            </ng-template>
+                          </button>                 
+                          <ng-container *ngIf="confirmForm.value.currentPassword && currentpass">
+                            <span class="form-error-message" [ngClass]="{'text-success': currentpass, 'text-danger': !currentpass}" >
+                              {{EmailResponse}}{{EmailResponse?'!':''}}
+                            </span></ng-container>                       
+                          <ng-container *ngIf="DuplicateCheck">
+                            <span [ngStyle]="{'color':DuplicateCheck ? 'red' : ''}">
+                                 {{EmailResponse}}{{EmailResponse?'!':''}}
+                            </span>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                      <label class="label-title">New password <span
+                          [ngClass]="{'text-danger': getPassword.length == 0 }">
+                          *</span></label>
+                      <div class="position-relative">
+                        <div class="position-relative password-visibility-block">
+                          <div [class.alignment-class]="isPasswordInvalid"></div>
+                          <input id="password" [type]="isNpVisible ? 'text' : 'password'" name="password" value=""
+                            placeholder="Enter new password" formControlName="password" class="form-control login-input"
+                            minlength="8" maxlength="16"
+                            [ngClass]="(confirmForm.get('password')?.hasError('required'))&& confirmForm.get('password')?.touched ||  (confirmForm.value.password.length<8 && confirmForm.value.password!='') ?'is-invalid': ''">
+                            <span  class="text-danger mt-4px d-block"
+                            *ngIf="confirmForm.get('password')?.hasError('required') && confirmForm.get('password')?.touched">
+                            New password is required!
+                         </span>
+                          <button class="btn password-visibility-icon" type="button"
+                            (click)="toggleNpVisibility()">
+                            <ng-container *ngIf="isNpVisible; else isNotVisible">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="none" d="M0 0h24v24H0z" />
+                                <path
+                                  d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                  fill="rgba(143,143,143,1)" />
+                              </svg>
+                            </ng-container>
+                            <ng-template #isNotVisible>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="none" d="M0 0h24v24H0z" />
+                                <path
+                                  d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                  fill="rgba(143,143,143,1)" />
+                              </svg>
+                            </ng-template>
+                          </button>
+                          <div class="pwValidPopover">
+                            <div class="pwValidPopover_Header">Passwords must be at least eight characters long and
+                              contain at least one lowercase letter, one uppercase letter, one number, and one special
+                              character.</div>
+                            <span></span>
+                            <div class="pwValidPopover_Body">
+                              <ul class="pwValidPopover_Body_list">
+                                <li
+                                  [ngClass]="{'active':!f['password'].hasError('hasSmallCase')&& (f['password'].dirty||f['password'].touched)&&f['password'].value}">
+                                  <span></span> Lowercase letter
+                                </li>
+                                <li
+                                  [ngClass]="{'active':!f['password'].hasError('hasCapitalCase')&& (f['password'].dirty||f['password'].touched)&&f['password'].value}">
+                                  <span></span> Uppercase letter
+                                </li>
+                                <li
+                                  [ngClass]="{'active':!f['password'].hasError('hasNumber')&& (f['password'].dirty||f['password'].touched)&& f['password'].value}">
+                                  <span></span> Number
+                                </li>
+                                <li
+                                  [ngClass]="{'active':!f['password'].hasError('hasSpecialCharacter')&& (f['password'].dirty||f['password'].touched)&&f['password'].value}">
+                                  <span></span> Special character
+                                </li>
+                                <li
+                                  [ngClass]="{'active':!f['password'].errors?.minlength && (f['password'].dirty||f['password'].touched)&&f['password'].value}">
+                                  <span></span> # of characters
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div *ngIf="f['password'].errors?.minlength" class="text-danger mt-4px d-block">
+                          Password must be at least 8 characters!
+                        </div>
+                        <span class="text-danger mt-4px d-block"
+                          *ngIf="!confirmForm.get('password')?.hasError('required') && confirmForm.get('password')?.invalid && !f['password'].errors?.minlength">
+                          Password is invalid!
+                        </span>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                      <label for="formLabel">Confirm password <span
+                          [ngClass]="{'text-danger': getConfirmPassword.length == 0 }">*</span></label>
+                      <div class="position-relative password-visibility-block">
+                        <input [type]="isCpVisible ? 'text' : 'password'" class="form-control" id="confirmPassword"
+                          placeholder="Re-enter new password" formControlName="confirmPassword" (input)="updatepassword($event)"
+                          minlength="8" maxlength="16"
+                          [ngClass]="{'is-invalid':f['confirmPassword'].hasError('notEquivalent') && f['confirmPassword'].value && f['confirmPassword'],'is-valid':(!f['confirmPassword'].errors && f['confirmPassword'] && f['confirmPassword'].value)}" />
+                      </div>
+                      <div class="invalid-feedback"
+                        [ngClass]="{'d-block':f['confirmPassword'].hasError('notEquivalent')&&(f['confirmPassword'].touched)&& f['confirmPassword'].value}">
+                        Password and confirm password must match!
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12 p-0" *ngIf="PasswordCheck==true">
+                    <div class="alert alert-danger">{{errorMessage}}</div>
+                  </div>
+                </form>
+              </div>
+              <!-- <ng-container *ngIf="DuplicateCheck">
+                <span [ngStyle]="{'color':DuplicateCheck ? 'red' : ''}">
+                     {{EmailResponse}}
+                </span>
+            </ng-container> -->
+              <div class="card-footer text-end">
+                <button id="reset" type="button" class="btn btn-link" [disabled]="!onnetworkSubmit"
+                  (click)="reset()">Reset</button>
+                  <button type="button" class="btn btn-primary submit" [disabled]="PasswordCheck==true || confirmForm.invalid || DuplicateCheck "(click)="updatePassword()">Update</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

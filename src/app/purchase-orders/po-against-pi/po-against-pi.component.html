@@ -1,0 +1,944 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/purchase-orders">Purchase Orders</a></li>
+        <li class="breadcrumb-item active" aria-current="page">PO Against PI</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+
+            <div class="card-body">
+                <h6 class="card-title">Purchase Order Against PI</h6>
+                <div class="mb-3" *ngIf="PurchaseOrderGuid">
+                    <label for="purchaseOrderNo" class="form-label">PurchaseOrderNo: 
+                        <strong>{{this.purchaseOrderDetails.PurchaseOrderNo}}</strong></label>
+                </div>
+                <form [formGroup]="purchaseOrderForm">
+                    <div class="row" *ngIf="!PurchaseOrderGuid">
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <!-- <label for="purchasedUnit" class="form-label d-flex ">Pending PI <span [ngClass]="{'text-danger': this.purchaseOrderForm.get('PendingPI')?.value==''}">&nbsp;*</span></label>
+                            <ng-select [items]="ListOfSupplier" [closeOnSelect]="true" [searchable]="true" formControlName="PendingPI"
+                                [multiple]="true" (change)="SelectIndentsForItems($event)" bindLabel="IndentNo"
+                                placeholder="Select Location"  [readonly]="PurchaseOrderGuid">
+                            </ng-select> -->
+                            <label for="machineName" class="form-label d-flex">Supplier Name </label>
+                            <ng-select [items]="SupplierItems" [inputAttrs]="{maxlength: '48'}" [closeOnSelect]="true"
+                                [searchable]="true" [multiple]="true" formControlName="SuppliersName"
+                                (clear)="onSelectClose()" [readonly]="PurchaseOrderGuid"
+                                [notFoundText]="'No supplier found'"
+                                [ngClass]="(purchaseOrderForm.get('SuppliersName')?.hasError('required')) && purchaseOrderForm.get('SuppliersName')?.touched ? 'is-invalid' : ''"
+                                bindLabel="SupplierName" placeholder=" Select supplier name"
+                                (add)="OnSelectSupplier($event)" (remove)="removeSupplier($event)">
+                            </ng-select>
+                            <span class="text-danger mt-4px d-block"
+                                *ngIf="purchaseOrderForm.get('SuppliersName')?.hasError('required') && purchaseOrderForm.get('SuppliersName')?.touched?'is-invalid' : ''">
+                                Supplier name is required!</span>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <label for="machineName" class="form-label">From Date</label>
+                            <div class="input-group" (click)="!PurchaseOrderGuid?dpFromDate.toggle():''">
+                                <input #dpFromDate="ngbDatepicker" ngbDatepicker container="body" class="form-control"
+                                    [readonly]="PurchaseOrderGuid" placeholder="yyyy-mm-dd" [readOnly]="true"
+                                    (dateSelect)="selectFromDate($event)" name="dpFromDate" formControlName="FromDate1">
+                                <button class="input-group-text" type="button">
+                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <label class="form-label">To Date</label>
+                            <div class="input-group" (click)="!PurchaseOrderGuid?dp2.toggle():''">
+                                <input #dp2="ngbDatepicker" ngbDatepicker container="body" class="form-control"
+                                    [readonly]="PurchaseOrderGuid" [minDate]="minDate" placeholder="yyyy-mm-dd"
+                                    [readOnly]="true" (dateSelect)="selectToDate($event)" name="dpFromDate"
+                                    formControlName="ToDate1">
+                                <button class="input-group-text" type="button">
+                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <label class="form-label">Indent Number</label>
+                            <input class="form-control" type="text" maxlength="10" (keyup)="changeSearch($event)"
+                                [readonly]="PurchaseOrderGuid" formControlName="IndentNumber">
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <label for="purchasedUnit" class="form-label d-flex ">Location </label>
+                            <ng-select [items]="CenterLocation" [inputAttrs]="{maxlength: '48'}" [closeOnSelect]="true"
+                                [searchable]="true" [multiple]="true" bindLabel="LocationName" bindValue="LocationGuid"
+                                formControlName="LocationGuid" placeholder="Select Location"
+                                [notFoundText]="'No location found'" (change)="SelectLocation($event)"
+                                [readonly]="PurchaseOrderGuid">
+                            </ng-select>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 mb-3">
+                            <label for="purchasedUnit" class="form-label d-flex ">Pending PI <span
+                                    [ngClass]="{'text-danger':PendingPI.length=='' }">&nbsp;*</span></label>
+                            <ng-select [items]="ListOfSupplier" [inputAttrs]="{maxlength: '48'}" [closeOnSelect]="true"
+                                [searchable]="true" [notFoundText]="'No pending PI found'" #ngSelectComponent
+                                [ngClass]="(purchaseOrderForm.get('PendingPI')?.hasError('required')) && purchaseOrderForm.get('PendingPI')?.touched ? 'is-invalid' : ''"
+                                formControlName="PendingPI" [multiple]="true" (change)="SelectIndentsForItems($event)"
+                                bindLabel="IndentNo" placeholder="Select pending PI" [readonly]="PurchaseOrderGuid">
+                            </ng-select>
+                            <span class="text-danger mt-4px d-block"
+                                *ngIf="purchaseOrderForm.get('PendingPI')?.hasError('required') && purchaseOrderForm.get('PendingPI')?.touched?'is-invalid' : ''">
+                                Pending PI is required!</span>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check form-switch mb-2">
+                                    <input type="checkbox" id="formSwitch1" formControlName="Isurgent"
+                                        (click)="ISUrgentPO" class="form-check-input">
+                                    <label for="formSwitch1" class="form-check-label">To mark it has urgent?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center" *ngIf="PurchaseOrderGuid && status !=='Approved'">
+                        <h6 class="card-title">Item Details</h6>
+                        <div class="form-check form-switch mb-2">
+                            <input type="checkbox" id="formSwitch1" formControlName="Isurgent"
+                                (change)="ISUrgentPO($event)" class="form-check-input" [checked]="Isurgent">
+                            <label for="formSwitch1" class="form-check-label">To mark it has urgent?</label>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border bg-light">
+                        <div class="card-body p-3">
+                            <div class="row pi-items">
+                                <!-- <double-scroll> -->
+                                    <div style="max-height: 420px; overflow-y: scroll;">
+                                        <table class="table bg-white">
+                                            <thead
+                                                style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                                <tr>
+                                                    <th>
+                                                        <input type="checkbox" [checked]="allcheckbox"
+                                                            (click)="handleCheckboxChange($event)" />
+                                                        All
+                                                    </th>
+                                                    <th>SNo</th>
+                                                    <th>IndentNo</th>
+                                                    <th>Location</th>
+                                                    <th class="freeze-col-1">Item Name</th>
+                                                    <th class="freeze-col-2">Catalog No</th>
+                                                    <th>Vendor Item Name</th>
+                                                    <th>Quotations <span
+                                                            [ngClass]="{'text-danger':!this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value?.IndentNo}">
+                                                            *</span></th>
+                                                    <th>Supplier Name</th>
+                                                    <th>Manufacturer</th>
+                                                    <th>Pack Size</th>
+                                                    <th>Purchase Unit</th>
+                                                    <th>Narration</th>
+                                                    <th>Rate</th>
+                                                    <th>Reason</th>
+                                                    <th>Disc(%)</th>
+                                                    <th>Tax(%)</th>
+                                                    <th>Buy Price</th>
+                                                    <th>Quantity</th>
+                                                    <th>Net AMT.</th>
+                                                    <th>STOCK IN HAND QUANTITY</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container *ngIf="!shimmerVisible">
+                                                    <tr formArrayName="lstpurchaseOrderItems"
+                                                        *ngFor="let item of addItemslist.controls; let i = index">
+                                                        <ng-container [formGroupName]="i">
+                                                            <td><input type="checkbox"
+                                                                    [disabled]="status=='Approved' || ((QuotationItemlist | filterItems: this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.ItemGuid)[0]?.QuotationNo === 0) || this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.latestQuotation === 0 || !role.toLowerCase().includes('Maker'.toLowerCase())"
+                                                                    (change)="OnItemsSelect(item,i)"
+                                                                    [(ngModel)]="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].IsSelected"
+                                                                    [ngModelOptions]="{standalone: true}" /></td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].SNo}}</td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].IndentNo}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].DeliveryLocation}}
+                                                            </td>
+                                                            <td class="freeze-col-1 truncate max-w-200"  title="{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemName}}">{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemName}}
+                                                            </td>
+                                                            <td class="freeze-col-2">{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].CatalogNo}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].VendorItemName}}</td>
+                                                            <td><ng-select appendTo='body'
+                                                                    [inputAttrs]="{maxlength: '48'}"
+                                                                    [items]="QuotationItemlist |  filterItems: this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.ItemGuid"
+                                                                    [searchable]="true" [multiple]="false"
+                                                                    [ngClass]="(purchaseOrderForm.get('QuotationNo')?.hasError('required')) && purchaseOrderForm.get('QuotationNo')?.touched ? 'is-invalid' : ''"
+                                                                    (change)="OnSelectQuotation($event,i)"
+                                                                    [readonly]="(((QuotationItemlist | filterItems: this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.ItemGuid)[0]?.QuotationNo === 0)|| this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.latestQuotation === 0) || PurchaseOrderGuid || status=='Approved'"
+                                                                    formControlName="QuotationNo"
+                                                                    bindLabel="QuotationNo"
+                                                                    placeholder=" Select quotations">
+                                                                </ng-select>
+                                                                <ng-container
+                                                                    *ngIf="(((QuotationItemlist | filterItems: this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.ItemGuid)[0]?.QuotationNo === 0)|| this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.latestQuotation === 0)">
+                                                                    <div class="text-danger">
+                                                                        There are no quotation provided.
+                                                                    </div>
+                                                                </ng-container>
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].VenderNme}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ManufactureName}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].POSize}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].PurchaseOrderUnit}}
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].Narration}}
+                                                            </td>
+                                                            <td><span class="rupee">&#8377;</span>
+                                                                {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemRate }}
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    [readOnly]="this.lstQuotationNo[i]?.QuotationNo== item.value?.QuotationNo?.QuotationNo ||this.lstQuotationNo[i]?.QuotationNo == item.value?.QuotationNo || item.value?.QuotationNo == null"
+                                                                    class="form-control wd-80"
+                                                                    formControlName="ReasonQuotationNo"
+                                                                    [ngClass]="(this.lstQuotationNo[i]?.QuotationNo == addItemslist.at(i).get('QuotationNo')?.value || this.lstQuotationNo[i]?.QuotationNo == null || item.value?.QuotationNo == null) ? 'form-control wd-80' 
+                                                                : (addItemslist.at(i).get('ReasonQuotationNo')?.value == null || addItemslist.at(i).get('ReasonQuotationNo')?.value == '' ) ?  'is-invalid' :  'form-control wd-80'"
+                                                                    type="text"
+                                                                    (input)="AddReasonForQuotationNo($event , i) ">
+                                                            </td>
+                                                            <td><input type="number" class="form-control wd-80" min="0"
+                                                                    formControlName="DiscountPercentage"
+                                                                    (input)="ChangeDiscount(item,i)"
+                                                                    [readOnly]="status=='Approved'">
+                                                            </td>
+                                                            <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].TaxPercentage}}
+                                                            </td>
+                                                            <td><span class="rupee">&#8377;</span>
+                                                                {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].UnitPrice
+                                                                | exactNumbers}}
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control h-34"
+                                                                    formControlName="OrderQuantity" min="0"
+                                                                    (input)="ItemQuantityCalculation(i, purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemGuid)"
+                                                                    [readOnly]="!purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].IndentNo || status=='Approved'"
+                                                                    style="width:70px; padding-inline: 5px;" />
+                                                                    <div *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.DefaultItemQuantity < this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.OrderQuantity">
+                                                                    <span class="text-danger">Order quantity cannot exceed {{ this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i]?.DefaultItemQuantity }}</span>
+                                                                   </div>
+                                                            </td>
+                                                            <td><span class="rupee">&#8377;</span>
+                                                                {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].TotalAmount
+                                                                | exactNumbers}}
+                                                            </td>
+                                                            <td>
+                                                                {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].StockInhandQuantity}}
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-outline-primary btn-xs me-1"
+                                                                    target="_blank"
+                                                                    [routerLink]="['/items/view-item',this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemGuid]"><span
+                                                                        class="feather icon-eye"></span> View
+                                                                </a>
+                                                            </td>
+                                                        </ng-container>
+                                                    </tr>
+                                                </ng-container>
+                                                <!--Shimmer UI -->
+                                                <ng-container *ngIf="shimmerVisible">
+                                                    <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="shimmerBG line"></div>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <!--Shimmer UI -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <!-- </double-scroll> -->
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="card-title">Terms & Conditions</h6>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex gap-1">
+                                        <label for="manufacturerName" class="form-label ">
+                                            Payment
+                                            Term
+                                        </label>
+                                        <span [ngClass]="{'text-danger': !purchaseOrderForm.value.PaymentTerm}">
+                                            *</span>
+                                    </div>
+                                    <span class="small text-primary cursor-pointer" id="addNewManufacturer"
+                                        (click)="openBasicModal(paymentterm)" *ngIf="status!=='Approved'">Add
+                                        other</span>
+                                </div>
+                                <select class="form-select" id="manufacturerName" formControlName="PaymentTerm"
+                                    [disabled]="status=='Approved' || !role.toLowerCase().includes('Maker'.toLowerCase())"
+                                    [ngClass]="(purchaseOrderForm.get('PaymentTerm')?.hasError('required')) && purchaseOrderForm.get('PaymentTerm')?.touched ? 'is-invalid' : ''">
+                                    <option selected disabled value=null>Select payment term </option>
+                                    <option value="StaticTerm" *ngIf="!this.purchaseOrderForm.value.PaymentTerm">
+                                        100% Payment within 30 days of delivery and submission of invoice with delivery
+                                        acknowledgement</option>
+                                    <option *ngIf="this.purchaseOrderForm.value.PaymentTerm"
+                                        value={{this.purchaseOrderForm.value.PaymentTerm}}>
+                                        {{this.purchaseOrderForm.value.PaymentTerm=='StaticTerm'?'100% Payment within 30 days of delivery and submission of invoice with delivery acknowledgement':this.purchaseOrderForm.value.PaymentTerm}}</option>
+                                </select>
+                                <span class="text-danger mt-4px d-block"
+                                    *ngIf="purchaseOrderForm.get('PaymentTerm')?.hasError('required') && purchaseOrderForm.get('PaymentTerm')?.touched?'is-invalid' : ''">
+                                    Payment term is required!</span>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex gap-1">
+                                        <label for="manufacturerName" class="form-label ">
+                                            Delivery
+                                            Term
+                                        </label>
+                                        <span [ngClass]="{'text-danger': !purchaseOrderForm.value.DeliveryTerm}">
+                                            *</span>
+                                    </div>
+                                    <span class="small text-primary cursor-pointer" id="addNewManufacturer"
+                                        (click)="openBasicModal(deliveryItems)">Add other</span>
+                                </div>
+                                <select class="form-select" id="manufacturerName" [maxlength]="150"
+                                    formControlName="DeliveryTerm"
+                                    [ngClass]="(purchaseOrderForm.get('DeliveryTerm')?.hasError('required')) && purchaseOrderForm.get('DeliveryTerm')?.touched ? 'is-invalid' : ''">
+                                    <option selected disabled value=null>Select delivery term </option>
+                                    <option *ngIf="this.purchaseOrderForm.value.DeliveryTerm"
+                                        value={{this.purchaseOrderForm.value.DeliveryTerm}}>
+                                        {{this.purchaseOrderForm.value.DeliveryTerm}}</option>
+                                </select>
+                                <span class="text-danger mt-4px d-block"
+                                    *ngIf="purchaseOrderForm.get('DeliveryTerm')?.hasError('required') && purchaseOrderForm.get('DeliveryTerm')?.touched?'is-invalid' : ''">
+                                    Delivery term is required!</span>
+                            </div>
+                        </div> -->
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Delivery term
+                                    <span [ngClass]="{'text-danger': !purchaseOrderForm.value.DeliveryTerm}">
+                                        *</span>
+                                </label>
+                                <input type="text" id="itemName" class="form-control" [maxlength]="150"
+                                    placeholder="Enter delivery term " formControlName="DeliveryTerm"
+                                    [readonly]="status=='Approved' || !role.toLowerCase().includes('Maker'.toLowerCase())"
+                                    [ngClass]="(purchaseOrderForm.get('DeliveryTerm')?.hasError('required')) && purchaseOrderForm.get('DeliveryTerm')?.touched ? 'is-invalid' : ''" />
+                                <span class="text-danger mt-4px d-block"
+                                    *ngIf="purchaseOrderForm.get('DeliveryTerm')?.hasError('required') && purchaseOrderForm.get('DeliveryTerm')?.touched?'is-invalid' : ''">
+                                    Delivery term is required!</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">NFA No.</label>
+                                <input type="text" id="itemName" class="form-control" [maxlength]="150"
+                                    placeholder="Enter NFA no." formControlName="NFANo"
+                                    [readonly]="status=='Approved' || !role.toLowerCase().includes('Maker'.toLowerCase())" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="itemDescription" class="form-label">Terms and Conditions </label>
+                                <textarea class="form-control" id="itemDescription" rows="3" [maxLength]="150"
+                                    placeholder="Enter terms and condtions" [readonly]="status=='Approved'|| !role.toLowerCase().includes('Maker'.toLowerCase())"
+                                    formControlName="TermsandConditions"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-2" *ngIf="PurchaseViewDetails?.CheckedReason || PurchaseViewDetails?.ApproveReason"/>
+                    <div class="" *ngIf="PurchaseViewDetails?.CheckedReason || PurchaseViewDetails?.ApproveReason">
+                        <div class="col-sm-12"><span class="fw-bold"><u>Reason</u> :</span></div>
+                        <div class="col-sm-12" *ngIf="PurchaseViewDetails?.CheckedReason">
+                            <span class="fw-bold">Checked by and reason:</span>
+                            {{PurchaseViewDetails?.CheckedByName}}
+                            {{PurchaseViewDetails?.CheckedReason == null ? "(N/A)" : "(" +
+                            PurchaseViewDetails?.CheckedReason + ")"}}
+                        </div>
+
+                        <div class="col-sm-12" *ngIf="PurchaseViewDetails?.ApproveReason">
+                            <span class="fw-bold">Approved by and reason:</span>
+                            {{PurchaseViewDetails?.AppprovedByName}}
+                            {{PurchaseViewDetails?.ApproveReason == null? " (N/A)" : " (" +
+                            PurchaseViewDetails?.ApproveReason + ")"}}
+                        </div>
+                    </div>
+                    <hr class="my-2" />
+                    <ng-template #deliveryItems let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add delivery term</h5>
+                            <button type="button" class="btn-close" (click)="modal.close('by: close icon')"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Delivery Term</label>
+                                        <input type="text" id="itemName" class="form-control"
+                                            formControlName="AddDeliveryTerm" placeholder="Enter delivery term"
+                                            maxlength="150" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary me-2"
+                                (click)="modal.close('by: close icon')">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary submit"
+                                [disabled]="!purchaseOrderForm.value.AddDeliveryTerm"
+                                (click)="modal.close('by: close icon');addOtherDeliveryTerm()">Save</button>
+                        </div>
+                    </ng-template>
+                    <ng-template #paymentterm let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add payment term</h5>
+                            <button type="button" class="btn-close" (click)="modal.close('by: close icon')"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Payment Term</label>
+                                        <input type="text" id="itemName" class="form-control"
+                                            placeholder="Enter payment term" maxlength="150"
+                                            formControlName="paymentsTerms" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary me-2"
+                                (click)="modal.close('by: close icon')">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary submit"
+                                [disabled]="!purchaseOrderForm.value.paymentsTerms"
+                                (click)="modal.close('by: close icon');addOtherPaymentTerm()">Save</button>
+                        </div>
+                    </ng-template>
+                </form>
+
+            </div>
+            <div class="">
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <div class="modal-footer justify-content-center">
+                            <div *ngIf="PurchaseOrderGuid" class="btn-group btn-group-sm" role="group"
+                                aria-label="Basic mixed styles example">
+                                <!-- <button type="button" class="btn btn-outline-secondary"
+                                [routerLink]="['/purchase-orders/po-against-pi/']"
+                                (click)="OnSelectPO($event)">
+                                  <span class="feather icon-edit"></span> Edit</button> -->
+
+                                <button *ngIf="PurchaseViewDetails.IsDeleted==false&& PurchaseViewDetails.GRN==false &&PurchaseViewDetails.RecallByName ==null&&this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase()) " class="btn btn-outline-secondary"
+                                    (click)="modal.close('by: close icon')" [disabled]="FormChanged"
+                                    (click)="openBasicModal(deletePurchaseOrder);PurchaseOrderDetailas(PurchaseViewDetails)"><span
+                                        class="feather icon-trash-2"></span> Cancel
+                                    PO</button>
+                                <button type="button" class="btn btn-outline-secondary" [disabled]="FormChanged"
+                                    *ngIf="status!='Checked' && status!='Approved'&& PurchaseViewDetails.IsDeleted==false &&PurchaseViewDetails.RecallByName ==null && role.toLowerCase().includes('Checker'.toLowerCase())"
+                                    (click)="openBasicModal(PurchaseOrder);changestatus(PurchaseOrderGuid,'Checker')"
+                                    >
+                                    <span class="feather icon-check-square"></span> Mark as Checked </button>
+
+
+                                <button type="button" class="btn btn-outline-secondary" [disabled]="FormChanged"
+                                    *ngIf="status!='Approved' && status=='Checked'&& PurchaseViewDetails.IsDeleted==false &&PurchaseViewDetails.RecallByName ==null &&  role.toLowerCase().includes('Approval'.toLowerCase())"
+                                    (click)="openBasicModal(PurchaseOrder);changestatus(PurchaseOrderGuid,'Approval')"
+                                   >
+                                    <span class="feather icon-check-square"></span> Mark as Approved </button>
+
+                                <button type="button" class="btn btn-outline-secondary" (click)="DownloadPdf('print')" [disabled]="FormChanged">
+                                    <span class="feather icon-printer"></span> Print</button>
+
+                                <button type="button" class="btn btn-secondary" (click)="DownloadPdf('download')" [disabled]="FormChanged">
+                                    <span class="feather icon-download"></span> Download</button>
+
+                                <button class="border-bottom" *ngIf="status!=='Approved'&&PurchaseViewDetails.IsDeleted==false &&PurchaseViewDetails.RecallByName ==null" type="button"
+                                    class="btn btn-outline-secondary" [disabled]="FormChanged"
+                                    (click)="openBasicModal(centers);PurchaseOrderDetailas(purchaseOrderDetails)"><span
+                                        class="feather icon-refresh-cw"></span> Shipping Address</button>
+
+                                <button *ngIf="status ==='Approved'&& PurchaseViewDetails.IsDeleted==false && this.purchaseOrderDetails.GRN==false &&PurchaseViewDetails.RecallByName ==null" class="border-bottom"
+                                    class="btn btn-outline-secondary" (click)="modal.dismiss('by: close icon')"
+                                    (click)="openXlModal(xlModal1);getPurchaseOrderGuid(PurchaseOrderGuid)" [disabled]="FormChanged">
+                                    <span class="feather icon-rotate-ccw"></span> Recall
+                                </button>
+                                <button class="btn btn-outline-secondary" *ngIf="purchaseOrderDetails.POTotalAmount - purchaseOrderDetails.DueAmount > 1 && PurchaseViewDetails.IsDeleted==false &&PurchaseViewDetails.RecallByName ==null && role.toLowerCase().includes('Maker'.toLowerCase())"
+                                    (click)="openBasicModal(paymentModal);FormChanged=false" [disabled]="FormChanged">
+                                    <span class="feather icon-credit-card"></span> Payment
+                                </button>
+                                <button class="btn btn-outline-secondary" *ngIf="PurchaseViewDetails.IsDeleted==false"
+                                    (click)="openXlModal(xlModal);getQuotationByGuid(purchaseOrderDetails);" [disabled]="FormChanged"><span
+                                        class="feather icon-eye"></span> Quotation View
+                                </button>
+                                <!-- <div class="form-check form-switch mb-2">
+                                    <input type="checkbox" id="formSwitch1" [formControl]="isUrgentControl"
+                                        (change)="ISUrgentPO($event)" class="form-check-input">
+                                    <label for="formSwitch1" class="form-check-label">To mark it has urgent?</label>
+                                </div> -->
+                            </div>
+                        </div>
+                        <div class="text-end" *ngIf="status!=='Approved' && role.toLowerCase().includes('Maker'.toLowerCase())">
+                            <button type="button" class="btn btn-secondary me-2" (click)="FormReset()"
+                                [disabled]="!FormChanged" *ngIf="PurchaseViewDetails.RecallByName ==null&&PurchaseViewDetails.IsDeleted==false&&PurchaseOrderGuid||!PurchaseOrderGuid">Reset</button>
+                            <button type="button" class="btn btn-primary submit" *ngIf="PurchaseViewDetails.RecallByName ==null&&PurchaseViewDetails.IsDeleted==false||!PurchaseOrderGuid"
+                                (click)="SavePurchaseOrderPOAgainstPI()"
+                                [disabled]="purchaseOrderForm.invalid || !isChecked || !FormChanged || IsReasonQuotationNo || quotationExpired">
+                                {{PurchaseOrderGuid?'Update':'Save'}}</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template #deletePurchaseOrder let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cancel purchse order</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Are you sure do you want to cancel
+                            <strong>{{PurchaseOrderName}}</strong> purchase order?</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">PurchaseOrderNo: 
+                            <strong>{{purchaseOrderNo}}</strong></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+                No
+            </button>
+            <button type="button" class="btn btn-primary submit"
+                (click)="modal.close('by: close icon');DeletePurchaseOrder()">Yes</button>
+        </div>
+    </ng-template>
+    <ng-template #centers let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Shipping Address</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon');"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <label for="locations" class="label">Location</label>
+                    <ng-select placeholder="search by store name" name="locations" class="ng-select-custom-250min"
+                        [(ngModel)]="locationGuid" [items]="CenterLocation" bindValue="LocationGuid"
+                        (change)="Changelocation($event)" bindLabel="LocationName" [multiple]="false">
+                    </ng-select>
+                </div>
+                <div class="col-sm-12">
+                    <div class="my-3">
+                        <label for="itemName" class="form-label"> Do you want to change this
+                            <strong>{{ centername?centername:location}}</strong> shipping Location?</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');">
+                No
+            </button>
+            <button type="button" class="btn btn-primary submit" [disabled]="locationGuid==''"
+                (click)="modal.close('by: close icon');UpdateShippingLocation();">Yes</button>
+        </div>
+
+
+        <ng-template #deletequotation let-modal>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Quotation</h5>
+                <button type="button" class="btn-close" (click)="modal.close('by: close icon')"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label for="itemName" class="form-label">Are you sure do you want to delete
+                                <strong>{{purchaseOrderDetails.SupplierName}}</strong> quotation ?</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+                    No
+                </button>
+                <button type="button" class="btn btn-primary submit"
+                    (click)="modal.close('by: close icon');DeleteQuotation()">Yes</button>
+            </div>
+        </ng-template>
+    </ng-template>
+    <ng-template #xlModal1 let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="recallPurchaseOrder">Recall Purchase Order</h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss('by: close icon');recallReason=''"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form (ngSubmit)="confirmRecall()" #recallForm="ngForm">
+                <div class="form-group">
+                    <label for="recallReason">Reason for Recall:</label>
+                    <textarea id="recallReason" name="recallReason" class="form-control" [(ngModel)]="recallReason"
+                        required></textarea>
+                </div>
+                <!-- Add hidden input for PurchaseOrderGuid to bind it to the form -->
+                <input type="hidden" name="PurchaseOrderGuid" [(ngModel)]="body.PurchaseOrderGuid">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary"
+                        (click)="modal.dismiss('by: close icon')" (click)="clearReason()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" (click)="modal.dismiss('by: close icon')"
+                        [disabled]="recallReason == ''">Save</button>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+    <!-- Delivery Items -->
+    <ng-template #xlModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Supplier Quotation Detail</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+        <div class="container-fluid d-flex justify-content-between mt-4 flex-sm-row flex-column">
+            <div class="col-lg-5 ps-0">
+                <p class="mt-1 mb-1"><span class="fw-bold">Supplier name</span>:
+                    {{this.quotationDetails[0]?.SupplierName}}
+                </p>
+                <p class="mt-1 mb-1"><span class="fw-bold">Supplier
+                        state</span>:{{this.quotationDetails[0]?.SupplierStateName}}</p>
+                <p class="mt-1 mb-1"><span class="fw-bold">Delivery
+                        location</span>:{{locationList}}</p>
+                <p class="mt-1 mb-1"><span class="fw-bold">Created by</span>:{{this.quotationDetails[0]?.CreatedBy}}</p>
+                <div *ngIf="this.quotationDetails[0]?.CheckedByName!=null">
+                    <p class="mt-1 mb-1"><span class="fw-bold">Checked by</span>:
+                        {{this.quotationDetails[0]?.CheckedByName}}
+                    </p>
+                </div>
+                <div *ngIf="this.quotationDetails[0]?.ApprovedByName!=null">
+                    <p class="mt-1 mb-1"><span class="fw-bold">Approved
+                            by</span>:{{this.quotationDetails[0]?.ApprovedByName}}
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 pe-0 text-sm-end">
+                <p class="mb-1"><span class="fw-bold">Quotation reference
+                        No.:</span>{{this.quotationDetails[0]?.QuotationRefNo}}</p>
+                <p class="mb-1"><span class="fw-bold">Supplier address:</span>
+                    {{this.quotationDetails[0]?.SupplierAddress}}
+                    ,
+                    Hyderabad.</p>
+                <p class="mb-1"><span class="fw-bold">GSTN No.:</span> {{this.quotationDetails[0]?.GSTNNo}}</p>
+                <p class="mb-1"><span class="fw-bold">From date:</span> {{this.quotationDetails[0]?.FromDate |
+                    date:'dd-MM-yyyy'}}<span class="fw-bold">To
+                        date:</span> {{this.quotationDetails[0]?.ToDate | date:'dd-MM-yyyy'}} </p>
+                <p class="mb-1"><span class="fw-bold">Created date:</span> {{this.quotationDetails[0]?.CreateDate |
+                    date:'dd-MM-yyyy'}}</p>
+                <div *ngIf="this.quotationDetails[0]?.CheckedDate!=null">
+                    <p class="mb-1"><span class="fw-bold">Checked date:</span> {{this.quotationDetails[0]?.CheckedDate |
+                        date:'dd-MM-yyyy'}}</p>
+                </div>
+                <div *ngIf="this.quotationDetails[0]?.ApprovedDate!=null">
+                    <p class="mb-1"><span class="fw-bold">Approved date:</span>{{this.quotationDetails[0]?.ApprovedDate
+                        |
+                        date:'dd-MM-yyyy'}}</p>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-body">
+            <double-scroll>
+                <table class="table table-bordered pt-3">
+                    <thead>
+                        <tr>
+
+                            <th>Quotation No</th>
+                            <th>Item Name</th>
+                            <th>Item Category Name</th>
+                            <th>HSN Code</th>
+                            <th>Manufacturer Name</th>
+                            <th>Machine Name</th>
+                            <th>Rate</th>
+                            <th>Discount %</th>
+                            <th>SGST %</th>
+                            <th>CGST %</th>
+                            <th>IGST %</th>
+                            <th>Buy Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let quotations of quotationDetails">
+                            <!-- <td>{{deliveryLocationName}}</td>
+                        <td>{{deliveryState}}</td>  -->
+                            <td>{{quotations.QuotationNo}}</td>
+                            <td>{{quotations.ItemName}}</td>
+                            <td>{{quotations.ItemCategoryName}}</td>
+                            <td>{{quotations.HSNCode?quotations.HSNCode:'N/A'}}</td>
+                            <td>{{quotations.ManufactureName}}</td>
+                            <td>{{quotations.MachineName}}</td>
+                            <td>&#8377;{{quotations.Rate}}</td>
+                            <td>{{quotations.DiscountPer}}</td>
+                            <td>{{quotations.SGSTPer == 0?'--': quotations.SGSTPer}}</td>
+                            <td>{{quotations.CGSTPer == 0?'--':quotations.CGSTPer}}</td>
+                            <td>{{quotations.IGSTPer}}</td>
+                            <td>&#8377;{{quotations.BuyPrice}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- </div> -->
+            </double-scroll>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+        </div>
+    </ng-template>
+    <ng-template #paymentModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="recallPurchaseOrder">Payment details</h5>
+            <button type="button" class="btn-close" (click)="modal.dismiss('by: close icon');resetfrom()"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div *ngIf="fileUrl">
+                <div class="col-12">Attachment:</div>
+                <div class="pastedImageOutput">
+                    <i class="feather icon-x-circle" (click)="RemoveImage()" type="button"></i>
+                    <img [src]="fileUrl" alt="Uploaded Image">
+                </div>
+              </div>
+            <!-- <div class="col-12">PO Number:</div>
+         <div class="col-12"><b>{{ purchaseOrderDetails.PurchaseOrderNo}}</b></div> -->
+         <div class="mb-3">
+            <label for="purchaseOrderNo" class="form-label">PO Number: 
+                <strong>{{purchaseOrderDetails.PurchaseOrderNo}}</strong></label>
+        </div>
+         <!-- <div class="mb-3" *ngIf="InvoiceNumber != null">
+            <label for="InvoiceNumber" class="form-label">Invoice No: 
+                <strong>{{this.InvoiceNumber}}</strong></label>
+        </div> -->
+            <form [formGroup]="PaymentDetailForm">
+                <div class="row">
+                    <div class="col-12 col-md-12 mb-3">
+                <label class="form-label">Payment attachment<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('imageUrl')?.value==''}">*</span></label>
+                <div class="form-control d-flex felx-row">
+                    <div id="editableDiv"  (click)="markAsTouched('imageUrl')" (input)="textValues()" contenteditable="true"  type="file" (paste)="pasteImage($event)" class="form-control imgPasteElement PasteContent">
+                    </div>
+                    <p type="button" class="bg-none text-primary"  (click)="markAsTouched('imageUrl')" (click)="fileInput.click()">
+                        <i class="feather icon-upload fs-2"></i>
+                    </p>
+            </div>
+            
+            <!-- <input type="file" id="upload-resume" fileToUpload class="form-control mt-3"
+                   (change)="UplodeInvoice($event);"formControlName="fileUpload"> -->
+                   <!-- <div style="width: 100%; height: 40px;" contenteditable="true" (paste)="pasteImage($event)" class="form-control" placeholder="Enter text"></div> -->
+
+<!-- Hidden file input -->
+<input type="file" id="fileInput" (change)="UplodeInvoice($event);" style="display: none;" #fileInput>
+
+<!-- Visible icon button -->
+<span class="text-danger" *ngIf="PaymentDetailForm.get('imageUrl')?.touched &&this.PaymentDetailForm.get('imageUrl')?.value==''">Image url is required!</span>
+            </div>
+                    <div class="col-12 col-md-12 mb-3">
+                <label class="form-label">Bank name<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('BankName')?.value==''}">*</span></label>
+                <input class="form-control" formControlName="BankName" type="text" placeholder="Enter bank name"
+                [ngClass]="{'is-invalid':PaymentDetailForm.get('BankName')?.hasError('required') && PaymentDetailForm.get('BankName')?.touched}">
+                <span class="text-danger"  *ngIf="PaymentDetailForm.get('BankName')?.touched && PaymentDetailForm.get('BankName')?.invalid">Bank name is required!</span>
+            </div>
+                  <div class="col-12 col-md-12 mb-3">
+                    <label class="form-label">Transaction ID<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('TransectionID')?.value==null}">*</span></label>
+                   <input class="form-control" formControlName="TransectionID" type="text" placeholder="Enter transaction ID"
+                    [ngClass]="{'is-invalid':PaymentDetailForm.get('TransectionID')?.hasError('required') && PaymentDetailForm.get('TransectionID')?.touched}">
+                    <span class="text-danger"  *ngIf="PaymentDetailForm.get('TransectionID')?.touched && PaymentDetailForm.get('TransectionID')?.invalid">TransactionID is required!</span>
+                </div>
+                <div class="col-12 col-md-12 mb-3">
+                    <label class="form-label">Invoice Number<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('InvoiceNumber')?.value==null}">*</span></label>
+                   <input class="form-control" formControlName="InvoiceNumber" type="text" placeholder="Enter Invoice number "
+                    [ngClass]="{'is-invalid':PaymentDetailForm.get('InvoiceNumber')?.hasError('required') && PaymentDetailForm.get('InvoiceNumber')?.touched}">
+                    <span class="text-danger"  *ngIf="PaymentDetailForm.get('InvoiceNumber')?.touched && PaymentDetailForm.get('v')?.invalid">Invoice number is required!</span>
+                </div>
+                    <div class="col-12 col-md-12 mb-3">
+                     <label class="form-label">Transaction date<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('TransectionDate')?.value==null}">*</span></label>
+                     <div class="input-group">
+                      <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                        ngbDatepicker #d2="ngbDatepicker"
+                        [maxDate]="TodayDate" readonly
+                        formControlName="TransectionDate"
+                        [ngClass]="{'is-invalid': PaymentDetailForm.get('TransectionDate')?.hasError('required') && PaymentDetailForm.get('TransectionDate')?.touched}">
+                       <button class="input-group-text" type="button" (click)="d2.toggle()">
+                        <i class="feather icon-calendar icon-md text-muted"></i>
+                      </button>
+                      </div> 
+                      <div class="text-danger" *ngIf="PaymentDetailForm.get('TransectionDate')?.touched && PaymentDetailForm.get('TransectionDate')?.invalid">Transaction date is required!</div>               
+                    </div>
+                    <div class="col-12 col-md-12 mb-3">
+                        <label class="form-label">Mode of payment<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('Modeofpayment')?.value==''}">*</span></label>
+                        <select class="form-select form-select-sm" formControlName="Modeofpayment"
+                            placeholder="Select Payment">
+                            <option value="" disabled>Select mode of payment</option>
+                            <option value="Online">Online payment</option>
+                            <option value="Offline">Offline payment</option>
+                            <option value="Cash">Cash payment</option>
+                            <option value="Credit card">Credit card payment</option>
+                        </select>
+                        <span class="text-danger"  *ngIf="PaymentDetailForm.get('Modeofpayment')?.touched && PaymentDetailForm.get('Modeofpayment')?.invalid"> Please select a valid payment mode.</span>
+                    </div>
+                    <div class="col-12 col-md-12 mb-3">
+                <label class="form-label">Total amount <span [ngClass]="{'text-danger': this.PaymentDetailForm.get('TotalAmount')?.value==''}">*</span></label>
+                <input class="form-control" formControlName="TotalAmount" type="text" placeholder="Enter Amount" readonly>
+            </div> 
+                    <div class="col-12 col-md-12 mb-3">
+                      <label class="form-label">Due amount <span [ngClass]="{'text-danger': this.PaymentDetailForm.get('Dueamount')?.value==''}">*</span></label>
+                     <input class="form-control" formControlName="Dueamount" type="text" placeholder="Enter Amount" readonly>
+                    </div> 
+                    <div class="col-12 col-md-12 mb-3">
+                      <label class="form-label">Paid amount<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('PaidAmount')?.value==''}">*</span></label>
+                      <input class="form-control" formControlName="PaidAmount" type="text" placeholder="Enter Amount" (keypress)="restrictCharectors($event)"
+                      [ngClass]="{'is-invalid':PaymentDetailForm.get('PaidAmount')?.hasError('required') && PaymentDetailForm.get('PaidAmount')?.touched}" (input)="paidamount($event)">
+                      <span class="text-danger"  *ngIf="PaymentDetailForm.get('PaidAmount')?.touched && PaymentDetailForm.get('PaidAmount')?.invalid">Paid amount is required!</span>
+                      <span class="text-danger"  *ngIf="isvalid">Paid amount is less than the Due amount!</span>
+                    </div> 
+                    <div class="col-12 col-md-12 mb-3">
+                <label class="form-label">Remarks<span [ngClass]="{'text-danger': this.PaymentDetailForm.get('Remarks')?.value==''}">*</span></label>
+                <textarea class="form-control" placeholder="Enter your remarks" formControlName="Remarks"
+                [ngClass]="{'is-invalid':PaymentDetailForm.get('Remarks')?.hasError('required') && PaymentDetailForm.get('Remarks')?.touched}"></textarea>
+                <span class="text-danger"  *ngIf="PaymentDetailForm.get('Remarks')?.touched && PaymentDetailForm.get('Remarks')?.invalid">Remarks is required!</span>
+               </div>
+                </div>
+                <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('by: close icon');resetfrom()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="modal.dismiss('by: close icon');SavePayment()"  [disabled]="PaymentDetailForm.invalid || isvalid">Save</button>
+        </div>
+            </form>
+        </div>
+    </ng-template>
+    <ng-template #PurchaseOrder let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Remarks</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason=''" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-22">
+                        <label for="reason" class="form-label">Reason:</label>
+                        <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');reason=''">
+                No
+            </button>
+            <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon');"
+                (click)="UpdateStatus()">
+                Yes
+            </button>
+
+        </div>
+    </ng-template>
+    <ng-template #ExpiryQuotation let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Quotation Expired</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Please update quotation.
+                            </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">    
+            <button type="button" class="btn btn-primary submit"
+                (click)="modal.close('by: close icon')"  >Ok</button>
+        </div>
+      </ng-template>
+
+      <ng-template #packSizeDiff let-modal >
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Pack Size Mismatch</h5>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">The indent Pack Size and Purchase Order Pack Size do not match for the following items S.No: 
+                            <b>{{packSizeArray}}</b>
+                            </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">    
+            <button type="button" class="btn btn-primary submit"
+                (click)="modal.close('by: close icon');">Ok</button>
+        </div>
+      </ng-template>
+    <!-- Modal -->

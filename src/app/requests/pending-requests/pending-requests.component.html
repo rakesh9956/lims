@@ -1,0 +1,201 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Requests</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Pending Requests</li>
+    </ol>
+</nav>
+
+<!-- <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">ALL ITEMS</h4>
+          <p class=“text-muted”>Read the <a href="https://github.com/swimlane/ngx-datatable" target="_blank"> Official Ngx-datatable Documentation </a>for a full list of instructions and other options.</p>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>Pending Requests</div>
+                    <div class="d-flex align-items-center text-end">
+                        <input type="text" class="form-control form-select-sm" placeholder="Search"
+                            (keyup)="updateFilter($event)" />
+                            <button class="btn btn-primary btn-sm w-75 ms-1" routerLink="/requests/new-request"><span class="feather icon-plus"></span> Add Item</button>
+                    </div>
+                </h6>
+                <div class="table-responsive">
+                    <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="rows" [loadingIndicator]="loadingIndicator"
+                        [columnMode]="ColumnMode.force" [footerHeight]="50" [limit]="10" rowHeight="auto">
+                        <ngx-datatable-column [width]="50" name="Item #" prop="item-code"></ngx-datatable-column>
+                        <ngx-datatable-column name="Item Name"></ngx-datatable-column>
+                        <!-- <ngx-datatable-column name="Description"></ngx-datatable-column> -->
+                        <ngx-datatable-column [width]="80" name="Batch #" prop="batch-code"></ngx-datatable-column>
+                        <ngx-datatable-column [width]="80" name="Expiry Date #"
+                            prop="expiry-date"></ngx-datatable-column>
+                        <ngx-datatable-column [width]="50" name="Pending Qty" prop="pending-qty"></ngx-datatable-column>
+                        <ngx-datatable-column name="Pending Remarks" prop="pending-remarks"></ngx-datatable-column>
+                        <ngx-datatable-column name="Indent #" prop="indent-no"></ngx-datatable-column>
+                        <ngx-datatable-column name="Action">
+                            <ng-template ngx-datatable-cell-template>
+                                <button class="btn btn-outline-primary btn-xs me-1" (click)="openXlModal(xlModal)"><span
+                                        class="feather icon-eye"></span></button>
+                                <button class="btn btn-primary btn-xs">Edit</button>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal-->
+<ng-template #xlModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Indent Details</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <double-scroll>
+        <!-- <div class="table-responsive"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <th>Indent Date</th>
+                        <th>Indent #</th>
+                        <th>Indent Name</th>
+                        <th>Indent From Location</th>
+                        <th>Indent To Location date</th>
+                        <th>Unit</th>
+                        <th>Issued Qty</th>
+                        <th>Receive Qty</th>
+                        <th>Reject Qty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>21-June-2022</td>
+                        <td>SI-78956234</td>
+                        <td>URIC ACID DXI800 BEXKMAN R1 4 X 12 ML, R2 4 x 5ML</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>45</td>
+                        <td>30</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>15-May-2022</td>
+                        <td>SI-78956234</td>
+                        <td>Serum Creatinine Test Kit CRT200 R1 4 X 12 ML, R2 4 x 5ML</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>45</td>
+                        <td>40</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>12-Apr-2022</td>
+                        <td>SI-78956234</td>
+                        <td>Albumin ELISA Kit ALB300</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>85</td>
+                        <td>75</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>21-June-2022</td>
+                        <td>SI-78956234</td>
+                        <td>Hemoglobin A1c Test HbA1c400</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>96</td>
+                        <td>59</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>01-Jan-2016</td>                        
+                        <td>SI-78956234</td>
+                        <td>Total Cholesterol TC100</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>857</td>
+                        <td>152</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td>18-July-2011</td>
+                        <td>SI-78956234</td>
+                        <td>Triglycerides Test TRG500</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>                        
+                        <td>Kit</td>
+                        <td>152</td>
+                        <td>85</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>22-March-2013</td>
+                        <td>SI-78956234</td>
+                        <td>C-Reactive Protein CRP600</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>                       
+                        <td>Kit</td>
+                        <td>63</td>
+                        <td>15</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>12-Apr-2022</td>
+                        <td>SI-78956234</td>
+                        <td>Albumin ELISA Kit ALB300</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>85</td>
+                        <td>75</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>21-June-2022</td>
+                        <td>SI-78956234</td>
+                        <td>Hemoglobin A1c Test HbA1c400</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>
+                        <td>Kit</td>
+                        <td>96</td>
+                        <td>59</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>18-July-2011</td>
+                        <td>SI-78956234</td>
+                        <td>Triglycerides Test TRG500</td>
+                        <td>YODA LIFELINE DIAGNOSTICS BIO CHEMISTRY</td>
+                        <td>YODA LIFELINE DIAGNOSTICS STORE </td>                        
+                        <td>Kit</td>
+                        <td>152</td>
+                        <td>85</td>
+                        <td>12</td>
+                    </tr>
+                </tbody>
+            </table>
+        <!-- </div> -->
+        </double-scroll>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    </div>
+</ng-template>
+<!-- Modal -->

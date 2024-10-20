@@ -1,0 +1,317 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/grn">GRN</a></li>
+        <li class="breadcrumb-item active" aria-current="page">New GRN</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">GRN Details</h6>
+                <form>
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label for="manufacturerName" class="form-label d-flex justify-content-between">GRN
+                                    Location </label>
+                                <select class="form-select" id="manufacturerName">
+                                    <option selected disabled>Select Location</option>
+                                    <option value="1">Manufacturer 1</option>
+                                    <option value="2">Manufacturer 2</option>
+                                    <option value="3">Manufacturer 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label for="machineName" class="form-label">Supplier</label> 
+                                <select class="form-select" id="machineName">
+                                    <option selected disabled>Select supplier</option>
+                                    <option value="1">Machine 1</option>
+                                    <option value="2">Machine 2</option>
+                                    <option value="3">Machine 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 align-items-end">
+                            <label class="form-check-label mb-2" for="itemFIFOorder">
+                                Search Option
+                            </label>
+                            <div class="mb-3 d-flex ">
+                                <div class="form-check me-1 mb-2 flex-shrink-0">
+                                    <input type="radio" class="form-check-input" id="itemFIFOorder">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Direct Rate
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2 flex-shrink-0">
+                                    <input type="radio" class="form-check-input" id="itemFIFOorder">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Quotation Rate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="manufacturerCatalogNo" class="form-label">Item</label>
+                                <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                    placeholder="Enter Item name">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="manufacturerCatalogNo" class="form-label">Item</label>
+                                <input type="text" id="manufacturerCatalogNo" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="manufacturerCatalogNo" class="form-label">Old PO Number</label>
+                                <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                    placeholder="Enter Old PO number">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Manufacturer</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select manufacturer</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Machine</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select machine</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Pack
+                                    Size</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select pack size</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">Barcode</label>
+                                <input type="text" id="manufacturerConverter" class="form-control"
+                                    placeholder="Scan barcode for quick GRN">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
+                            <div class="mb-3">
+                                <button class="btn-primary btn"><span class="feather icon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+
+                    <h6 class="card-title" >Item Details</h6>
+                    <div class="row">
+                        <div class="col-md-12 stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap" 
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            [footerHeight]="50" [limit]="10" rowHeight="auto">
+                                            <ngx-datatable-column [width]="50" name="New Batch"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="item Type"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="40" name="item Id"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Item"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Item Code"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="HSN Code"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Purchased Unit"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Conv Enter"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Consume Unit"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Barcode"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Batch No."></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Expiry on"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Rate"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Paid Qty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Extra Free Qty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Discount %"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="IGST %"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="CGST %"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="SGST %"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Dis. Amt."></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Total GST Amt."></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Buy Price"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="50" name="Net AMT."></ngx-datatable-column>
+                                           
+                                            <ngx-datatable-column [width]="50"  name="Action">
+                                                <ng-template ngx-datatable-cell-template>
+                                                    <button class="btn  btn-xs me-1" ><span
+                                                            class="mdi text-danger mdi-close-circle"></span></button>
+
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+
+                    <h6 class="card-title" >Invoice Details</h6>
+                    <div class="row">
+
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Invoice Number</label>
+                                <input type="text" id="itemName" class="form-control"
+                                    placeholder="Enter invoice number">
+                            </div>
+                        </div>
+
+                       
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label d-flex justify-content-between">Invoice Date </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="yyyy-mm-dd"
+                                        name="dp" [(ngModel)]="selectedDate" ngbDatepicker #d1="ngbDatepicker">
+                                    <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                      <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                  </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemHSNCode" class="form-label">Challan Number</label>
+                                <input type="text" id="itemHSNCode" class="form-control"
+                                    placeholder="Enter challan number">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemGSTTax" class="form-label d-flex justify-content-between">Challan Date</label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="yyyy-mm-dd"
+                                        name="dp" [(ngModel)]="selectedDate" ngbDatepicker #d="ngbDatepicker">
+                                    <button class="input-group-text" type="button" (click)="d.toggle()">
+                                      <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                  </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Gate Entry No.</label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter gate entry no">
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Frieght</label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter frieght">
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">Octroi</label>
+                                <input type="text" id="itemMakeModel" class="form-control" placeholder="Enter octroi">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Round Off</label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter round off">
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">GRN Amount</label>
+                                <input type="text" id="itemMakeModel" class="form-control"
+                                    placeholder="Enter GRN amount">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Invoice Amount</label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter invoice amount">
+                            </div>
+                        </div>
+
+
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">Narration</label>
+                                <input type="text" id="itemMakeModel" class="form-control"
+                                    placeholder="Enter narration">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
+                            <div class="mb-3">
+                                <button class="btn-primary btn"><span class="feather icon-plus"></span> Add</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end ">
+                        <div class="text-end d-flex align-items-end flex-end flex-column flex-sm-row">
+                        <div class="form-check mr-2 mb-2">
+                            <input type="checkbox" class="form-check-input" id="itemFIFOorder">
+                            <label class="form-check-label" for="itemFIFOorder">
+                               Print Barcode
+                            </label>
+                        </div>
+                        <div>
+                        <button type="button" class="btn btn-secondary me-2">Reset</button>
+                        <button type="button" class="btn btn-primary submit">Save</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

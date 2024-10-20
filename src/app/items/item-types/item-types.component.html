@@ -1,0 +1,112 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/items">Items</a></li>
+    <li class="breadcrumb-item active" aria-current="items">Item Types</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-12 stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title d-flex align-items-center justify-content-between">
+          <div>ITEM TYPES</div>
+          <div class="d-flex align-items-center">
+            <input type="text" class="form-control form-select-sm" placeholder="Search"
+              (ngModelChange)="changeSearch($event)" (input)="searchItem()" [(ngModel)]="Keyword" maxlength="48" />
+            <button class="btn btn-primary btn-sm w-100 ms-2" routerLink="./new-item-type">
+              <span class="feather icon-plus"></span> Add Item Type
+            </button>
+          </div>
+        </h6>
+        <div class="table-responsive" *ngIf="this.noItemsFound == false && !shimmerVisible">
+          <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="AllItemTypes"
+            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" [footerHeight]="50" [limit]="10"
+            rowHeight="auto">
+            <!-- <ngx-datatable-column name="Id" [width]="50"></ngx-datatable-column> -->
+            <ngx-datatable-column name="Category" prop="SubcategoryType"></ngx-datatable-column>
+            <ngx-datatable-column name="Item Type Code" prop="ItemTypeCode">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.ItemTypeCode?row.ItemTypeCode:'N/A'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Item Type Name" prop="ItemTypeName"></ngx-datatable-column>
+            <ngx-datatable-column name="Description" prop="Description" [width]="500"></ngx-datatable-column>
+            <!-- <ngx-datatable-column name="Status" prop="Status"></ngx-datatable-column> -->
+            <!-- <ngx-datatable-column name="Action"  [width]="70" [sortable]="false">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <button class="btn btn-primary btn-xs" id="edit-btn" placement="bottom"
+                                    routerLink="./new-item-type" (click)="GetSelectedItemType(row)"><span class="feather icon-edit"></span> Edit</button>
+                            </ng-template>
+                        </ngx-datatable-column> -->
+            <ngx-datatable-column name="Actions" [width]="100" [sortable]="false">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <div ngbDropdown>
+                  <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom" container="body"
+                    popoverClass="dataTableActions" [ngbPopover]="dataTableActions">
+                    Actions <span class="feather icon-chevron-down"></span>
+                  </button>
+                  <ng-template #dataTableActions>
+                    <div aria-labelledby="actionsDropdown">
+                      <button class="border-bottom" ngbDropdownItem routerLink="./new-item-type"
+                        (click)="GetSelectedItemType(row)">
+                        <span class="feather icon-edit"></span> Edit
+                      </button>
+                      <button class="border-bottom" ngbDropdownItem (click)="
+                          openBasicModal(deleteitemtypes); ItemtypeDetails(row)
+                        ">
+                        <span class="feather icon-trash-2"></span> Delete
+                      </button>
+                    </div>
+                  </ng-template>
+                </div>
+                <!-- <button class="btn btn-primary btn-xs"
+                                    [routerLink]="['/manufacturers/new-manufacturer',row.ManufacturGuid]"><span
+                                        class="feather icon-edit"></span> Edit</button> -->
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+        </div>
+        <!--Shimmer UI Table -->
+        <div class="p-4"><app-shimmers *ngIf="shimmerVisible" [type]="'table'"></app-shimmers></div>
+        <!--Shimmer UI Table -->
+        <!-- No records found UI -->
+        <ng-container *ngIf="this.noItemsFound == true && !shimmerVisible">
+          <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+            <div class="py-5 text-muted">
+              <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                <i class="feather icon-alert-circle fs-2"></i>
+                <span> No item types found!</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #deleteitemtypes let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Delete ItemType</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="mb-3">
+          <label for="itemName" class="form-label">Are you sure do you want to delete
+            <strong>{{ ItemTypeName }}</strong> ?</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+      No
+    </button>
+    <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon'); DeleteItemtype()">
+      Yes
+    </button>
+  </div>
+</ng-template>

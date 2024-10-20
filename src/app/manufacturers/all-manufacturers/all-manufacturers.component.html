@@ -1,0 +1,140 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Manufacturers</a></li>
+        <li class="breadcrumb-item active" aria-current="page">All Manufacturers</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>MANUFACTURERS</div>
+                    <div class="d-flex align-items-center text-end flex-column flex-sm-row">
+                        <div  *ngIf=" manufacturelist.length>0 " class="align-items-center d-flex flex-column flex-sm-row flex-shrink-0">
+                            <span class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0 ">
+                                {{(rowCount*(pageNumber-1))+1}}-{{TotalCount>rowCount*pageNumber?rowCount*pageNumber:TotalCount}}
+                                of
+                                {{TotalCount}} </span>
+                              
+                            <select name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm me-0 me-sm-2 mb-1 mb-sm-0"
+                                *ngIf="manufacturelist != null"(change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                        </div>
+                            <!-- <input type="text"   class="form-control form-select-sm mb-1 mb-sm-0 ms-0 ms-sm-2 h-38" 
+                             maxlength="48" placeholder="Search" [(ngModel)]="keyword" (ngModelChange)="changeSearch($event)" /> -->
+                             <input type="text" class="form-control form-select-sm me-0 me-sm-2 mb-1 mb-sm-0  h-38"
+                                maxlength="50" placeholder="Search" 
+                                (keyup)="changeSearch($event)" />
+                            
+                        <button class="btn btn-primary btn-sm  w-100 me-0 me-sm-2" *ngIf="(Roles.toLowerCase().includes('create'.toLowerCase()))"
+                            routerLink="/manufacturers/new-manufacturer"><span class="feather icon-plus"></span> Add
+                            Manufacturer</button>
+                    </div>
+                </h6>
+                <div class="table-responsive" *ngIf="!shimmerVisible">
+                    <ngx-datatable [scrollbarH]="true" class="bootstrap" [rows]="manufacturelist" 
+                        [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" rowHeight="auto">
+                        <ngx-datatable-column name="Manufacturer" prop="ManufactureName"></ngx-datatable-column>
+                        <ngx-datatable-column name="Contact Person" prop="ContactPerson">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.ContactPerson ? row.ContactPerson : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <ngx-datatable-column name="Contact No" prop="ContactNo">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.ContactNo ? row.ContactNo : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        
+                        <ngx-datatable-column name="Email" prop="Email">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.Email ? row.Email : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Address" prop="Address"></ngx-datatable-column>
+                        
+                        <!-- <ngx-datatable-column name="Status" prop="Status">
+                            <ng-template let-row="rows" ngx-datatable-cell-template>
+                                Active
+                            </ng-template>
+                        </ngx-datatable-column> -->
+                        <ngx-datatable-column name="Actions" [width]="100" [sortable]="false">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <div ngbDropdown>
+                                    <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom"
+                                        container="body" popoverClass="dataTableActions"
+                                        [ngbPopover]="dataTableActions">Actions <span
+                                            class="feather icon-chevron-down"></span></button>
+                                    <ng-template #dataTableActions>
+                                        <div aria-labelledby="actionsDropdown">
+                                            <button class="border-bottom" ngbDropdownItem *ngIf="(Roles.toLowerCase().includes('edit'.toLowerCase()))"
+                                                [routerLink]="['/manufacturers/new-manufacturer',row.ManufacturGuid]"><span
+                                                    class="feather icon-edit"></span> Edit</button>
+                                                    <button class="border-bottom" ngbDropdownItem *ngIf="(Roles.toLowerCase().includes('delete'.toLowerCase()))"
+                                                      (click)="openBasicModal(deleteManufacture);ManufactureDetails(row)"><span
+                                                        class="feather icon-trash-2"></span> Delete</button>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                                <!-- <button class="btn btn-primary btn-xs"
+                                    [routerLink]="['/manufacturers/new-manufacturer',row.ManufacturGuid]"><span
+                                        class="feather icon-edit"></span> Edit</button> -->
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="6" [rows]="5"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-container *ngIf="IsShow && !shimmerVisible">
+                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                        <div class="py-5 text-muted">
+                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                <i class="feather icon-alert-circle fs-2"></i>
+                                <span>No manufacturers found!</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="card-footer" *ngIf="!IsShow">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                    [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                    [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+
+                </div>
+            </div>
+        </div>      
+    </div>
+</div>
+
+<ng-template #deleteManufacture let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Manufacturer</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to delete 
+                        <strong>{{ManufactureName}}</strong> ?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');DeleteManufacture()">Yes</button>
+    </div>
+</ng-template>

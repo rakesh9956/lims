@@ -1,0 +1,412 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/dp-consumption">DP consumption</a> </li>
+        <li class="breadcrumb-item active" aria-current="page">DP consumption</li>
+    </ol>
+</nav>
+
+
+
+<div class="row">
+
+
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12  col-md-4 col-lg-3">
+                        <div class="mb-3">
+                            <label for="manufacturerName" class="form-label"> Locations<span
+                                    [ngClass]="{'text-danger': SelectedLocationGuid=='' || SelectedLocationGuid==undefined }">
+                                    *</span> </label>
+                            <ng-select placeholder="search by location" name="SelectedLocationGuid"
+                                [notFoundText]="'No location found!'" class="ng-select-custom-250min"
+                                [(ngModel)]="SelectedLocationGuid" (change)="SelectLocation($event)"
+                                [inputAttrs]="{ maxlength:'50' }" required #name="ngModel"
+                                [ngClass]="(SelectedLocationGuid=='' || SelectedLocationGuid==undefined)  && name?.touched? 'is-invalid' : ''"
+                                [items]="CenterLocation" bindValue="LocationGuid" bindLabel="LocationName">
+                            </ng-select>
+                            <div class="text-danger"
+                                *ngIf="(SelectedLocationGuid=='' || SelectedLocationGuid==undefined)  && name?.touched? 'is-invalid' : ''">
+                                Location is required !</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                </div>
+                <h6 class="card-title">Item Details</h6>
+                <!-- <div class="table-responsive"> -->
+                <div class="row">
+                    <div class="col-md-12 stretch-card">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <ng-container>
+                                    <div class="example">
+                                        <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                                            <li [ngbNavItem]="1">
+                                                <a ngbNavLink (click)="filterItems('InHandItems')">Inhand items</a>
+                                                <ng-template ngbNavContent>
+                                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                                        <div *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">Inhand items</div>
+                                                        <div class="d-flex align-items-center text-end" *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">
+                                                            <input type="text" class="form-control form-select-sm" placeholder="Search" [(ngModel)]="keyword" maxlength="48" (keyup)="search($event,'Consumed')" />
+                                                        </div>
+                                                    </h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table bg-white" *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="freeze-col">Item name</th>
+                                                                    <th>Vendor Item name</th>
+                                                                    <th>HSN code</th>
+                                                                    <th>Catalog No</th>
+                                                                    <th>Machine name</th>
+                                                                    <th>Major Unit name</th>
+                                                                    <th>Manufacturer</th>
+                                                                    <th>Expiry Date</th>
+                                                                    <th>Receive qty</th>
+                                                                    <th>Remaining qty</th>
+                                                                    <th>Consume qty</th>
+                                                                    <th>Return qty</th>
+                                                                    <th>Batch Number</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container *ngIf="!shimmerVisible">
+                                                                    <tr *ngFor="let Itemdetails of consumedItems ">
+                                                                        <td class="freeze-col">{{Itemdetails.ItemName}}</td>
+                                                                        <td>{{Itemdetails.VendorItemName?Itemdetails.VendorItemName:'N/A'}}</td>
+                                                                        <td>{{Itemdetails.HsnCode==''||null?'N/A':Itemdetails.HsnCode}}</td>
+                                                                        <td>{{Itemdetails.CatalogNo==''||null?'N/A':Itemdetails.CatalogNo}}</td>
+                                                                        <td>{{Itemdetails.MachineName==''?'N/A':Itemdetails.MachineName}}
+                                                                        </td>
+                                                                        <td>{{Itemdetails.MajorUnitName}}</td>
+                                                                        <td>{{Itemdetails.ManufactureName}}</td>
+                                                                        <td>{{Itemdetails.ExpiryDate=='0001-01-01T00:00:00'?'N/A':Itemdetails.ExpiryDate| date:'dd-MM-yyyy'}}</td>
+                                                                        <td>{{Itemdetails.ReceiveQty}}</td>
+                                                                        <td>{{Itemdetails.ConsumeQty -
+                                                                            Itemdetails.ReturnQuantity-Itemdetails.ScrapQuantity}}</td>
+                                                                        <td>{{Itemdetails.DPConsumeQty}}</td>
+                                                                        <td>{{Itemdetails.ReturnQuantity}}</td>
+                                                                        <th>{{Itemdetails.BatchNumber}}</th>
+                                                                        <td>
+                                                                            <button type="button"
+                                                                                *ngIf="Itemdetails.Status==false && Itemdetails.IsReturn==false  && Itemdetails.ConsumeQty - Itemdetails.ReturnQuantity-Itemdetails.ScrapQuantity!=0 && Itemdetails.ReceiveQty != Itemdetails.ScrapQuantity"
+                                                                                class="btn btn-outline-primary btn-icon-text"
+                                                                                (click)="openBackDropCustomClass(ConsumeItems);SetConsumeItems(Itemdetails)">
+                                                                                <i class="feather icon-shopping-bag link-icon me-1"></i>
+                                                                                <span class="vertical-align-middle">Consume Item</span>
+                                                                            </button>
+                                                                            <!-- <span class="text-success"
+                                                                                *ngIf="Itemdetails.Status==true || Itemdetails.ConsumeQty-Itemdetails.ScrapQuantity==0 && Itemdetails.ReceiveQty != Itemdetails.ScrapQuantity">Consumed</span>
+                                                                            <span class="text-danger"
+                                                                                *ngIf="Itemdetails.IsReturn==true">Returned</span>
+                                                                            <span class="text-info"
+                                                                                *ngIf="Itemdetails.IspartialReturn==true && Itemdetails.ConsumeQty - Itemdetails.ReturnQuantity -Itemdetails.ScrapQuantity==0">Partial
+                                                                                Returned</span>
+                                                                            <span class="text-danger"
+                                                                                *ngIf="Itemdetails.IsItemScrap==true && Itemdetails.ReceiveQty == Itemdetails.ScrapQuantity">Scraped</span> -->
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <!--Shimmer UI -->
+                                                                <ng-container *ngIf="shimmerVisible">
+                                                                    <tr *ngFor="let dummyLoop of [].constructor(3)">
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <!--Shimmer UI -->
+                                                            </tbody>
+                                                        </table>
+                                                        <ng-container
+                                                            *ngIf="consumedItems?.length==0 && SelectedLocationGuid && !IsShow && !shimmerVisible">
+                                                            <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                                                <div class="py-5 text-muted">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                                        <i class="feather icon-alert-circle fs-2"></i>
+                                                                        <span>No items found!</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="SelectedLocationGuid==''||SelectedLocationGuid=='00000000-0000-0000-0000-000000000000' || IsShow && !shimmerVisible">
+                                                            <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                                                <div class="py-5 text-muted">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                                        <i class="feather icon-alert-circle fs-2"></i>
+                                                                        <span>Please select location!</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>    
+                                                </ng-template>
+                                            </li>
+                                            <li [ngbNavItem]="2">
+                                                <a ngbNavLink (click)="filterItems('Consumed')">Consumed items</a>
+                                                <ng-template ngbNavContent>
+                                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                                        <div *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">Consume items</div>
+                                                        <div class="d-flex align-items-center text-end" *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">                                                            
+                                                            <input type="text" class="form-control form-select-sm" placeholder="Search" [(ngModel)]="keyword" maxlength="48" (keyup)="search($event,'InHandItems')"/>
+                                                        </div>
+                                                    </h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table bg-white" *ngIf="(SelectedLocationGuid != '' && SelectedLocationGuid != undefined && SelectedLocationGuid!='00000000-0000-0000-0000-000000000000')">
+                                                            <thead style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                                                <tr>
+                                                                    <th class="freeze-col">Item name</th>
+                                                                    <th>Vendor Item name</th>
+                                                                    <th>HSN code</th>
+                                                                    <th>Catalog No</th>
+                                                                    <th>Machine name</th>
+                                                                    <th>Major Unit name</th>
+                                                                    <th>Manufacturer</th>
+                                                                    <th>Expiry Date</th>
+                                                                    <th>Receive qty</th>
+                                                                    <th>Remaining qty</th>
+                                                                    <th>Consume qty</th>
+                                                                    <th>Return qty</th>
+                                                                    <th>Batch Number</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container *ngIf="!shimmerVisible">
+                                                                    <tr *ngFor="let Itemdetails of inHandItems">
+                                                                        <td class="freeze-col">{{Itemdetails.ItemName}}</td>
+                                                                        <td>{{Itemdetails.VendorItemName?Itemdetails.VendorItemName:'N/A'}}</td>
+                                                                        <td>{{Itemdetails.HsnCode==''||null?'N/A':Itemdetails.HsnCode}}</td>
+                                                                        <td>{{Itemdetails.CatalogNo==''||null?'N/A':Itemdetails.CatalogNo}}</td>
+                                                                        <td>{{Itemdetails.MachineName==''?'N/A':Itemdetails.MachineName}}
+                                                                        </td>
+                                                                        <td>{{Itemdetails.MajorUnitName}}</td>
+                                                                        <td>{{Itemdetails.ManufactureName}}</td>
+                                                                        <td>{{Itemdetails.ExpiryDate=='0001-01-01T00:00:00'?'N/A':Itemdetails.ExpiryDate| date:'dd-MM-yyyy'}}</td>
+                                                                        <td>{{Itemdetails.ReceiveQty}}</td>
+                                                                        <td>{{Itemdetails.ConsumeQty -
+                                                                            Itemdetails.ReturnQuantity-Itemdetails.ScrapQuantity}}</td>
+                                                                        <td>{{Itemdetails.DPConsumeQty}}</td>
+                                                                        <td>{{Itemdetails.ReturnQuantity}}</td>
+                                                                        <th>{{Itemdetails.BatchNumber}}</th>
+                                                                        <td>
+                                                                            <!-- <button type="button"
+                                                                                
+                                                                                class="btn btn-outline-primary btn-icon-text"
+                                                                                (click)="openBackDropCustomClass(ConsumeItems);SetConsumeItems(Itemdetails)">
+                                                                                <i class="feather icon-shopping-bag link-icon me-1"></i>
+                                                                                <span class="vertical-align-middle">Consume Item</span>
+                                                                            </button> -->
+                                                                            <span class="text-success"
+                                                                                *ngIf="Itemdetails.Status==true || Itemdetails.ConsumeQty-Itemdetails.ScrapQuantity==0 && Itemdetails.ReceiveQty != Itemdetails.ScrapQuantity">Consumed</span>
+                                                                            <span class="text-danger"
+                                                                                *ngIf="Itemdetails.IsReturn==true">Returned</span>
+                                                                            <span class="text-info"
+                                                                                *ngIf="Itemdetails.IspartialReturn==true && Itemdetails.ConsumeQty - Itemdetails.ReturnQuantity -Itemdetails.ScrapQuantity==0">Partial
+                                                                                Returned</span>
+                                                                            <span class="text-danger"
+                                                                                *ngIf="Itemdetails.IsItemScrap==true && Itemdetails.ReceiveQty == Itemdetails.ScrapQuantity">Scraped</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <!--Shimmer UI -->
+                                                                <ng-container *ngIf="shimmerVisible">
+                                                                    <tr *ngFor="let dummyLoop of [].constructor(3)">
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="shimmerBG line"></div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <!--Shimmer UI -->
+                                                            </tbody>
+                                                        </table>
+                                                        <ng-container
+                                                            *ngIf="inHandItems?.length==0 && SelectedLocationGuid && !IsShow && !shimmerVisible">
+                                                            <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                                                <div class="py-5 text-muted">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                                        <i class="feather icon-alert-circle fs-2"></i>
+                                                                        <span>No items found!</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="SelectedLocationGuid==''||SelectedLocationGuid=='00000000-0000-0000-0000-000000000000' || IsShow && !shimmerVisible">
+                                                            <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                                                <div class="py-5 text-muted">
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                                        <i class="feather icon-alert-circle fs-2"></i>
+                                                                        <span>Please select location!</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-template>
+                                            </li>
+                                        </ul>
+                                        <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+                                    </div>
+                                </ng-container>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- </div> -->
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-sm-12">
+        <hr>
+    </div> -->
+</div>
+
+<ng-template #ConsumeItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Consume items</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');ConsumeItemslist.clear();"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="IndentItemsDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr> 
+                                    <td>#</td>
+                                    <td>Item Name</td>
+                                    <td>Vendor Item Name</td>
+                                    <td>Batch Number</td>
+                                    <td>Expiry Date</td>
+                                    <td>Received Quantity</td>
+                                    <td>Consume Quantity</td>
+                                    <td>Units</td>
+                                    <td>On Board Stock</td>
+                                    <td>On Hand Stock</td>
+                                    <td>Reason For Use</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr formArrayName="ConsumeDetailItems"
+                                    *ngFor="let item of ConsumeItemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <td><input type="checkbox"   (change)="Checkeditem($event,item,i)">
+                                         </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ItemName}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].VendorItemName?this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].VendorItemName:'N/A'}}</td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].BatchNumber}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ExpiryDate=='0001-01-01T00:00:00'? 'N/A' : this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ExpiryDate| date:'dd-MM-yyyy'}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ReceiveQty}}
+                                            <!-- </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ConsumeQuantity}} -->
+                                        </td>
+                                        <td><input class="form-control" style="width:100px" min="0"
+                                                formControlName="ConsumeQuantity" (input)="ChangeConsumeQuantity(item,i)"
+                                               [max]="this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].oldConsumeQuantity" 
+                                                type="number"  (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"></td>
+                                        <td><input class="form-control" style="width:100px" formControlName="Units"
+                                                (ngModelChange)="setvalidauion($event, i)"
+                                                [value]="this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].Units"
+                                                (input)="ChangeConsume(item,i)" type="text"></td>
+                                        <td ><input class="form-control" type="number" [min]="0" formControlName="OnBoardStock"></td>
+                                        <td><input class="form-control" type="number" [min]="0" formControlName="OnHandStock"></td>
+                                        <td>
+                                            <textarea class="form-control h-38" formControlName="ReasonForUse"
+                                                [value]="this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ReasonForUse"></textarea>
+                                        </td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');ConsumeItemslist.clear()">Cancel</button>
+        <button type="button" class="btn btn-primary" [disabled]="(!isAnyValueFilled) || isQuantityCheck==true"
+            (click)="modal.close('by: Save button');SaveConsumeItems()">Save</button>
+    </div>
+</ng-template>

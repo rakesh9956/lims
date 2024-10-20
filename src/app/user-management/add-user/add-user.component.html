@@ -1,0 +1,1777 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/user-management">User Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="EmployeeGuid == '' ">{{b2bUsers==false?'Add User':'Add B2B Client'}}</li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="EmployeeGuid != '' && EmployeeGuid !=null ">{{b2bUsers==false?'Edit User':'Edit B2B Client'}}</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>Employee details</div>
+                    <ng-container *ngIf="!shimmerVisible">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-primary btn-sm ms-0 ms-sm-2"
+                                *ngIf="this.SelectedUserDetails?.IsDeleted==true && EmployeeGuid && !adminDisabled"
+                                (click)="clickDeactivate('Activate');">Make Active</button>
+                            <button class="btn btn-danger btn-sm w-100 ms-2"
+                                *ngIf="this.SelectedUserDetails?.IsDeleted==false && EmployeeGuid && !adminDisabled"
+                                (click)="clickDeactivate('Deactive');">Deactivate</button>
+                        </div>
+                    </ng-container>
+                    <!--Shimmer UI -->
+                    <ng-container *ngIf="shimmerVisible">
+                        <tr *ngFor="let dummyLoop of [].constructor(1)"
+                            class="align-items-end align-self-end d-flex justify-content-end">
+                            <td>
+                                <div class="d-flex text-end">
+                                    <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <!--Shimmer UI -->
+                </h6>
+                <form [formGroup]="employeeDetailsForm" *ngIf="!shimmerVisible && !b2bUsers">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Employee code<span
+                                        [ngClass]="{'text-danger': !employeeDetailsForm.value?.employeeCode}">
+                                        *</span></label>
+                                <input type="text" id="itemName" class="form-control" placeholder="Enter employee code"
+                                    formControlName="employeeCode" maxlength="20"
+                                    (input)="SearchDeatils($event,'EmployeeCode')" [readOnly]="EmployeeGuid!=''"
+                                    [ngClass]="employeeDetailsForm.get('employeeCode')?.hasError('required') && employeeDetailsForm.get('employeeCode')?.touched || (SearchCount && SearchType=='EmployeeCode')  ?  'is-invalid' : '' ">
+                                <div
+                                    *ngIf="employeeDetailsForm.get('employeeCode')?.hasError('required') && employeeDetailsForm.get('employeeCode')?.touched">
+                                    <span class="text-danger mt-4px d-block">Employee code is required!</span>
+                                </div>
+                                <div
+                                    *ngIf="SearchCount && employeeDetailsForm.value.employeeCode && SearchType=='EmployeeCode'">
+                                    <span class="text-danger mt-4px d-block">Employee code already exists!</span>
+                                </div>
+                                <div
+                                    *ngIf="!SearchCount && employeeDetailsForm.value.employeeCode && SearchType=='EmployeeCode'">
+                                    <span class="text-success mt-4px d-block">Valid Employee code!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemTemperature" class="form-label">Map pro</label>
+                                <select name="itemTemperature" id="itemTemperature" class="form-control">
+                                    <option selected disabled>Select One</option>
+                                    <option value="1">NA</option>
+                                    <option value="2">NA</option>
+                                    <option value="2">NA</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemHSNCode" class="form-label">Name<span
+                                        [ngClass]="{'text-danger': !name}"> *</span></label>
+                                <input type="text" id="itemHSNCode" class="form-control" placeholder="Enter name"
+                                    formControlName="name" maxlength="50"
+                                    [ngClass]="employeeDetailsForm.get('name')?.hasError('required') && employeeDetailsForm.get('name')?.touched? 'is-invalid' : '' ">
+                                <div
+                                    *ngIf="employeeDetailsForm.get('name')?.hasError('required') && employeeDetailsForm.get('name')?.touched">
+                                    <span class="text-danger mt-4px d-block">Name is required!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="manufacturerName" class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Designation</span>
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': !employeeDetailsForm.value?.DesignationGuid}"
+                                            class="ms-1">*</span> -->
+                                    </div>
+                                    <span class="small text-primary cursor-pointer" id="addNewManufacturer"
+                                        (click)="openBasicModal(designation);SearchCount=false;resetDesignationPopUp()">Add
+                                        New</span>
+                                </label>
+                                <!-- <select class="form-select" formControlName="DesignationGuid" maxlength="50"
+                                    [ngClass]="employeeDetailsForm.get('DesignationGuid')?.hasError('required') && employeeDetailsForm.get('DesignationGuid')?.touched? 'is-invalid' : '' ">
+                                    <option value='' selected disabled>Select designation</option>
+                                    <option *ngFor="let designation of lstDesignation"
+                                        [value]="designation.DesignationGuid">{{designation.DesignationName}}</option>
+                                </select> -->
+                                <ng-select [items]="lstDesignation" [closeOnSelect]="true" [searchable]="true"
+                                    bindValue="DesignationGuid" [inputAttrs]="{maxlength: '48'}"
+                                    bindLabel="DesignationName" placeholder="Select designation"
+                                    formControlName="DesignationGuid">
+                                </ng-select>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('DesignationGuid')?.hasError('required') && employeeDetailsForm.get('DesignationGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Designation is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Street No.
+                                    <!-- <span [ngClass]="{'text-danger': !streetNo}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter street no."
+                                    formControlName="streetNo" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('streetNo')?.hasError('required') && employeeDetailsForm.get('streetNo')?.touched">
+                                    <span class="text-danger mt-4px d-block">Street No. is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Locality
+                                    <!-- <span [ngClass]="{'text-danger': !locality}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter locality" formControlName="locality" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('locality')?.hasError('required') && employeeDetailsForm.get('locality')?.touched">
+                                    <span class="text-danger mt-4px d-block">Locality is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">City
+                                    <!-- <span [ngClass]="{'text-danger': !city}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control" placeholder="Enter city"
+                                    formControlName="city" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('city')?.hasError('required') && employeeDetailsForm.get('city')?.touched">
+                                    <span class="text-danger mt-4px d-block">City is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">Pincode
+                                    <!-- <span [ngClass]="{'text-danger': !Pincode}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemMakeModel" class="form-control" placeholder="Enter pincode"
+                                    formControlName="pincode" maxlength=6 (keypress)="phoneNoValidator($event)"
+                                    [ngClass]="employeeDetailsForm.get('pincode')?.hasError('required') && employeeDetailsForm.get('pincode')?.touched? 'is-invalid' : '' ">
+                                <span class="text-danger"
+                                    *ngIf="employeeDetailsForm.get('pincode')?.invalid && !employeeDetailsForm.get('pincode')?.hasError('required')">
+                                    Enter valid pincode!
+                                </span>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('pincode')?.hasError('required') && employeeDetailsForm.get('pincode')?.touched">
+                                    <span class="text-danger mt-4px d-block">Pincode is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                        <h6 class="card-title">Office address</h6>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">House No.
+                                    <!-- <span [ngClass]="{'text-danger': !houseNo}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter house no."
+                                    formControlName="houseNo" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('houseNo')?.hasError('required') && employeeDetailsForm.get('houseNo')?.touched">
+                                    <span class="text-danger mt-4px d-block">House No. is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Street No.
+                                    <!-- <span [ngClass]="{'text-danger': !ofcStreetNo}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter street no."
+                                    formControlName="ofcStreetNo" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('ofcStreetNo')?.hasError('required') && employeeDetailsForm.get('ofcStreetNo')?.touched">
+                                    <span class="text-danger mt-4px d-block">Street No. is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Locality
+                                    <!-- <span [ngClass]="{'text-danger': !ofcLocality}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter locality" formControlName="ofcLocality" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('ofcLocality')?.hasError('required') && employeeDetailsForm.get('ofcLocality')?.touched">
+                                    <span class="text-danger mt-4px d-block">Locality is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">City
+                                    <!-- <span [ngClass]="{'text-danger': !ofcCity}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control" placeholder="Enter city"
+                                    formControlName="ofcCity" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('ofcCity')?.hasError('required') && employeeDetailsForm.get('ofcCity')?.touched">
+                                    <span class="text-danger mt-4px d-block">City is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">Pincode
+                                    <!-- <span [ngClass]="{'text-danger': !ofcPincode}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemMakeModel" class="form-control" placeholder="Enter pincode"
+                                    formControlName="ofcPincode" maxlength=6 (keypress)="phoneNoValidator($event)">
+                                <span class="text-danger"
+                                    *ngIf="employeeDetailsForm.get('ofcPincode')?.invalid && !employeeDetailsForm.get('ofcPincode')?.hasError('required')">
+                                    Enter valid pincode!
+                                </span>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('ofcPincode')?.hasError('required') && employeeDetailsForm.get('ofcPincode')?.touched">
+                                    <span class="text-danger mt-4px d-block">Pincode is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Email<span [ngClass]="{'text-danger': !email}">
+                                        *</span></label>
+                                <!-- <label for="itemCode" class="form-label">Email<span [ngClass]="{'text-danger': employeeDetailsForm.get('email')?.hasError('required') && employeeDetailsForm.get('email')?.touched}"> *</span></label> -->
+                                <div class="position-relative">
+                                    <input type="text" id="itemCode" class="form-control" placeholder="Enter email"
+                                        (keyup)="EmailKeyup($event)" formControlName="email" required maxlength="40"
+                                        on-focusout="employeeDetailsForm.value.email!=employeeDetailsForm.value.updatedEmail?focusOutFunction():'';defaultEmail($event)"
+                                        [ngClass]="employeeDetailsForm.get('email')?.hasError('required') && employeeDetailsForm.get('email')?.touched? 'is-invalid' : ''">
+                                    <div class="spinLoader" *ngIf="SpinnerCheck">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18"
+                                            height="18">
+                                            <path fill="none" d="M0 0h24v24H0z" />
+                                            <path
+                                                d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('email')?.hasError('required') && employeeDetailsForm.get('email')?.touched">
+                                    <span class="text-danger mt-4px d-block">Email is required!</span>
+                                </ng-container> -->
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('email')?.hasError('required') && employeeDetailsForm.get('email')?.touched">
+                                    <span class="text-danger mt-4px d-block">Email is required!</span>
+                                </ng-container>
+                                <!-- <ng-container
+                                *ngIf="employeeDetailsForm.value.email!='' && u.email.errors">
+                                    <span class="text-danger mt-4px d-block">Enter valid email!</span>
+                                </ng-container> -->
+                                <ng-container
+                                    *ngIf="(!employeeDetailsForm.get('email')?.hasError('required'))  && employeeDetailsForm.get('email')?.invalid &&(employeeDetailsForm.get('email') || employeeDetailsForm.get('email')?.dirty);">
+                                    <span class="text-danger mt-4px d-block">Enter a valid email!</span>
+                                </ng-container>
+                                <ng-container *ngIf="employeeDetailsForm.value.email ">
+                                    <span class="form-error-message"
+                                        [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                        {{EmailResponse}}
+                                    </span>
+                                </ng-container>
+
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-4">
+                            <div class="mb-3 col-xl-12">
+                                <div class="phoneWrapper">
+                                    <div class="countryCodeWrapper">
+                                        <label for="formLabel">Country code<span
+                                                [ngClass]="{'text-danger': employeeDetailsForm.value.countrycode?.length == 0 }">
+                                                *</span></label>
+                                        <select id="countryCode" formControlName="countrycode" maxlength="50"
+                                            [ngClass]="employeeDetailsForm.get('countrycode')?.hasError('required') && employeeDetailsForm.get('countrycode')?.touched? 'is-invalid' : '' "
+                                            class="form-control login-input pl-2 countryCodeBox phone-dropdown"
+                                            (change)="Oncountrychange($event)">
+                                            <option value="+91" selected disabled>+91-(IN)</option>
+                                            <!-- <option value="+91">+91-(IN)</option> -->
+                                            <!-- <option *ngFor="let option of countrycode" [value]="option.dialCode">
+                                                {{option.dialCode}} - ({{option.isoCode}}) </option> -->
+                                        </select>
+                                        <div
+                                            *ngIf="employeeDetailsForm.get('countrycode')?.hasError('required') && employeeDetailsForm.get('countrycode')?.touched">
+                                            <span class="text-danger mt-4px d-block">Country code is required!</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 phone-input">
+                                        <label for="itemSpecialization" class="form-label">Mobile No.
+                                            <!-- <span [ngClass]="{'text-danger': !mobileNo}"> *</span> -->
+                                        </label>
+                                        <input type="text" id="itemSpecialization" class="form-control"
+                                            (keypress)="phoneNoValidator($event)" placeholder="Enter mobile number"
+                                            formControlName="mobileNo" maxlength="10">
+                                        <!-- <ng-container
+                                            *ngIf="employeeDetailsForm.get('mobileNo')?.hasError('required') && employeeDetailsForm.get('mobileNo')?.touched">
+                                            <span class="text-danger mt-4px d-block">Mobile No. is required!</span>
+                                        </ng-container> -->
+                                        <span class="text-danger position-absolute"
+                                            *ngIf="mobileNo?.length <=9 && mobileNo?.length !=''&& mobileNo!=null">
+                                            Enter valid mobile number!
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+                            
+                        </div> -->
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label"> Landline No.
+                                    <!-- <span [ngClass]="{'text-danger': !phoneNo}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter Landline number" formControlName="phoneNo" maxlength="11"
+                                    (keypress)="landlineNoValidator($event)">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('phoneNo')?.hasError('required') && employeeDetailsForm.get('phoneNo')?.touched">
+                                    <span class="text-danger mt-4px d-block">Landline No. is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                    <h6 class="card-title">Personal details</h6>
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Father's name
+                                    <!-- <span [ngClass]="{'text-danger': !fathersName}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter father's name"
+                                    formControlName="fathersName" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('fathersName')?.hasError('required') && employeeDetailsForm.get('fathersName')?.touched">
+                                    <span class="text-danger mt-4px d-block">Father's name is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Mother's name
+                                    <!-- <span [ngClass]="{'text-danger': !mothersName}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter mother's name" formControlName="mothersName" maxlength="50">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('mothersName')?.hasError('required') && employeeDetailsForm.get('mothersName')?.touched">
+                                    <span class="text-danger mt-4px d-block">Mother's name is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="Date of Birth" class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>DOB</span>
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': employeeDetailsForm.get('dob')?.invalid}"
+                                            class="ms-1"> *</span> -->
+                                    </div>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dd" maxlength="10"
+                                        readonly formControlName="dob" ngbDatepicker #d1="ngbDatepicker"
+                                        (input)="phoneNoValidator($event)">
+                                    <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('dob')?.hasError('required') && employeeDetailsForm.get('dob')?.touched">
+                                    <span class="text-danger mt-4px d-block">DOB is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemMakeModel" class="form-label">Qualification</label>
+                                <input type="text" id="itemMakeModel" class="form-control"
+                                    placeholder="Enter qualification" formControlName="qualification" maxlength="50"
+                                    [ngClass]="employeeDetailsForm.get('qualification')?.hasError('required') && employeeDetailsForm.get('qualification')?.touched? 'is-invalid' : '' ">
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('qualification')?.hasError('required') && employeeDetailsForm.get('qualification')?.touched">
+                                    <span class="text-danger mt-4px d-block">Qualification is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">ESI number</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter ESI number"
+                                    formControlName="esiNumber" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">EPF number</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter EPF number"
+                                    formControlName="epfNumber" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">PAN number
+                                    <!-- <span [ngClass]="{'text-danger': !panNumber}"> *</span> -->
+                                </label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter PAN number" formControlName="panNumber" maxlength="10">
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('panNumber')?.hasError('required') && employeeDetailsForm.get('panNumber')?.touched">
+                                    <span class="text-danger mt-4px d-block">PAN number is required!</span>
+                                </ng-container> -->
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.value.panNumber!='' && u.panNumber.errors &&  panNumber!=null">
+                                    <span class="text-danger mt-4px d-block">Enter valid pan number!</span>
+                                </ng-container>
+
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemSpecialization" class="form-label">Passport number</label>
+                                <input type="text" id="itemSpecialization" class="form-control"
+                                    placeholder="Enter passport number" formControlName="passportNumber" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="Start Date" class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Start date</span>
+                                        <!-- <span [ngClass]="{'text-danger': employeeDetailsForm.get('startDate')?.invalid}"
+                                            class="ms-1">*</span> -->
+                                    </div>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" maxlength="10"
+                                        formControlName="startDate" ngbDatepicker #d="ngbDatepicker" readonly
+                                        (input)="phoneNoValidator($event)"
+                                        [maxDate]="{year: maxCurDate.year, month: maxCurDate.month, day: maxCurDate.day}">
+                                    <button class="input-group-text" type="button" (click)="d.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('startDate')?.hasError('required') && employeeDetailsForm.get('startDate')?.touched">
+                                    <span class="text-danger mt-4px d-block">Start date is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Blood group</span>
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': employeeDetailsForm.get('bloodGroup')?.invalid}"
+                                            class="ms-1">*</span> -->
+                                    </div>
+                                </label>
+                                <select class="form-select bloodGroup" formControlName="bloodGroup"
+                                    [ngClass]="employeeDetailsForm.get('bloodGroup')?.hasError('required') && employeeDetailsForm.get('bloodGroup')?.touched? 'is-invalid' : '' ">
+                                    <option value="" disabled selected hidden>Select blood group</option>
+                                    <option value="1">A+</option>
+                                    <option value="2">A-</option>
+                                    <option value="3">B+</option>
+                                    <option value="4">B-</option>
+                                    <option value="5">AB+</option>
+                                    <option value="6">AB-</option>
+                                    <option value="7">O+</option>
+                                    <option value="8">O-</option>
+                                </select>
+                                <!-- <ng-container
+                                    *ngIf="employeeDetailsForm.get('bloodGroup')?.hasError('required') && employeeDetailsForm.get('bloodGroup')?.touched">
+                                    <span class="text-danger mt-4px d-block">Blood group is required!</span>
+                                </ng-container> -->
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="AccessMobileApp">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Access mobile app
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="allowSharing">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Allow sharing
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="approveSpecialRate">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Approve special rate
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="amrValueAccess">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        AMR value access
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="hideRate">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Hide rate
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-8 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="approveAmendmentofMachineReading">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Can save/Approve amendment of machine reading
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="sampleLogisticReject">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Sample logistic reject
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                        formControlName="globalReportAccess">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                        Global report access
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+
+
+                    </div>
+                    <h6 class="card-title">Approvals</h6>
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">GRN</label>
+                            <ng-multiselect-dropdown formControlName="GRNApprovals" [placeholder]="'Select GRN'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsGRN">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">IM</label>
+                            <ng-multiselect-dropdown formControlName="IMApprovals" [placeholder]="'Select IM'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsIM">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+
+                            <label class="form-label d-flex justify-content-between">IS</label>
+                            <ng-multiselect-dropdown formControlName="ISApprovals" [placeholder]="'Select IS'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsIS">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">PI</label>
+                            <ng-multiselect-dropdown formControlName="PIApprovals" [placeholder]="'Select PI'"
+                                [settings]="piDropdownSettings" [data]="ApprovalDetailsPI">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">PO</label>
+                            <ng-multiselect-dropdown formControlName="POApprovals" [placeholder]="'Select PO'"
+                                [settings]="poDropdownSettings" [data]="ApprovalDetailsPO">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">POD</label>
+                            <ng-multiselect-dropdown formControlName="PODApprovals" [placeholder]="'Select POD'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsPOD">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SI</label>
+                            <ng-multiselect-dropdown formControlName="SIApprovals" [placeholder]="'Select SI'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSI">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+
+                            <label class="form-label d-flex justify-content-between">SPV</label>
+                            <ng-multiselect-dropdown formControlName="SPVApprovals" [placeholder]="'Select SPV'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSPV">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SR</label>
+                            <ng-multiselect-dropdown formControlName="SRApprovals" [placeholder]="'Select SR'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSR">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">VM</label>
+                            <ng-multiselect-dropdown formControlName="VMApprovals" [placeholder]="'Select VM'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsVM">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">VQ</label>
+                            <ng-multiselect-dropdown formControlName="VQApprovals" [placeholder]="'Select VQ'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsVQ">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">QO</label>
+                            <ng-multiselect-dropdown formControlName="QOApprovals" [placeholder]="'Select QO'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsQO">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SCRAP</label>
+                            <ng-multiselect-dropdown formControlName="SCRAPApprovals" [placeholder]="'Select scrap'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSCRAP">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SRF</label>
+                            <ng-multiselect-dropdown formControlName="SRFApprovals" [placeholder]="'Select SRF'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSRF">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SUPPLIER</label>
+                            <ng-multiselect-dropdown formControlName="SUPPLIERApprovals" [placeholder]="'Select supplier'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSUPPLIER">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">MANUFACTURE</label>
+                            <ng-multiselect-dropdown formControlName="MANUFACTUREApprovals" [placeholder]="'Select Manufacture'"
+                            [settings]="dropdownSettings" [data]="ApprovalDetailsMANUFACTURE">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                              <label class="form-label d-flex justify-content-between">Payment Roles</label>
+                              <ng-select [items]="PaymentRoles"
+                                         [closeOnSelect]="true"
+                                         [searchable]="false"
+                                         bindValue="DesignationName"
+                                         bindLabel="DesignationName"
+                                         placeholder="Select payment role"
+                                         formControlName="paymentRoles">
+                              </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                    </div>
+
+                    <h6 class="card-title">Center details</h6>
+                    <div class="row">
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Head quarters</span><span
+                                            [ngClass]="{'text-danger': !employeeDetailsForm.value?.CenterGuid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                    <!-- <span class="small text-primary cursor-pointer w-auto"
+                                        (click)="openBasicModal(addCenter);reset();SearchCount=false">Add
+                                        new</span> -->
+                                </label>
+                                <!-- <select class="form-select" formControlName="CenterGuid"
+                                    [ngClass]="employeeDetailsForm.get('CenterGuid')?.hasError('required') && employeeDetailsForm.get('CenterGuid')?.touched? 'is-invalid' : '' ">
+                                    <option value='' selected disabled>Select center</option>
+                                    <option *ngFor="let center of lstCenter" [value]="center.CenterGuid">
+                                        {{center.CompanyName}}</option>
+                                </select> -->
+                                <ng-select [items]="lstCenter" [closeOnSelect]="true" [searchable]="true"
+                                    [ngClass]="{'is-invalid':employeeDetailsForm.get('CenterGuid')?.hasError('required') && employeeDetailsForm.get('CenterGuid')?.touched}"
+                                    bindValue="CenterGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="Center"
+                                    placeholder="Select head quarters" formControlName="CenterGuid">
+                                </ng-select>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('CenterGuid')?.hasError('required') && employeeDetailsForm.get('CenterGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Head quarters is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Center </span><span
+                                            [ngClass]="{'text-danger': employeeDetailsForm.get('CenterLocationList')?.invalid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                </label>
+                                <ng-multiselect-dropdown formControlName="CenterLocationList"
+                                    (onDeSelect)="onSelectCenters($event)"
+                                    [ngClass]="{'is-invalid':employeeDetailsForm.get('CenterLocationList')?.hasError('required') && employeeDetailsForm.get('CenterLocationList')?.touched}"
+                                    placeholder="Select Center" [settings]="CenterdropdownSettings"
+                                    [data]="lstLocations" (click)="onClickMultiselect('CenterLocationList')">
+                                </ng-multiselect-dropdown>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('CenterLocationList')?.hasError('required') && employeeDetailsForm.get('CenterLocationList')?.touched ">
+                                    <span class="text-danger">Center is required!</span>
+                                </ng-container>
+                            </div>
+                        </div> -->
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <!-- <label class="form-label d-flex justify-content-between">
+                                <div>
+                                    <span>Specific centers</span><span
+                                        [ngClass]="{'text-danger': !employeeDetailsForm.value?.CenterLocationGuid}"
+                                        class="ms-1"> *</span>
+                                </div>
+                            </label> -->
+                            <div>
+                                <span>Centers</span><span
+                                    [ngClass]="{'text-danger': !employeeDetailsForm.value?.CenterLocationGuid}"
+                                    class="ms-1"> *</span>
+                            </div>
+                            <!-- <select class="form-select" formControlName="CenterLocationGuid"
+                                [ngClass]="employeeDetailsForm.get('CenterLocationGuid')?.hasError('required') && employeeDetailsForm.get('CenterLocationGuid')?.touched? 'is-invalid' : '' ">
+                                <option value='' selected disabled>Select center</option>
+                                <option *ngFor="let location of lstLocations" [value]="location.CenterGuid">
+                                    {{location.Center}}</option>
+                            </select> -->
+                            <!-- [items]="StateLocationDetails"  -->
+                            <ng-select [items]="lstLocations" [closeOnSelect]="true" [searchable]="true"
+                                [ngClass]="{'is-invalid':employeeDetailsForm.get('CenterLocationGuid')?.hasError('required') && employeeDetailsForm.get('CenterLocationGuid')?.touched}"
+                                bindValue="CenterGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="CompanyName"
+                                (change)="ChangeCenter($event)" placeholder="Select specific center"
+                                formControlName="CenterLocationGuid">
+                            </ng-select>
+                            <ng-container
+                                *ngIf="employeeDetailsForm.get('CenterLocationGuid')?.hasError('required') && employeeDetailsForm.get('CenterLocationGuid')?.touched">
+                                <span class="text-danger mt-4px d-block">Specific center is required!</span>
+                            </ng-container>
+                        </div>
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Locations</span><span
+                                            [ngClass]="{'text-danger': employeeDetailsForm.get('LstDeapartments')?.invalid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                </label>
+                                <ng-multiselect-dropdown formControlName="LstDeapartments"
+                                    (onDeSelect)="onlocationSelect($event)"
+                                    [ngClass]="{'is-invalid':employeeDetailsForm.get('LstDeapartments')?.hasError('required') && employeeDetailsForm.get('LstDeapartments')?.touched}"
+                                    placeholder="Select locations" [settings]="departmentsDropdownSettings"
+                                    [data]="lstDepartment" (click)="onClickMultiselect('LstDeapartments')">
+                                </ng-multiselect-dropdown>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('LstDeapartments')?.hasError('required') && employeeDetailsForm.get('LstDeapartments')?.touched ">
+                                    <span class="text-danger">location is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+
+
+
+                        <!-- <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label
+                                    class="form-label d-flex justify-content-between">Departments</label>
+                                <select class="form-select">
+                                    <option selected disabled>Select department</option>
+                                    <option [value]="i" *ngFor="let department of departments; let i = index">{{department}}</option>
+                                    
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <div class="col-lg-3 col-md-6 col-sm-3">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Zone</span><span
+                                            [ngClass]="{'text-danger': !employeeDetailsForm.value?.ZoneGuid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                </label>
+                                <!-- <select class="form-select" formControlName="ZoneGuid"
+                                    [ngClass]="employeeDetailsForm.get('ZoneGuid')?.hasError('required') && employeeDetailsForm.get('ZoneGuid')?.touched? 'is-invalid' : '' ">
+                                    <option value="" selected disabled>Select zone</option>
+                                    <option *ngFor="let zone of lstZone" [value]="zone.ZoneGuid">{{zone.Zone}}</option>
+                                </select> -->
+                                <ng-select [items]="lstZone" [closeOnSelect]="true" [searchable]="true"
+                                    [ngClass]="{'is-invalid':employeeDetailsForm.get('ZoneGuid')?.hasError('required') && employeeDetailsForm.get('ZoneGuid')?.touched}"
+                                    bindValue="ZoneGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="Zone"
+                                    placeholder="Select zone" formControlName="ZoneGuid">
+                                </ng-select>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('ZoneGuid')?.hasError('required') && employeeDetailsForm.get('ZoneGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Zone is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6 col-sm-3">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>State</span><span
+                                            [ngClass]="{'text-danger': !employeeDetailsForm.value?.StateGuid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                </label>
+                                <!-- <select class="form-select" formControlName="StateGuid"
+                                    [ngClass]="employeeDetailsForm.get('StateGuid')?.hasError('required') && employeeDetailsForm.get('StateGuid')?.touched? 'is-invalid' : '' ">
+                                    <option value='' selected disabled>Select state</option>
+                                    <option *ngFor="let state of lstState" [value]="state.StateGuid">{{state.State}}
+                                    </option>
+                                </select> -->
+                                <ng-select [items]="StateDetails" [closeOnSelect]="true" [searchable]="true"
+                                    [readonly]="true"
+                                    [ngClass]="{'is-invalid':employeeDetailsForm.get('StateGuid')?.hasError('required') && employeeDetailsForm.get('StateGuid')?.touched}"
+                                    bindValue="StateGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="StateName"
+                                    placeholder="Select zone" formControlName="StateGuid">
+                                </ng-select>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('StateGuid')?.hasError('required') && employeeDetailsForm.get('StateGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">State is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-3 mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <div>
+                                    <span>Roles</span><span
+                                        [ngClass]="{'text-danger': employeeDetailsForm.get('LstRoles')?.invalid}"
+                                        class="ms-1"> *</span>
+                                </div>
+                            </label>
+                            <ng-multiselect-dropdown formControlName="LstRoles" [placeholder]="'Select Roles'"
+                                [settings]="roleDropdownSettings" [data]="lstRole" (onSelect)="onitemSelect($event)"
+                                (onDeSelect)="onDeSelectRoles($event)" (click)="onClickMultiselect('LstRoles')"
+                                [ngClass]="{'is-invalid':employeeDetailsForm.get('LstRoles')?.hasError('required') && employeeDetailsForm.get('LstRoles')?.touched}">
+                            </ng-multiselect-dropdown>
+                            <ng-container
+                                *ngIf="employeeDetailsForm.get('LstRoles')?.hasError('required') && employeeDetailsForm.get('LstRoles')?.touched?'is-invalid' : ''">
+                                <span class="text-danger mt-4px d-block">Roles is required!</span>
+                            </ng-container>
+                        </div>
+
+                        <!-- <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Center</span><span
+                                            [ngClass]="{'text-danger': !employeeDetailsForm.value.CenterGuid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                    <span class="small text-primary cursor-pointer w-auto"
+                                        (click)="openBasicModal(addCenter);reset()">Add
+                                        new</span>
+                                </label>
+                                <select class="form-select" formControlName="CenterGuid"
+                                    [ngClass]="employeeDetailsForm.get('CenterGuid')?.hasError('required') && employeeDetailsForm.get('CenterGuid')?.touched? 'is-invalid' : '' ">
+                                    <option value='' selected disabled>Select center</option>
+                                    <option *ngFor="let center of lstCenter" [value]="center.CenterGuid">
+                                        {{center.CompanyName}}</option>
+                                </select>
+                                <ng-container
+                                    *ngIf="employeeDetailsForm.get('CenterGuid')?.hasError('required') && employeeDetailsForm.get('CenterGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Center is required!</span>
+                                </ng-container>
+                            </div>
+                        </div> -->
+
+
+                        <!-- <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">Default
+                                    center</label>
+                                <select class="form-select">
+                                    <option selected disabled>Select default center</option>
+                                    <option value="1">center 1</option>
+                                    <option value="2">center 2</option>
+                                    <option value="3">center 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">Default
+                                    roles </label>
+                                <select class="form-select roles-select" formControlName="defaultRoles">
+                                    <option style="color: gray" value="" disabled selected hidden>Select default roles
+                                    </option>
+                                    <option *ngFor="let lst of defaultRole" value="{{lst.RoleGuid}}">{{lst.RoleName}}
+                                    </option>
+                                    <!-- <option value="2">roles 2</option>
+                                    <option value="3">roles 3</option> -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h6 class="card-title">Login details</h6>
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">User name<span
+                                        [ngClass]="{'text-danger': employeeDetailsForm.get('userName')?.invalid && employeeDetailsForm.get('userName')?.errors}">
+                                        *</span></label>
+                                <input type="text" id="manufacturerConverter" class="form-control"
+                                    class="form-control pr-35px" [attr.disabled]="EmployeeGuid ? '' : null"
+                                    placeholder="Enter user name" formControlName="userName" readonly>
+                                <!-- <span class="help-block form-error-message"
+                                    *ngIf="employeeDetailsForm.get('userName')?.errors">
+                                    <span class="text-danger"
+                                        *ngIf="employeeDetailsForm.get('userName')?.hasError('required') && 
+                                            (employeeDetailsForm.get('userName')?.touched)">User
+                                        name is required!
+                                    </span>
+                                </span>
+
+                                <span class="text-danger form-error-message"
+                                    *ngIf="(!employeeDetailsForm.get('userName')?.hasError('required'))  && employeeDetailsForm.get('userName')?.invalid &&(employeeDetailsForm.get('userName') || employeeDetailsForm.get('email')?.dirty);">
+                                    Enter valid user name!
+                                </span> -->
+                                <!-- <ng-template #validuser>
+                                    <ng-container
+                                        *ngIf="employeeDetailsForm.value.email !=employeeDetailsForm.value.userName && employeeDetailsForm.value.userName!='' && employeeDetailsForm.value.email!=''; else validEmail ">
+                                        <span class="text-danger mt-4px d-block">Email and username must match!</span>
+                                    </ng-container>
+                                </ng-template> -->
+                                <!-- <ng-template #validEmail>
+                                    <ng-container *ngIf="employeeDetailsForm.value.userName && DuplicateCheck">
+                                        <span class="form-error-message"
+                                            [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                            {{EmailResponse}}
+                                        </span>
+                                    </ng-container>
+                                </ng-template> -->
+
+                                <!-- on-focusout="focusOutFunction()" -->
+                                <!-- <ng-container  *ngIf="employeeDetailsForm.value.email.length >0">
+                        <span [ngStyle]="{'color':EmailValid  ? 'green' : 'red' }">
+                            {{EmailResponse}}
+                        </span>
+                    </ng-container> -->
+                                <!-- <span class="text-danger form-error-message"
+                        *ngIf="(!employeeDetailsForm.get('userName')?.hasError('required'))  && employeeDetailsForm.get('userName')?.invalid &&(employeeDetailsForm.get('userName') || employeeDetailsForm.get('email')?.dirty)">
+                        Enter valid user name!
+                    </span> -->
+                                <!-- <span class="help-block form-error-message" *ngIf="employeeDetailsForm.get('userName')?.errors">
+                        <span class="text-danger" *ngIf="employeeDetailsForm.get('userName')?.hasError('required') && 
+                        (employeeDetailsForm.get('userName')?.touched || employeeDetailsForm.get('userName')?.dirty)">User name is required!
+                        </span>
+                    </span> -->
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Password <span
+                                        [ngClass]="{'text-danger': !employeeDetailsForm.value.password}">
+                                        *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isPsVisible ? 'text' : 'password'" type="password"
+                                        (input)="onFocusOutEvents($event)" id="password" class="form-control pr-40"
+                                        placeholder="Enter password" formControlName="password"
+                                        [attr.disabled]="EmployeeGuid ? '' : null" minlength="8" maxlength="16"
+                                        [ngClass]="(employeeDetailsForm.get('password')?.hasError('required')) && employeeDetailsForm.get('password')?.touched ||  (employeeDetailsForm.value.password?.length<8 && employeeDetailsForm.value.password!=='' && employeeDetailsForm.value.password!=null) ?'is-invalid': ''">
+                                    <!-- <ng-container
+                                        *ngIf="employeeDetailsForm.get('password')?.invalid && employeeDetailsForm.get('password')?.hasError('required')">
+                                    </ng-container> -->
+                                    <div class="invalid-feedback">
+
+                                        <!-- <ng-container
+                                          *ngIf="employeeDetailsForm.get('password')?.hasError('required') &&  !employeeDetailsForm.get('password')?.touched && submitted">
+                                          Password is required!
+                                        </ng-container> -->
+                                    </div>
+                                    <button class="btn password-visibility-icon" type="button"
+                                        (click)="EmployeeGuid?null:togglePsVisibility()">
+                                        <ng-container *ngIf="isPsVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                        <ng-template #isNotVisible>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-template>
+                                    </button>
+
+                                    <div class="pwValidPopover">
+                                        <div class="pwValidPopover_Header">Passwords must be at least eight characters
+                                            long and
+                                            contain at least one lowercase letter, one uppercase letter, one number, and
+                                            one special
+                                            character.</div>
+                                        <span></span>
+                                        <div class="pwValidPopover_Body">
+                                            <ul class="pwValidPopover_Body_list">
+                                                <li
+                                                    [ngClass]="{'active':!u['password'].hasError('hasSmallCase')&& (u['password'].dirty||u['password'].touched)&&u['password'].value}">
+                                                    <span></span> Lowercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!u['password'].hasError('hasCapitalCase')&& (u['password'].dirty||u['password'].touched)&&u['password'].value}">
+                                                    <span></span> Uppercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!u['password'].hasError('hasNumber')&& (u['password'].dirty||u['password'].touched)&& u['password'].value}">
+                                                    <span></span> Number
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!u['password'].hasError('hasSpecialCharacter')&& (u['password'].dirty||u['password'].touched)&&u['password'].value}">
+                                                    <span></span> Special character
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!u['password'].errors?.minlength && (u['password'].dirty||u['password'].touched)&&u['password'].value}">
+                                                    <span></span> # of characters
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-danger mt-4px d-block"
+                                    *ngIf="employeeDetailsForm.get('password')?.hasError('required') && employeeDetailsForm.get('password')?.touched">
+                                    password is required!
+                                </span>
+
+                                <div *ngIf="u['password'].errors?.minlength" class="text-danger mt-4px d-block">
+                                    Password must be at least 8 characters!
+                                </div>
+                                <div
+                                    *ngIf="!employeeDetailsForm.get('password')?.hasError('required') && employeeDetailsForm.get('password')?.invalid && !u['password'].errors?.minlength && !EmployeeGuid">
+                                    <span class="text-danger mt-4px d-block"> Password is invalid!</span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Confirm password<span
+                                        [ngClass]="{'text-danger': !employeeDetailsForm.value.confirmPassword
+                                    || employeeDetailsForm.controls.confirmPassword.value !== employeeDetailsForm.controls.password.value }">
+                                        *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isCpVisible ? 'text' : 'password'" type="password"
+                                        id="Confirm password" class="form-control pr-40"
+                                        placeholder="Enter confirm password" formControlName="confirmPassword"
+                                        (input)="onFocusOutEvent($event)" minlength="8" maxlength="16"
+                                        [attr.disabled]="EmployeeGuid ? '' : null" [ngClass]="{
+                                            'is-invalid': (employeeDetailsForm.get('confirmPassword')?.hasError('required') && 
+                                            employeeDetailsForm.get('confirmPassword')?.touched && !IsvalidPasword) ,
+                                            'is-valid': employeeDetailsForm.controls.confirmPassword.value !== '' && IsvalidPasword && cpIsValid && employeeDetailsForm.controls.confirmPassword.value==employeeDetailsForm.controls.password.value
+                                        }">
+                                    <ng-container
+                                        *ngIf="(employeeDetailsForm.get('confirmPassword')?.hasError('required')) && employeeDetailsForm.get('confirmPassword')?.touched && confirmPassword.length==0? 'is-invalid' : ''">
+                                        <span class="text-danger mt-4px d-block">Confirm password is
+                                            required!
+                                        </span>
+                                    </ng-container>
+                                    <ng-container
+                                        *ngIf="employeeDetailsForm.controls.confirmPassword.value !== employeeDetailsForm.controls.password.value
+                                         && employeeDetailsForm.get('confirmPassword')?.touched && confirmPassword?.length!==0">
+                                        <span class="text-danger mt-4px d-block">Password and confirm password must
+                                            match!</span>
+                                    </ng-container>
+
+
+                                    <!-- <ng-container
+                                        *ngIf="employeeDetailsForm.value.confirmPassword !=employeeDetailsForm.value.password && employeeDetailsForm.get('confirmPassword')?.touched? 'is-invalid' : '' ">
+                                        <span class="text-danger mt-4px d-block">Password and confirm password
+                                            must
+                                            match!</span>
+                                    </ng-container> -->
+
+                                    <!-- <div class="invalid-feedback"
+                                    [ngClass]="{'d-block':f['confirmPassword'].hasError('notEquivalent')&&(f['confirmPassword'].touched)&& f['confirmPassword'].value}">
+                                    Password and confirm password must match!
+                                  </div> -->
+                                    <button class="btn password-visibility-icon" type="button"
+                                        (click)="EmployeeGuid?null:toggleCpVisibility()">
+                                        <ng-container *ngIf="isCpVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                        <!-- <ng-template #isNotVisible>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-template> -->
+                                    </button>
+                                    <!-- <div class="invalid-feedback"
+                                        [ngClass]="{'d-block': u.confirmPassword.errors &&  employeeDetailsForm.value.confirmPassword!='' || undefined}">
+                                        Password and confirm password must match!
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form [formGroup]="b2buserDetailsForm" *ngIf="!shimmerVisible && b2bUsers">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="client" class="form-label">Client type<span
+                                    [ngClass]="{'text-danger': !b2buserDetailsForm.value?.Clienttype}">
+                                    *</span></label>
+                                    <ng-select [items]="Clienttype " [closeOnSelect]="true" [searchable]="true" formControlName="Clienttype"
+                                    [ngClass]="b2buserDetailsForm.get('Clienttype')?.hasError('required') && b2buserDetailsForm.get('Clienttype')?.touched? 'is-invalid' : '' "
+                                    bindLabel="item_text" bindValue="item_text" placeholder="Select client type" [notFoundText]="'No client type found!'">
+                                </ng-select>
+                                <div
+                                    *ngIf="b2buserDetailsForm.get('Clienttype')?.hasError('required') && b2buserDetailsForm.get('Clienttype')?.touched">
+                                    <span class="text-danger mt-4px d-block">Client type is required!</span>
+                                </div>  
+                                 <!-- <select  id="rowLimit"
+                                    class="form-select form-select-sm mw-80px ms-0 ms-sm-2 mb-1 mb-sm-0 h-38">
+                                    <option value={{item.item_text}} *ngFor="let item of Clienttype">{{item.item_text}}</option>
+                                </select> -->  
+                                                                                                 
+                                </div>
+                            </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="employeeCode" class="form-label">Client B2b code<span
+                                        [ngClass]="{'text-danger': !b2buserDetailsForm.value?.employeeCode}">
+                                        *</span></label>
+                                <input type="text" id="employeeCode" class="form-control"
+                                    placeholder="Enter employee code" formControlName="employeeCode" maxlength="20"
+                                    [attr.disabled]="EmployeeGuid ? '' : null"
+                                    (input)="SearchDeatils($event,'employeeCode')" (keyup)="B2BCode($event)"
+                                    [ngClass]="b2buserDetailsForm.get('employeeCode')?.hasError('required') && b2buserDetailsForm.get('employeeCode')?.touched || (SearchCount && SearchType=='EmployeeCode')  ?  'is-invalid' : '' ">
+                                <div
+                                    *ngIf="b2buserDetailsForm.get('employeeCode')?.hasError('required') && b2buserDetailsForm.get('employeeCode')?.touched">
+                                    <span class="text-danger mt-4px d-block"> Client B2B code is required!</span>
+                                </div>
+                                <div
+                                    *ngIf="(!b2buserDetailsForm.get('employeeCode')?.hasError('required'))&& b2buserDetailsForm.get('employeeCode')?.invalid &&(b2buserDetailsForm.get('employeeCode') || b2buserDetailsForm.get('employeeCode')?.dirty);">
+                                    <span class="text-danger mt-4px d-block">Enter a valid B2B code!</span>
+                                </div>
+                                <div
+                                    *ngIf="SearchCount && b2buserDetailsForm.value.employeeCode && SearchType=='employeeCode'&& b2buserDetailsForm.value.employeeCode.length>10">
+                                    <span class="text-danger mt-4px d-block">B2B code already exists!</span>
+                                </div>
+                                <div
+                                    *ngIf="!SearchCount && b2buserDetailsForm.value.employeeCode && b2buserDetailsForm.get('employeeCode')?.valid && SearchType=='employeeCode'">
+                                    <span class="text-success mt-4px d-block">Valid B2B code!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name<span
+                                        [ngClass]="{'text-danger': !b2buserDetailsForm.value.name}"> *</span></label>
+                                <input type="text" id="name" class="form-control" placeholder="Enter name"
+                                    formControlName="name" maxlength="50"  (keyup)="click($event )"
+                                    [ngClass]="b2buserDetailsForm.get('name')?.hasError('required') && b2buserDetailsForm.get('name')?.touched? 'is-invalid' : '' ">
+                                <div
+                                    *ngIf="b2buserDetailsForm.get('name')?.hasError('required') && b2buserDetailsForm.get('name')?.touched">
+                                    <span class="text-danger mt-4px d-block">Name is required!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3 col-xl-12">
+                                <div class="phoneWrapper">
+                                    <div class="countryCodeWrapper">
+                                        <label for="formLabel">Country code<span
+                                                [ngClass]="{'text-danger': b2buserDetailsForm.value.countrycode?.length == 0 }">
+                                                *</span></label>
+                                        <select id="countryCode" formControlName="countrycode" maxlength="50"
+                                            [ngClass]="b2buserDetailsForm.get('countrycode')?.hasError('required') && b2buserDetailsForm.get('countrycode')?.touched? 'is-invalid' : '' "
+                                            class="form-control login-input pl-2 countryCodeBox phone-dropdown"
+                                            (change)="Oncountrychange($event)">
+                                            <option value="+91" selected disabled>+91-(IN)</option>
+                                            <!-- <option value="+91">+91-(IN)</option> -->
+                                            <!-- <option *ngFor="let option of countrycode" [value]="option.dialCode">
+                                                {{option.dialCode}} - ({{option.isoCode}}) </option> -->
+                                        </select>
+                                        <div
+                                            *ngIf="b2buserDetailsForm.get('countrycode')?.hasError('required') && b2buserDetailsForm.get('countrycode')?.touched">
+                                            <span class="text-danger mt-4px d-block">Country code is required!</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-90 phone-input">
+                                        <label for="itemSpecialization" class="form-label">Mobile No.
+                                            <!-- <span [ngClass]="{'text-danger': !mobileNo}"> *</span> -->
+                                        </label>
+                                        <input type="text" id="itemSpecialization" class="form-control"
+                                            (keypress)="phoneNoValidator($event)" placeholder="Enter mobile number"
+                                            formControlName="mobileNo" maxlength="10">
+                                        <!-- <ng-container
+                                            *ngIf="employeeDetailsForm.get('mobileNo')?.hasError('required') && employeeDetailsForm.get('mobileNo')?.touched">
+                                            <span class="text-danger mt-4px d-block">Mobile No. is required!</span>
+                                        </ng-container> -->
+                                        <span class="text-danger position-absolute"
+                                            *ngIf="mobileNo?.length <=9 && mobileNo?.length !=''&& mobileNo!=null">
+                                            Enter valid mobile number!
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Email<span [ngClass]="{'text-danger': !userName}">
+                                        *</span></label>
+                                <div class="position-relative">
+                                    <input type="text" id="itemCode" class="form-control" placeholder="Enter email"
+                                        (keyup)="EmailKeyup($event)" formControlName="userName" required maxlength="40"
+                                        on-focusout="focusOutFunction();" [attr.disabled]="EmployeeGuid ? '' : null"
+                                        [ngClass]="b2buserDetailsForm.get('userName')?.hasError('required') && b2buserDetailsForm.get('userName')?.touched? 'is-invalid' : ''">
+                                    <div class="spinLoader" *ngIf="SpinnerCheck">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18"
+                                            height="18">
+                                            <path fill="none" d="M0 0h24v24H0z" />
+                                            <path
+                                                d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <ng-container
+                                    *ngIf="b2buserDetailsForm.get('userName')?.hasError('required') && b2buserDetailsForm.get('userName')?.touched">
+                                    <span class="text-danger mt-4px d-block">Email is required!</span>
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="(!b2buserDetailsForm.get('userName')?.hasError('required'))  && b2buserDetailsForm.get('userName')?.invalid &&(b2buserDetailsForm.get('userName') || b2buserDetailsForm.get('userName')?.dirty);">
+                                    <span class="text-danger mt-4px d-block">Enter a valid email!</span>
+                                </ng-container>
+                                <ng-container *ngIf="b2buserDetailsForm.value.userName ">
+                                    <span class="form-error-message"
+                                        [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                        {{EmailResponse}}
+                                    </span>
+                                </ng-container>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr>
+                    </div>
+                    <h6 class="card-title">Center details</h6>
+                    <div class="row">
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between">
+                                    <div>
+                                        <span>Locations</span><span
+                                            [ngClass]="{'text-danger': b2buserDetailsForm.get('LstDeapartments')?.invalid}"
+                                            class="ms-1"> *</span>
+                                    </div>
+                                </label>
+                                <ng-multiselect-dropdown formControlName="LstDeapartments"
+                                    [ngClass]="{'is-invalid':b2buserDetailsForm.get('LstDeapartments')?.hasError('required') && b2buserDetailsForm.get('LstDeapartments')?.touched}"
+                                    placeholder="Select locations" [settings]="departmentsDropdownSettings"
+                                    [data]="lstDepartment">
+                                </ng-multiselect-dropdown>
+                                <ng-container
+                                    *ngIf="b2buserDetailsForm.get('LstDeapartments')?.hasError('required') && b2buserDetailsForm.get('LstDeapartments')?.touched ">
+                                    <span class="text-danger">location is required!</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-3 mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <div>
+                                    <span>Roles</span><span
+                                        [ngClass]="{'text-danger': b2buserDetailsForm.get('LstRoles')?.invalid}"
+                                        class="ms-1"> *</span>
+                                </div>
+                            </label>
+                            <ng-multiselect-dropdown formControlName="LstRoles" [placeholder]="'Select Roles'" [disabled]="EmployeeGuid"
+                            [settings]="roleDropdownSettings" [data]="b2BlstRole" (onSelect)="onitemSelect($event)"
+                            (onDeSelect)="onDeSelectRoles($event)" (click)="onClickMultiselect('LstRoles')"
+                                [ngClass]="{'is-invalid':b2buserDetailsForm.get('LstRoles')?.hasError('required') && b2buserDetailsForm.get('LstRoles')?.touched}">
+                            </ng-multiselect-dropdown>
+                            <ng-container
+                                *ngIf="b2buserDetailsForm.get('LstRoles')?.hasError('required') && b2buserDetailsForm.get('LstRoles')?.touched?'is-invalid' : ''">
+                                <span class="text-danger mt-4px d-block">Roles is required!</span>
+                            </ng-container>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 grid-margin mb-3">
+                            <label class="form-label d-flex justify-content-between">SI</label>
+                            <ng-multiselect-dropdown formControlName="SIApprovals" [placeholder]="'Select SI'"
+                                [settings]="dropdownSettings" [data]="ApprovalDetailsSI">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-3 mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <div>
+                                    <span>Items</span><span
+                                        [ngClass]="{'text-danger': b2buserDetailsForm.get('LstItemDetails')?.invalid}"
+                                        class="ms-1"> *</span>
+                                </div>
+                            </label>
+                            <ng-multiselect-dropdown formControlName="LstItemDetails" [placeholder]="'Select Items'"
+                                [settings]="ItemDropdownSettings" [data]="lstItems" (onSelect)="onitemSelect($event)"
+                                (onDeSelect)="onItemDeSelectRoles('LstItemDetails')" (click)="onClickitemMultiselect('LstItemDetails')"
+                                [ngClass]="{'is-invalid':b2buserDetailsForm.get('LstItemDetails')?.hasError('required') && b2buserDetailsForm.get('LstItemDetails')?.touched}">
+                            </ng-multiselect-dropdown>
+                            <ng-container
+                                *ngIf="b2buserDetailsForm.get('LstItemDetails')?.hasError('required') && b2buserDetailsForm.get('LstItemDetails')?.touched?'is-invalid' : ''">
+                                <span class="text-danger mt-4px d-block">Items is required!</span>
+                            </ng-container>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h6 class="card-title">Login detailsb2b</h6>
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">User name <span
+                                        [ngClass]="{'text-danger': b2buserDetailsForm.get('email')?.invalid && b2buserDetailsForm.get('email')?.errors}">
+                                        *</span></label>
+                                <div class="position-relative">
+                                    <input type="text" id="manufacturerConverter" class="form-control" readonly [attr.disabled]="EmployeeGuid&&!EmployeeGuid" 
+                                    on-focusout="focusOutFunction()"
+                                        class="form-control pr-35px"  (keyup)="click($event)"
+                                        placeholder="Enter user name" formControlName="email" >
+                                    <div class="spinLoader" *ngIf="SpinnerCheck">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18"
+                                            height="18">
+                                            <path fill="none" d="M0 0h24v24H0z" />
+                                            <path
+                                                d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- <ng-container *ngIf="b2buserDetailsForm.value.email ">
+                                        <span class="form-error-message"
+                                            [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                            {{EmailValid?'Valid UserName':EmailResponse}}
+                                        </span>
+                                    </ng-container> -->
+                                <!-- <span class="help-block form-error-message"
+                                    *ngIf="employeeDetailsForm.get('userName')?.errors">
+                                    <span class="text-danger"
+                                        *ngIf="employeeDetailsForm.get('userName')?.hasError('required') && 
+                                            (employeeDetailsForm.get('userName')?.touched)">User
+                                        name is required!
+                                    </span>
+                                </span>
+
+                                <span class="text-danger form-error-message"
+                                    *ngIf="(!employeeDetailsForm.get('userName')?.hasError('required'))  && employeeDetailsForm.get('userName')?.invalid &&(employeeDetailsForm.get('userName') || employeeDetailsForm.get('email')?.dirty);">
+                                    Enter valid user name!
+                                </span> -->
+                                <!-- <ng-template #validuser>
+                                    <ng-container
+                                        *ngIf="employeeDetailsForm.value.email !=employeeDetailsForm.value.userName && employeeDetailsForm.value.userName!='' && employeeDetailsForm.value.email!=''; else validEmail ">
+                                        <span class="text-danger mt-4px d-block">Email and username must match!</span>
+                                    </ng-container>
+                                </ng-template> -->
+                                <!-- <ng-template #validEmail>
+                                    <ng-container *ngIf="employeeDetailsForm.value.userName && DuplicateCheck">
+                                        <span class="form-error-message"
+                                            [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                            {{EmailResponse}}
+                                        </span>
+                                    </ng-container>
+                                </ng-template> -->
+
+                                <!-- on-focusout="focusOutFunction()" -->
+                                <!-- <ng-container  *ngIf="employeeDetailsForm.value.email.length >0">
+                        <span [ngStyle]="{'color':EmailValid  ? 'green' : 'red' }">
+                            {{EmailResponse}}
+                        </span>
+                    </ng-container> -->
+                                <!-- <span class="text-danger form-error-message"
+                        *ngIf="(!employeeDetailsForm.get('userName')?.hasError('required'))  && employeeDetailsForm.get('userName')?.invalid &&(employeeDetailsForm.get('userName') || employeeDetailsForm.get('email')?.dirty)">
+                        Enter valid user name!
+                    </span> -->
+                                <!-- <span class="help-block form-error-message" *ngIf="employeeDetailsForm.get('userName')?.errors">
+                        <span class="text-danger" *ngIf="employeeDetailsForm.get('userName')?.hasError('required') && 
+                        (employeeDetailsForm.get('userName')?.touched || employeeDetailsForm.get('userName')?.dirty)">User name is required!
+                        </span>
+                    </span> -->
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Password <span
+                                        [ngClass]="{'text-danger': !b2buserDetailsForm.value.password}">
+                                        *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isPsVisible ? 'text' : 'password'" type="password"
+                                        (input)="onFocusOutEvents($event)"  id="password" class="form-control pr-40"
+                                        placeholder="Enter password" formControlName="password"
+                                        [attr.disabled]="EmployeeGuid ? '' : null" minlength="8" maxlength="16"
+                                        [ngClass]="(b2buserDetailsForm.get('password')?.hasError('required')) && b2buserDetailsForm.get('password')?.touched ||  (employeeDetailsForm.value.password?.length<8 && employeeDetailsForm.value.password!=='' && employeeDetailsForm.value.password!=null) ?'is-invalid': ''">
+                                    <!-- <ng-container
+                                        *ngIf="employeeDetailsForm.get('password')?.invalid && employeeDetailsForm.get('password')?.hasError('required')">
+                                    </ng-container> -->
+                                    <div class="invalid-feedback">
+
+                                        <!-- <ng-container
+                                          *ngIf="employeeDetailsForm.get('password')?.hasError('required') &&  !employeeDetailsForm.get('password')?.touched && submitted">
+                                          Password is required!
+                                        </ng-container> -->
+                                    </div>
+                                    <button class="btn password-visibility-icon" type="button"
+                                        (click)="EmployeeGuid?null:togglePsVisibility()">
+                                        <ng-container *ngIf="isPsVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                        <ng-template #isNotVisible>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-template>
+                                    </button>
+
+                                    <div class="pwValidPopover">
+                                        <div class="pwValidPopover_Header">Passwords must be at least eight characters
+                                            long and
+                                            contain at least one lowercase letter, one uppercase letter, one number, and
+                                            one special
+                                            character.</div>
+                                        <span></span>
+                                        <div class="pwValidPopover_Body">
+                                            <ul class="pwValidPopover_Body_list">
+                                                <li
+                                                    [ngClass]="{'active':!b2b['password'].hasError('hasSmallCase')&& (b2b['password'].dirty||b2b['password'].touched)&&b2b['password'].value}">
+                                                    <span></span> Lowercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!b2b['password'].hasError('hasCapitalCase')&& (b2b['password'].dirty||b2b['password'].touched)&&b2b['password'].value}">
+                                                    <span></span> Uppercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!b2b['password'].hasError('hasNumber')&& (b2b['password'].dirty||b2b['password'].touched)&& b2b['password'].value}">
+                                                    <span></span> Number
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!b2b['password'].hasError('hasSpecialCharacter')&& (b2b['password'].dirty||b2b['password'].touched)&&b2b['password'].value}">
+                                                    <span></span> Special character
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!b2b['password'].errors?.minlength && (b2b['password'].dirty||b2b['password'].touched)&&b2b['password'].value}">
+                                                    <span></span> # of characters
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-danger mt-4px d-block"
+                                    *ngIf="b2buserDetailsForm.get('password')?.hasError('required') && b2buserDetailsForm.get('password')?.touched">
+                                    password is required!
+                                </span>
+
+                                <div *ngIf="b2b['password'].errors?.minlength" class="text-danger mt-4px d-block">
+                                    Password must be at least 8 characters!
+                                </div>
+                                <div
+                                    *ngIf="!b2buserDetailsForm.get('password')?.hasError('required') && b2buserDetailsForm.get('password')?.invalid && !b2b['password'].errors?.minlength && !EmployeeGuid">
+                                    <span class="text-danger mt-4px d-block"> Password is invalid!</span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3 col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Confirm password<span
+                                        [ngClass]="{'text-danger': !b2buserDetailsForm.value.confirmPassword
+                                                            || b2buserDetailsForm.controls.confirmPassword.value !== b2buserDetailsForm.controls.password.value }">
+                                        *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isCpVisible ? 'text' : 'password'" type="password" id="Confirm password"
+                                        class="form-control pr-40" placeholder="Enter confirm password" formControlName="confirmPassword"
+                                        (input)="onFocusOutEvent($event)" minlength="8" maxlength="16"
+                                        [attr.disabled]="EmployeeGuid ? '' : null" [ngClass]="{
+                                                                    'is-invalid': (b2buserDetailsForm.get('confirmPassword')?.hasError('required') && 
+                                                                    b2buserDetailsForm.get('confirmPassword')?.touched && !IsvalidPasword) ,
+                                                                    'is-valid': b2buserDetailsForm.controls.confirmPassword.value !== '' && IsvalidPasword && cpIsValid
+                                                                }">
+                                    <ng-container
+                                        *ngIf="(b2buserDetailsForm.get('confirmPassword')?.hasError('required')) && b2buserDetailsForm.get('confirmPassword')?.touched && confirmPassword.length==0? 'is-invalid' : ''">
+                                        <span class="text-danger mt-4px d-block">Confirm password is
+                                            required!
+                                        </span>
+                                    </ng-container>
+                                    <ng-container *ngIf="!b2buserDetailsForm.get('confirmPassword')?.hasError('required') && b2buserDetailsForm.controls.confirmPassword.value !==
+                                                                 b2buserDetailsForm.controls.password.value">
+                                        <span class="text-danger mt-4px d-block">Password and confirm password must
+                                            match!</span>
+                                    </ng-container>
+                                   
+                                    <!--- <ng-container>
+                                            <label for="itemName" class="form-label">Accepted only excel file</label>
+                                             <span class="text-muted float small">Accepted only excel file.</span> 
+                                            <input class="form-control pr-40" #fileInput type="file" id="upload-resume" fileToUpload 
+                                                (change)="uploadData($event)" accept=".excel" placeholder="Enter consumption unit">
+                                            <span class="text-muted text-end">You can download sample file from <button
+                                                    class="btn btn-link p-0 align-baseline">here</button>.</span>
+                                                    
+                                        </ng-container> -->
+                                   
+                        
+                        
+                                    <!-- <ng-container
+                                                                *ngIf="employeeDetailsForm.value.confirmPassword !=employeeDetailsForm.value.password && employeeDetailsForm.get('confirmPassword')?.touched? 'is-invalid' : '' ">
+                                                                <span class="text-danger mt-4px d-block">Password and confirm password
+                                                                    must
+                                                                    match!</span>
+                                                            </ng-container> -->
+                        
+                                    <!-- <div class="invalid-feedback"
+                                                            [ngClass]="{'d-block':f['confirmPassword'].hasError('notEquivalent')&&(f['confirmPassword'].touched)&& f['confirmPassword'].value}">
+                                                            Password and confirm password must match!
+                                                          </div> -->
+                                    <button class="btn password-visibility-icon" type="button" (click)="EmployeeGuid?null:toggleCpVisibility()">
+                                        <ng-container *ngIf="isCpVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                        <!-- <ng-template #isNotVisible>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                                        height="20">
+                                                                        <path fill="none" d="M0 0h24v24H0z" />
+                                                                        <path
+                                                                            d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                                                            fill="rgba(143,143,143,1)" />
+                                                                    </svg>
+                                                                </ng-template> -->
+                                    </button>
+                                    <!-- <div class="invalid-feedback"
+                                                                [ngClass]="{'d-block': u.confirmPassword.errors &&  employeeDetailsForm.value.confirmPassword!='' || undefined}">
+                                                                Password and confirm password must match!
+                                                            </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row" *ngIf="!shimmerVisible">
+                    <div class="col-sm-12 text-end" *ngIf="!b2bUsers">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                            (click)="reset()">Reset</button>
+                        <button type="button" *ngIf="EmployeeGuid == '' " class="btn btn-primary submit"
+                            [disabled]="employeeDetailsForm.invalid || !FormChanged || !IsvalidPasword || SearchCount || DuplicateCheck"
+                            (click)="clickSave()">Save</button>
+
+                        <!-- [disabled]="employeeDetailsForm.invalid || !FormChanged" [disabled]="!FormChanged"-->
+                        <button type="button" *ngIf="EmployeeGuid !== '' && EmployeeGuid != null"
+                            class="btn btn-primary submit" (click)="UpdateEmployee()"
+                            [disabled]="employeeDetailsForm.invalid || employeeDetailsForm.get('mobileNo')?.invalid || (mobileNo?mobileNo.length <= 9:'' || phoneNo?phoneNo.length <= 10 : '') || !FormChanged">Update</button>
+                    </div>
+                    <div class="col-sm-12 text-end" *ngIf="b2bUsers">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"  
+                            (click)="B2Breset()">Reset</button>
+                        <button type="button" *ngIf="EmployeeGuid == '' " class="btn btn-primary submit" [disabled]="b2buserDetailsForm.invalid || !FormChanged || !IsvalidPasword"
+                            (click)="clickSave()">Save</button>
+                        <button type="button" *ngIf="EmployeeGuid !== '' && EmployeeGuid != null"
+                            class="btn btn-primary submit" (click)="Updateb2bEmployee()"
+                            [disabled]="!FormChanged||b2buserDetailsForm.invalid">Update</button>
+                    </div>
+                </div>
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Designation -->
+<ng-template #designation let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add designation </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"
+            (click)="resetDesignationPopUp()"></button>
+    </div>
+    <div class="modal-body">
+        <div [formGroup]="designationForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Designation<span
+                                [ngClass]="{'text-danger': designationForm.value.designation==null  }">
+                                *</span></label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter designation"
+                            formControlName="designation" maxlength="50"
+                            (keyup)="keyDownHandler($event);SearchDeatils($event,'Designation')"
+                            [ngClass]="{'is-invalid':designationForm.get('designation')?.hasError('required') && designationForm.get('designation')?.touched || (SearchCount && SearchType=='Designation')}">
+                        <ng-container
+                            *ngIf="designationForm.get('designation')?.hasError('required') && designationForm.get('designation')?.touched">
+                            <span class="text-danger mt-4px d-block">Designation is required!</span>
+                        </ng-container>
+                        <span class="text-danger form-error-message"
+                            *ngIf="SearchCount && designationForm.value.designation && SearchType=='Designation'">
+                            Designation already exists!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="designationForm.invalid || SearchCount"
+            (click)="designationsave('CusDesignation');modal.close('by: close icon')|| duplicate">Save</button>
+    </div>
+</ng-template>
+<!-- Modal -->
+
+<!-- Center -->
+<ng-template #addCenter let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add center</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" (click)="resetCenterPopup()"
+            aria-label="Close"></button>
+    </div>
+    <!-- <div class="modal-body">
+        <div [formGroup]="centerForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Center name<span
+                                [ngClass]="{'text-danger': centerForm.value.center?.length == 0  }"> *</span></label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter center name"
+                            [ngClass]=" centerForm.get('center')?.touched? 'is-invalid' : '' " formControlName="center"
+                            (input)="SearchDeatils($event,'Center')" maxlength="50">
+                        <ng-container
+                            *ngIf="centerForm.get('center')?.hasError('required') && centerForm.get('center')?.touched">
+                            <span class="text-danger mt-4px d-block">Center name is required!</span>
+                        </ng-container>
+                        <ng-container *ngIf="SearchCount && centerForm.value.center">
+                            <span class="text-danger mt-4px d-block">Center already exists!</span>
+                        </ng-container>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="!centerForm.value.center || SearchCount "
+            (click)="centersave();modal.close('by: close icon')">Save</button>
+    </div> -->
+</ng-template>
+<!-- Modal -->

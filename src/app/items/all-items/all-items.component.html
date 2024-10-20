@@ -1,0 +1,472 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a>Item</a></li> -->
+        <li class="breadcrumb-item active" aria-current="items">All Items</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body p-0">
+                <ng-container *ngIf="!shimmerVisible && IsShow">
+                    <div class="example">
+                        <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                            <li [ngbNavItem]="1">
+                                <a ngbNavLink (click)="getItems('All Items')">All Items</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>ALL ITEMS</div>
+                                        <div class="d-flex align-items-center text-end">
+                                            <!-- <div class="me-2">
+                                            <div ngbDropdown>
+                                                <button class="btn btn-outline-dark h-32" id="dropdownBasic1" ngbDropdownToggle>Filter
+                                                    by</button>
+                                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                                    <button ngbDropdownItem>
+                                                        <div class="form-check mb-2">
+                                                            <input type="checkbox" class="form-check-input" id="lowstock">
+                                                            <label class="form-check-label" for="lowstock">
+                                                                Low Stock Items
+                                                            </label>
+                                                        </div>
+                                                    </button>
+                                                    <button ngbDropdownItem>
+                                                        <div class="form-check mb-2">
+                                                            <input type="checkbox" class="form-check-input" id="expiryItems">
+                                                            <label class="form-check-label" for="expiryItems">
+                                                                Expiring Items
+                                                            </label>
+                                                        </div>
+                                                    </button>
+                                                    <button ngbDropdownItem>Clear Filter</button>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchItem" (input)="filterAllItems()" maxlength="48"/>
+                                            <button class="btn btn-primary btn-sm w-75 ms-2" routerLink="/items/new-item"
+                                                (click)="AddItem()"><span class="feather icon-plus"></span> Add
+                                                Item</button>
+                                            <button (click)="getItems('Print');" class="btn btn-primary btn-sm w-75 ms-2" ><span
+                                                class="feather icon-arrow-up"></span> Export Items</button>
+                                        </div>
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <ngx-datatable [scrollbarH]="true" #table class="all-items-table bootstrap" [rows]="ItemsData"
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            [limit]="40" rowHeight="auto">
+                                            <ngx-datatable-column name="Item Name" prop="ItemName">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]">{{row.ItemName}}</a>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="80" name="HSN Code">
+                                                    <ng-template let-row="row" ngx-datatable-cell-template>
+                                                        <ng-container>
+                                                            {{ row.HSNCode?row.HSNCode:'N/A'}}
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="90" name="Catalog #"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <!-- <ngx-datatable-column [width]="80" name="GST Tax %"
+                                                prop="GSTTax"></ngx-datatable-column> -->
+                                            <ngx-datatable-column [width]="90" name="Category"
+                                                prop="Category"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Department"
+                                                prop="Department"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="Manufacturer"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Machine"
+                                                prop="Machine"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="IsExpirable" prop="expiry-date"
+                                                prop="IsExpirable"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="80" name="STATUS" prop="IsDeleted" [sortable]="true">
+                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                    <ng-container>
+                                                        <span [ngStyle]="{'color': row.IsDeleted == false ? 'green' : 'red'}">{{ row.IsDeleted==false?'Active':'In-Active'}}</span>
+                                                    </ng-container>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="APPROVAL STATUS">
+                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                    <ng-container>
+                                                        <span   [ngClass]="row.ApprovalStatus=='1'? 'badge bg-info': row.ApprovalStatus=='0'? 'badge bg-warning': row.ApprovalStatus=='2'? 'badge bg-success':''">
+                                                            {{ row.ApprovalStatus == '1' ? 'Checked' : row.ApprovalStatus == '0' ? 'Maker' : row.ApprovalStatus == '2' ? 'Approved' : '' }}
+                                                        </span>
+                                                    </ng-container>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column name="Action" [width]="300" [sortable]='false'>
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <div class="d-flex">
+                                                        <a [routerLink]="['/items/view-item',row.ItemGuid]" target="_blank"
+                                                        class="btn btn-outline-primary btn-xs me-1">
+                                                            <span class="feather icon-eye"></span> View
+                                                        </a>
+                                                        <div ngbDropdown>
+                                                            <button class="btn btn-secondary btn-xs" id="actionsDropdown"
+                                                                placement="bottom" container="body" [ngbPopover]="dataTableActions"
+                                                                popoverClass="dataTableActions">Actions <span
+                                                                    class="feather icon-chevron-down"></span></button>
+                                                            <ng-template #dataTableActions>
+                                                                <div aria-labelledby="actionsDropdown">
+                                                                    <div>
+                                                                        <button class="border-bottom" ngbDropdownItem 
+                                                                        *ngIf="row.IsDeleted == false && 
+                                                                        (row.ApprovalStatus != 2 && row.ApprovalStatus != 1) && 
+                                                                        (this.authservice.LoggedInUser.DEFAULTROLES.includes('STORE ADMIN') || 
+                                                                         this.authservice.LoggedInUser.DEFAULTROLES.includes('ADMIN'))"
+                                                                            maxlength="200" (click)="openBasicModal(CheckedItem);change(row,false)"><span
+                                                                                class="feather icon-check-square"></span> Mark as Checked</button>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button class="border-bottom" ngbDropdownItem 
+                                                                        *ngIf="row.IsDeleted == false && 
+                                                                        row.ApprovalStatus == 1 && 
+                                                                        (this.authservice.LoggedInUser.DEFAULTROLES.includes('STORE ADMIN') || 
+                                                                         this.authservice.LoggedInUser.DEFAULTROLES.includes('ADMIN'))"
+                                                                            maxlength="200" (click)="openBasicModal(CheckedItem);change(row,true)"><span
+                                                                                class="feather icon-thumbs-up"></span> Mark as Approved</button>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button class="border-bottom" ngbDropdownItem  [routerLink]="['/items/new-item',row.ItemGuid]"
+                                                                            maxlength="200">
+                                                                            <span
+                                                                            class="feather icon-edit"></span> Edit
+                                                                        </button>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button class="border-bottom" ngbDropdownItem   [disabled]="row.IsDeleted==true"
+                                                                        (click)="PopupfordeleteItem(deleteitem,'md');deleteItemDetails(row)"   maxlength="200">
+                                                                            <span
+                                                                            class="feather icon-slash"></span> In-Active
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-template>
+                                                        </div>
+                                                    </div>                                                   
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                    </div>
+                                <div *ngIf="ItemsData.length != 0">
+                                    <div class="d-flex justify-content-center my-3 pe-3">
+                                        <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="allItemsCount"
+                                            (pageChange)="onPageChange($event)" [maxSize]="maxSize" [rotate]="false"
+                                            [pageSize]="itemsPerPage" [(page)]="pageNumber"
+                                            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                                    </div>
+                                </div>
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="2">
+                                <a ngbNavLink (click)="getItems('LowStockItems');">Low Stock Items</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>Low Stock Items</div>
+                                        <div class="d-flex align-items-center text-end">
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchlowStockItem" (input)="filterLowStockItems()" maxlength="48" />
+                                            <button class="btn btn-primary btn-sm w-75 ms-2"
+                                                routerLink="/items/new-item"><span class="feather icon-plus"></span> Add
+                                                Item</button>
+                                        </div>
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="lowStock"
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            [limit]="40" rowHeight="auto">
+                                            <ngx-datatable-column name="Item Name" prop="ItemName">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]">{{row.ItemName}}</a>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="80" name="HSN Code">
+                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                    <ng-container>
+                                                        {{ row.HSNCode?row.HSNCode:'N/A'}}
+                                                    </ng-container>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="90" name="Catalog #"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <!-- <ngx-datatable-column [width]="80" name="GST Tax"
+                                                prop="GSTTax"></ngx-datatable-column> -->
+                                            <ngx-datatable-column [width]="90" name="Category"
+                                                prop="Category"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Department"
+                                                prop="Department"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="Manufacturer"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Machine"
+                                                prop="Machine"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="IsExpirable" prop="expiry-date">
+                                                <ng-template let-row="rows" ngx-datatable-cell-template>Yes</ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item Quantity"
+                                                prop="ItemQuantity"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Low Stock Count"
+                                                prop="LowStockCount"></ngx-datatable-column>
+                                            <!-- <ngx-datatable-column [width]="120" name="Item Quantity" prop="Difference">
+                                                <ng-template let-row="rows" ngx-datatable-cell-template></ng-template>
+                                            </ngx-datatable-column> -->
+                                            <ngx-datatable-column name="Action" [width]="160" [sortable]='false'>
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]" target="_blank"
+                                                        class="btn btn-outline-primary btn-xs me-1">
+                                                        <!-- <button class="btn btn-outline-primary btn-xs me-1"
+                                                    ><span class="feather icon-eye"></span> -->
+                                                    <span class="feather icon-eye"></span> View
+                                                        <!-- </button> -->
+                                                    </a>
+                                                    <button class="btn btn-primary btn-xs"
+                                                        [routerLink]="['/items/new-item',row.ItemGuid]"><span
+                                                            class="feather icon-edit"></span>
+                                                        Edit</button>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                        <div class="cartd-footer" *ngIf="lowStock.length != 0">
+                                            <div class="d-flex justify-content-center my-3 pe-3">
+                                                <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="lowStockCount"
+                                                    (pageChange)="onPageChange($event)" [maxSize]="maxSize" [rotate]="false"
+                                                    [pageSize]="itemsPerPage" [boundaryLinks]="boundaryLinks"
+                                                    [size]="size"></ngb-pagination>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="3">
+                                <a ngbNavLink (click)="getItems('ExpiryItems')">Expiring Items</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>Expiring Items</div>
+                                        <div class="d-flex align-items-center text-end">
+                                            <select name="" id="" class="form-control form-select h-32 me-2 w-auto pe-5"
+                                                (change)="expiresIndays($event)">
+                                                <option value="" selected disabled>Filter by</option>
+                                                <option *ngFor="let day of days" [value]="day.days">{{day.days}}</option>
+                                                <!-- <option value="">Expiring in 30 days</option>
+                                                <option value="">Expiring in 45 days</option> -->
+                                            </select>
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchExpirayItem" (input)="filterExpirayItems()" maxlength="48" />
+                                            <button class="btn btn-primary btn-sm ms-2 flex-shrink-0"
+                                                routerLink="/items/new-item"><span class="feather icon-plus"></span> Add
+                                                Item</button>
+                                        </div>
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="exipiryStock"
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            [limit]="40" rowHeight="auto">
+                                            <ngx-datatable-column name="Item Name" prop="ItemName">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]">{{row.ItemName}}</a>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="80" name="HSN Code">
+                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                    <ng-container>
+                                                        {{ row.HSNCode?row.HSNCode:'N/A'}}
+                                                    </ng-container>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="90" name="Catalog #"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <!-- <ngx-datatable-column [width]="80" name="GST Tax"
+                                                prop="GSTTax"></ngx-datatable-column> -->
+                                            <ngx-datatable-column [width]="90" name="Category"
+                                                prop="Category"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Department"
+                                                prop="Department"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="Manufacturer"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Machine"
+                                                prop="Machine"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Batch Number"prop="BatchNumber">
+                                            <ng-template ngx-datatable-cell-template let-row="row">
+                                                 <a>{{row.BatchNumber==null?'N/A':row.BatchNumber}}</a>
+                                            </ng-template></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Expiry Date" prop="ExpiryDate">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    {{ row.ExpiryDate | date:'dd-MM-yyyy' }}
+                                                </ng-template></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Expires in days" prop="ExpiresOn">
+                                                <!-- <ng-template let-row="rows" ngx-datatable-cell-template>{{rows}}</ng-template> -->
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column name="Action" [width]="160" [sortable]='false'>
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]" target="_blank"
+                                                        class="btn btn-outline-primary btn-xs me-1">
+                                                        <!-- <button class="btn btn-outline-primary btn-xs me-1"
+                                                            ><span
+                                                                class="feather icon-eye"></span> -->
+                                                                <span class="feather icon-eye"></span> View
+                                                        <!-- </button> -->
+                                                    </a>
+                                                    <button class="btn btn-primary btn-xs"
+                                                        [routerLink]="['/items/new-item',row.ItemGuid]"><span
+                                                            class="feather icon-edit"></span>
+                                                        Edit</button>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                        <div *ngIf="exipiryStock.length!= 0">
+                                            <div class="d-flex justify-content-center my-3 pe-3">
+                                                <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalLength"
+                                                    (pageChange)="onPageChange($event)" [maxSize]="maxSize" [rotate]="false"
+                                                    [pageSize]="itemsPerPage" [boundaryLinks]="boundaryLinks"
+                                                    [size]="size"></ngb-pagination>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="4">
+                                <a ngbNavLink (click)="getItems('StockItems');">Stock Items</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>Stock Items</div>
+                                        <div class="d-flex align-items-center text-end">
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchItem" (input)="filterStockItems()" maxlength="48"/>
+                                            <button class="btn btn-primary btn-sm w-100 ms-2"
+                                                routerLink="/items/new-item">Add Item</button>
+                                                
+                                        </div>
+                                    </h6>
+                                    <div class="table-responsive">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="stockItems"
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            [limit]="40" rowHeight="auto">
+                                            <ngx-datatable-column name="Item Name" prop="ItemName">
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]">{{row.ItemName}}</a>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                              <ngx-datatable-column [width]="80" name="HSN Code">
+                                                    <ng-template let-row="row" ngx-datatable-cell-template>
+                                                        <ng-container>
+                                                            {{ row.HsnCode?row.HsnCode:'N/A'}}
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="90" name="Catalog #"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <!-- <ngx-datatable-column [width]="80" name="GST Tax"
+                                                prop="GSTNTax"></ngx-datatable-column> -->
+                                            <!-- <ngx-datatable-column [width]="90" name="Category"
+                                                prop="Category"></ngx-datatable-column> -->
+                                            <!-- <ngx-datatable-column [width]="120" name="Department"
+                                                prop="Department"></ngx-datatable-column> -->
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="ManufactureName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Machine"
+                                                prop="MachineName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="IsExpirable" prop="IsExpirable">
+                                                <ng-template let-row="row" ngx-datatable-cell-template>{{row.IsExpirable==true?'No':'Yes'}}</ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item Quantity"
+                                                prop="ItemQuantity"></ngx-datatable-column>
+                                            <ngx-datatable-column name="Action" [width]="140" [sortable]='false'>
+                                                <ng-template ngx-datatable-cell-template let-row="row">
+                                                    <a [routerLink]="['/items/view-item',row.ItemGuid]" target="_blank"
+                                                    class="btn btn-outline-primary btn-xs me-1">
+                                                    <!-- <button class="btn btn-outline-primary btn-xs me-1"
+                                                        [routerLink]="['/items/view-item',row.ItemGuid]"> -->
+                                                        <span class="feather icon-eye"></span> View
+                                                    <!-- </button> -->
+                                                    </a>
+                                                    <!-- <button class="btn btn-primary btn-xs"
+                                                        routerLink="/items/new-item">Edit</button> -->
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+                                        <div *ngIf="stockItems.length != 0">
+                                            <div class="d-flex justify-content-center my-3 pe-3">
+                                                <ngb-pagination class="ms-auto d-sm-table"
+                                                    [collectionSize]="totalStockCount" (pageChange)="onPageChange($event)"
+                                                    [maxSize]="maxSize" [rotate]="false" [pageSize]="itemsPerPage"
+                                                    [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                        <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+                    </div>
+                </ng-container> 
+                 <!--Shimmer UI -->
+                <div class="p-4"><app-shimmers *ngIf="shimmerVisible" [type]="'table'"></app-shimmers></div>
+                <!--Shimmer UI -->               
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="this.noItemsFound==true || this.totalLength==0 && !shimmerVisible">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No Items found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #deleteitem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">In-Active Item</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to in-active this
+                        <strong>{{ItemName}}</strong> Item?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');DeleteItem()">Yes</button>
+    </div>
+</ng-template>
+
+
+<ng-template #CheckedItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Remarks</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason=''" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-22">
+                    <label for="reason" class="form-label">Reason:</label>
+                    <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')" (click)="clearReason()">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')" (click)="onUpdateStatus()" >
+            Yes
+        </button>
+    </div>
+</ng-template>

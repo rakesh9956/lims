@@ -1,0 +1,280 @@
+
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/manufacturers">Manufacturers</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{this.ManufactureGuid=="" || undefined? 'Add Manufacturer':'Edit Manufacture'}}</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+        <form [formGroup]="manufactureForm">
+            <div class="card-body">
+                <h6 class="card-title">New Manufacturer</h6>              
+                    <div class="row"  *ngIf="!shimmerVisible">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Name <span [ngClass]="{'text-danger': !ManufactureName}">*</span></label>
+                                <input type="text" id="itemName" class="form-control" placeholder="Enter Manufacturer name" 
+                                formControlName="ManufactureName" maxlength="50" (input)="changeSearch($event)" [readonly]="ManufactureGuid"
+                                [ngClass]="(manufactureForm.get('ManufactureName')?.hasError('required')) && manufactureForm.get('ManufactureName')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('ManufactureName')?.hasError('required') && manufactureForm.get('ManufactureName')?.touched">
+                                <span class="text-danger mt-4px d-block">Manufacturer name is required!</span>
+                            </ng-container>
+                            <ng-container
+                                *ngIf="CheckDuplicateManufacture && manufactureForm.value.ManufactureName ">
+                                <span class="text-danger mt-4px d-block">Manufacturer name already exists!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Contact person</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter Contact person name"
+                                formControlName="Contactperson" maxlength="50">
+                            <!-- <ng-container
+                                *ngIf="manufactureForm.get('Contactperson')?.hasError('required') && manufactureForm.get('Contactperson')?.touched">
+                                <span class="text-danger mt-4px d-block">Contact person is required!</span>
+                            </ng-container> -->
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                              <label for="itemHSNCode" class="form-label">DL No.</label>
+                              <input type="text" id="itemHSNCode" class="form-control" placeholder="Enter DL No."
+                                     formControlName="Dlno" maxlength="13">
+                              <!-- <ng-container *ngIf="manufactureForm.get('Dlno')?.hasError('required') && manufactureForm.get('Dlno')?.touched">
+                                <span class="text-danger mt-4px d-block">DL No. is required!</span>
+                              </ng-container> -->
+                              <ng-container 
+                              *ngIf="manufactureForm.value.Dlno!='' && u.Dlno.errors">
+                                <span class="text-danger mt-4px d-block">Enter valid DL No!</span>
+                              </ng-container>
+                            </div>
+                          </div>                          
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                              <label for="itemGSTTax" class="form-label">Tin No.</label>
+                              <input type="text" id="itemGSTTax" class="form-control" placeholder="Enter Tin No."
+                                formControlName="Tinno" maxlength="10">
+                                <!-- <ng-container *ngIf="manufactureForm.get('Tinno')?.hasError('required') && manufactureForm.get('Tinno')?.touched">
+                                    <span class="text-danger mt-4px d-block">Tin No. is required!</span>
+                                  </ng-container> -->
+                              <ng-container
+                              *ngIf="manufactureForm.value.Tinno!='' && u.Tinno.errors">
+                              <span class="text-danger mt-4px d-block">Enter valid Tin No!</span>                                    
+                          </ng-container>
+                            </div>
+                          </div>
+                                                
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                            <label for="itemName" class="form-label">Mobile</label>
+                            <input type="text" id="itemName" class="form-control"
+                                (keypress)="faxValidator($event)" placeholder="Enter Mobile No."
+                                formControlName="Mobile" maxlength="10">
+                            <!-- <ng-container
+                                *ngIf="manufactureForm.get('Mobile')?.hasError('required') && manufactureForm.get('Mobile')?.touched">
+                                <span class="text-danger mt-4px d-block">Mobile number is required!</span>
+                            </ng-container> -->
+                                <span class="text-danger position-absolute"
+                                  *ngIf="Mobile?.length <=9 && Mobile?.length !=''">
+                                 Enter valid mobile number!
+                              </span> 
+                          </div>
+                        </div>
+                
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Landline No.</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter landline No."
+                                formControlName="Phone" maxlength="11" (input)="faxValidator($event)"
+                                [ngClass]="(manufactureForm.get('Phone')?.hasError('required')) && manufactureForm.get('Phone')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Phone')?.hasError('required') && manufactureForm.get('Phone')?.touched">
+                                <span class="text-danger mt-4px d-block">Landline No is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Email</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter email"
+                                    (keyup)="EmailKeyup($event)" formControlName="Email"  maxlength="40"
+                                    on-focusout="focusOutFunction()">
+                              
+                                <!-- <ng-container
+                                    *ngIf="manufactureForm.get('Email')?.hasError('required') && manufactureForm.get('Email')?.touched">
+                                    <span class="text-danger mt-4px d-block">Email is required!</span>
+                                </ng-container> -->
+                               
+                                <!-- <ng-container
+                                    *ngIf="(!manufactureForm.get('Email')?.hasError('required'))  && manufactureForm.get('Email')?.invalid &&(manufactureForm.get('Email') || manufactureForm.get('Email')?.dirty);">
+                                    <span class="text-danger mt-4px d-block">Enter a valid email!</span>
+                                </ng-container> -->
+                                <!-- <ng-container *ngIf="manufactureForm.value.email && DuplicateCheck">
+                                    <span class="form-error-message"
+                                        [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                        {{EmailResponse}}
+                                    </span>
+                                </ng-container> -->
+                            </div>
+                            </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemGSTTax" class="form-label">Fax</label>
+                                <input type="text" id="itemGSTTax" class="form-control" placeholder="Enter fax"
+                                formControlName="Fax" maxlength="10" (input)="faxValidator($event)"
+                                [ngClass]="(manufactureForm.get('Fax')?.hasError('required')) && manufactureForm.get('Fax')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Fax')?.hasError('required') && manufactureForm.get('Fax')?.touched">
+                                <span class="text-danger mt-4px d-block">Fax is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">Address<span [ngClass]="{'text-danger': !Address}"> *</span></label>
+                                <input type="text" id="itemName" class="form-control" placeholder="Enter address"
+                                formControlName="Address" maxlength="50"
+                                [ngClass]="(manufactureForm.get('Address')?.hasError('required')) && manufactureForm.get('Address')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Address')?.hasError('required') && manufactureForm.get('Address')?.touched">
+                                <span class="text-danger mt-4px d-block">Address is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Address2</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter address2"
+                                formControlName="Address2" maxlength="50"
+                                [ngClass]="(manufactureForm.get('Address2')?.hasError('required')) && manufactureForm.get('Address2')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Address2')?.hasError('required') && manufactureForm.get('Address2')?.touched">
+                                <span class="text-danger mt-4px d-block">Address2 is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemHSNCode" class="form-label">Address3</label>
+                                <input type="text" id="itemHSNCode" class="form-control" placeholder="Enter address3"
+                                    formControlName="Address3" maxlength="50"
+                                [ngClass]="(manufactureForm.get('Address3')?.hasError('required')) && manufactureForm.get('Address3')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Address3')?.hasError('required') && manufactureForm.get('Address3')?.touched">
+                                <span class="text-danger mt-4px d-block">Address3 is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemGSTTax" class="form-label">Country<span [ngClass]="{'text-danger': !Country}"> *</span></label>
+                                <input type="text" id="itemGSTTax" class="form-control" placeholder="Enter country" readonly
+                                formControlName="Country" maxlength="5"
+                                [ngClass]="(manufactureForm.get('Country')?.hasError('required')) && manufactureForm.get('Country')?.touched ? 'is-invalid' : ''">
+                            <ng-container
+                                *ngIf="manufactureForm.get('Country')?.hasError('required') && manufactureForm.get('Country')?.touched">
+                                <span class="text-danger mt-4px d-block">Country is required!</span>
+                            </ng-container>
+                            </div>
+                        </div>
+                           <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">City</label>
+                                <input type="text" id="itemName" class="form-control" placeholder="Enter city"
+                                formControlName="City" maxlength="50">
+                            <!-- <ng-container
+                                *ngIf="manufactureForm.get('City')?.hasError('required') && manufactureForm.get('City')?.touched">
+                                <span class="text-danger mt-4px d-block">City is required!</span>
+                            </ng-container> -->
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Pincode</label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter pincode" (keypress)="faxValidator($event)"
+                                formControlName="Pincode" maxlength="6" (input)="faxValidator($event)">
+                            <!-- <ng-container
+                                *ngIf="manufactureForm.get('Pincode')?.hasError('required') && manufactureForm.get('Pincode')?.touched">
+                                <span class="text-danger mt-4px d-block">Pincode is required!</span>
+                            </ng-container> -->
+                            </div>
+                        </div>
+                        <!-- <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox"  class="form-check-input" id="itemFIFOorder" >
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                  Status
+                                    </label>
+                                  
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="col-sm-12">
+                            <hr> 
+                        </div>
+
+                    </div>
+                    <!--Shimmer UI -->
+                    <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                    <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2"  [disabled]="!FormChanged " (click)="openXlModal(consumptionUnit)">Reset</button>
+                        <button type="button" class="btn btn-primary submit" 
+                        [disabled]="!FormChanged||manufactureForm.invalid || (Mobile?Mobile?.length <=9:'')"
+                        (click)="SaveManufactureDetails();initForms()">{{ManufactureGuid?'Update':'Save'}}</button>
+                    </div>
+                    <!-- <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                            (click)="FormReset()">Reset</button>
+                        <button type="button" class="btn btn-primary submit"
+                            [disabled]="!FormChanged || indentForm.invalid"
+                            (click)="SaveIndentDetails()">{{IndentGuid?'Update':'Save'}}</button>
+                    </div> -->
+                </div>
+            </div>
+        </form>
+        
+        </div>
+    </div>
+</div>
+
+<!-- Manufacturer -->
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p>Do you want to reset this manufacturer details?</p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" (click)="closeManufacture();modal.close('by: close icon')">Yes</button>
+    </div>
+</ng-template>

@@ -1,0 +1,25 @@
+.flex-end{
+    justify-content: flex-end;
+ }
+ .mr-2{
+    margin-right: 20px;
+ }
+ .h-34{
+   height: 34px;
+ }
+ .ng-select {
+   display: initial;
+}
+
+.freeze-col {
+   position: sticky;
+   left: 0;
+   width: 150px;
+   min-width: 150px;
+   z-index: 2;
+   background: #fff;
+ }
+
+ .pi-items.row > * {
+   padding-left: 0 !important;
+}

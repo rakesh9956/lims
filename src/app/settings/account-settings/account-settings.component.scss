@@ -1,0 +1,123 @@
+.password-visibility-block {
+    .password-visibility-icon {
+        position: absolute;
+        top: 6px;
+        right: 15px;
+        width: 25px;
+        padding: 0;
+    }
+}
+
+.pwValidPopover {
+    width: 300px;
+    background-color: #fff;
+    box-shadow: 0px 0px 8px 0px #bdbdbd;
+    border-radius: 10px;
+    position: absolute;
+    top: calc(100% + 15px);
+    z-index: 111;
+    display: none;
+    right: 0;
+
+    @media screen and (max-width: 480px) {
+        width: auto;
+        position: relative;
+        margin-top: 10px;
+        top: unset;
+        right: unset;
+        display: block;
+    }
+
+    &::after {
+        bottom: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: rgba(255, 255, 255, 0);
+        border-bottom-color: #1a66d2;
+        border-width: 10px;
+        margin-left: -10px;
+
+        @media screen and (max-width: 480px) {
+            display: none;
+        }
+    }
+
+    &_Header {
+        background-color: #6571ff;
+        color: #fff;
+        width: 100%;
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        line-height: 18px;
+        font-size: 12px;
+        letter-spacing: 0.1px;
+    }
+
+    &_Body {
+        padding: 15px;
+        width: 100%;
+
+        &_list {
+            width: 100%;
+
+            @media screen and (max-width: 480px) {
+                padding-left: 0;
+            }
+
+            li {
+                display: block;
+
+                span {
+                    display: inline-block;
+                    width: 15px;
+                    height: 15px;
+                    border: 2px solid #ccc;
+                    background-color: #fff;
+                    border-radius: 50px;
+                }
+
+                &.active {
+
+                    span {
+                        border: 2px solid #28a745;
+                        background-color: #28a745;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#password,
+#confirmPassword {
+    &:focus {
+        &~.pwValidPopover {
+            display: block;
+        }
+    }
+
+    &~.pwValidPopover {
+        @media screen and (max-width: 480px) {
+            display: block;
+        }
+    }
+}
+
+.form-control.is-valid{
+    background-position: right 10px center !important;
+}
+.text-danger{
+    color: red !important;
+}
+.has-error {
+    border: 1px solid red;
+}
+.is-invalid {
+    border: 1px solid red;
+}

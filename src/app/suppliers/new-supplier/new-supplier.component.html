@@ -1,0 +1,669 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/suppliers">Suppliers</a></li>
+        <li class="breadcrumb-item active" aria-current="page"> {{this.SupplierDerailsForEdit!=null ?'Edit supplier':'Add supplier'}} </li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <form [formGroup]="suppliersForm">
+                <ng-container *ngIf="!shimmerVisible">
+                    <div class="card-body">
+                        <h6 class="card-title">Supplier details</h6>
+                        <div class="row">
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtSupplierName" id="lblSupplierName" class="form-label">Supplier name<span
+                                            [ngClass]="{'text-danger': SupplierName =='' ||suppliersForm.value.SupplierName ==null }"> *</span></label>
+                                    <input type="text" [maxlength]="50" id="txtSupplierName" class="form-control" [readonly]="SupplierGuid"
+                                         placeholder="Enter supplier name"
+                                        formControlName="SupplierName" (keyup)="!SupplierGuid?updateFilter($event):null"
+                                        [ngClass]="(suppliersForm.get('SupplierName')?.hasError('required')) && suppliersForm.get('SupplierName')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('SupplierName')?.hasError('required') && suppliersForm.get('SupplierName')?.touched">
+                                        <span class="text-danger mt-4px d-block">Supplier name is required!</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="totalCount && suppliersForm.value.SupplierName && !SupplierGuid">
+                                        <span class="text-danger mt-4px d-block">Supplier name already exists!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtSupplierCode" id="lblSupplierCode" class="form-label">Supplier code<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.SupplierCode =='' ||suppliersForm.value.SupplierName ==null}"> *</span></label>
+                                    <input type="text" id="txtSupplierCode" class="form-control"
+                                        placeholder="Enter supplier code" formControlName="SupplierCode" readOnly
+                                        [ngClass]="(suppliersForm.get('SupplierCode')?.hasError('required')) && suppliersForm.get('SupplierCode')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('SupplierCode')?.hasError('required') && suppliersForm.get('SupplierCode')?.touched">
+                                        <span class="text-danger mt-4px d-block">Supplier code is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtSupplierType" id="lblSupplierType" class="form-label">Supplier
+                                        category<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.SupplierTypeGuid ==null}"> *</span></label>
+                                    <select class="form-select" id="txtSupplierType" formControlName="SupplierTypeGuid"
+                                        [ngClass]="(suppliersForm.get('SupplierTypeGuid')?.hasError('required')) && suppliersForm.get('SupplierTypeGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value=null>Select supplier category type</option>
+                                        <option *ngFor="let categoryTypes of LstCategoryTypes"
+                                            [value]="categoryTypes.CategoryGuid">
+                                            {{categoryTypes.CategoryTypeName}}</option>
+                                    </select>
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('SupplierTypeGuid')?.hasError('required') && suppliersForm.get('SupplierTypeGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">Supplier category  is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtSupplierCategory" id="lblSupplierCategory" class="form-label">Supplier type<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.SupplierCategoryGuid?.length ==''}"> *</span></label>
+                                    <select class="form-select" id="txtSupplierCategory"
+                                        formControlName="SupplierCategoryGuid"
+                                        [ngClass]="(suppliersForm.get('SupplierCategoryGuid')?.hasError('required')) && suppliersForm.get('SupplierCategoryGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value="">Select supplier type</option>
+                                        <option *ngFor="let supplierType of LstSupplierCategoryfilterType"
+                                            [value]="supplierType.SupplierTypeGuid">
+                                            {{supplierType.SupplierTypeName}}</option>
+                                    </select>
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('SupplierCategoryGuid')?.hasError('required') && suppliersForm.get('SupplierCategoryGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">Supplier type is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtOrganizationType" id="lblOrganizationType"
+                                        class="form-label">Organization type<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.OrganizationTypeGuid?.length ==''}"> *</span></label>
+                                    <select class="form-select" id="txtOrganizationType"
+                                        formControlName="OrganizationTypeGuid"
+                                        [ngClass]="(suppliersForm.get('OrganizationTypeGuid')?.hasError('required')) && suppliersForm.get('OrganizationTypeGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value="">Select organization type</option>
+                                        <option *ngFor="let supplierType of LstSupplierOrganaizationfilterType"
+                                            [value]="supplierType.SupplierTypeGuid">{{supplierType.SupplierTypeName}}
+                                        </option>
+                                    </select>
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('OrganizationTypeGuid')?.hasError('required') && suppliersForm.get('OrganizationTypeGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">Supplier organization type is
+                                            required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtHouseNo/OfficeNO" id="lblHouse No./Office NO." class="form-label">House
+                                        No./Office No.<span
+                                            [ngClass]="{'text-danger': !HouseNo}"> *</span></label>
+                                    <input type="text" [maxlength]="150" id="txtHouseNo/OfficeNO" class="form-control"
+                                        formControlName="HouseNo" placeholder="Enter house No./office No."
+                                        [ngClass]="(suppliersForm.get('HouseNo')?.hasError('required')) && suppliersForm.get('HouseNo')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('HouseNo')?.hasError('required') && suppliersForm.get('HouseNo')?.touched">
+                                        <span class="text-danger mt-4px d-block">House No./Office No. is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Street/Building/Loc<span
+                                            [ngClass]="{'text-danger': !Street}"> *</span></label>
+                                    <input type="text" [maxlength]="150" id="txtStreet/Building/Loc" class="form-control"
+                                        formControlName="Street" placeholder="Enter street/building/loc"
+                                        [ngClass]="(suppliersForm.get('Street')?.hasError('required')) && suppliersForm.get('Street')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('Street')?.hasError('required') && suppliersForm.get('Street')?.touched">
+                                        <span class="text-danger mt-4px d-block">Street/Building/Loc is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtCountry" id="lblCountry" class="form-label">Country<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.CountryGuid?.length ==''}"> *</span></label>
+                                    <select class="form-select" id="txtCountry" formControlName="CountryGuid"
+                                        [ngClass]="(suppliersForm.get('CountryGuid')?.hasError('required')) && suppliersForm.get('CountryGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value="">Select country</option>
+                                        <option *ngFor="let centerCountryType of LstCenterCountryType"
+                                            [value]="centerCountryType.CenterCountryTypeGuid">{{centerCountryType.Country}}
+                                        </option>
+                                    </select>
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('CountryGuid')?.hasError('required') && suppliersForm.get('CountryGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">Country is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtState" id="lblState" class="form-label">State<span
+                                            [ngClass]="{'text-danger': suppliersForm.value.StateGuid?.length ==''}"> *</span></label>
+                                    <select class="form-select" id="txtState" formControlName="StateGuid"
+                                        [ngClass]="(suppliersForm.get('StateGuid')?.hasError('required')) && suppliersForm.get('StateGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value="">Select state</option>
+                                        <option *ngFor="let centerStateType of LstCenterStateType"
+                                            [value]="centerStateType.CenterStateTypeGuid">{{centerStateType.State}}
+                                        </option>
+                                    </select>
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('StateGuid')?.hasError('required') && suppliersForm.get('StateGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">State is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtPincode" id="lblPincode" class="form-label">Pincode<span
+                                            [ngClass]="{'text-danger': !suppliersForm.value.PinCode}"> *</span></label>
+                                    <input type="text" id="txtPincode" class="form-control" placeholder="Enter pincode"
+                                        formControlName="PinCode" maxlength="6" minlength="6" (keypress)="matcher($event)"
+                                        [ngClass]="suppliersForm.get('PinCode')?.hasError('required') && suppliersForm.get('PinCode')?.touched ? 'is-invalid' : '' ">
+                    
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('PinCode')?.hasError('required') && suppliersForm.get('PinCode')?.touched">
+                                        <span class="text-danger mt-4px d-block">Pincode is required!</span>
+                                    </ng-container>
+                                    <span class="text-danger"
+                                    *ngIf="suppliersForm.value.PinCode?.length < 6 && suppliersForm.value.PinCode !=null && !suppliersForm.get('PinCode')?.hasError('required')">
+                                      Enter valid pincode!
+                                </span>
+                                </div>
+                            </div>
+                    
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtLandline" id="lblLandline" class="form-label">Landline No.</label>
+                                    <input type="text" id="txtLandline" class="form-control" formControlName="Landline"
+                                        placeholder="Enter landline number" [maxlength]="11" (keypress)="matcher($event)">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtFaxNo" id="lblFaxNo" class="form-label">Fax No.</label>
+                                    <input type="text" id="txtFaxNo" class="form-control" placeholder="Enter fax No."
+                                        #numbersOnly formControlName="FaxNo" maxlength="10"  (keypress)="matcher($event)"  >
+                                    <span class="text-danger" *ngIf="suppliersForm.get('FaxNo')?.invalid ">
+                                        Enter valid Fax no!
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Office email id<span
+                                            [ngClass]="{'text-danger':!EmailId}"> *</span></label>
+                                    <input type="text" [maxlength]="50" class="form-control" formControlName="EmailId"
+                                        placeholder="Enter office email Id" required [maxlength]="50"
+                                        [ngClass]="(suppliersForm.get('EmailId')?.hasError('required')) && suppliersForm.get('EmailId')?.touched? 'is-invalid' : ''"
+                                        on-focusout="isDuplicateEmail()">
+                                    <span class="text-danger"
+                                        *ngIf="(suppliersForm.get('EmailId')?.hasError('required')) && suppliersForm.get('EmailId')?.touched">
+                                        Office email id is required !
+                                    </span>
+                                    <span class="text-danger"
+                                        *ngIf="suppliersForm.get('EmailId')?.invalid && !suppliersForm.get('EmailId')?.hasError('required')">
+                                        Enter valid email.
+                                    </span>
+                                    <span class="text-danger"
+                                    *ngIf="suppliersForm.get('EmailId')?.valid && suppliersForm.get('EmailId')?.touched && isEmailDuplicate &&!SupplierGuid">
+                                      Email already exists!
+                                </span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="BankName" id="lblStreet/Building/Loc" class="form-label">Bank
+                                        name </label>
+                                    <input type="text" id="BankName" class="form-control"
+                                        placeholder="Enter bank name" formControlName="BankName" maxlength="48">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div >
+                                    <label for="BankAccountNo" id="lblStreet/Building/Loc" class="form-label">Bank
+                                        account No.</label>
+                                    <input type="text" id="BankAccountNo" class="form-control"
+                                        placeholder="Bank account no." formControlName="BankAccountNo" maxlength="48" (keypress)="matcher($event)">
+                                </div>
+                                <!-- <ng-container *ngIf=" u.BankAccountNo.errors">
+                                    <span class="text-danger mt-4px d-block">Enter valid bank account No!</span>
+                                </ng-container> -->
+                                <div class="text-danger mt-4px d-block" *ngIf=" u.BankAccountNo.errors">
+                                    Enter valid bank account No!
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="BankIFSCcode" id="BankIFSCcode" class="form-label">Bank
+                                        IFSC code</label>
+                                    <input type="text" id="BankIFSCcode" class="form-control"
+                                        placeholder="Enter bank IFSC code" formControlName="BankIFSCCode" maxlength="48">
+                                    <ng-container *ngIf=" u.BankIFSCCode.errors">
+                                        <span class="text-danger mt-4px d-block">Enter valid bank IFSC code!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="Branchname" id="Branchname"
+                                        class="form-label">Branch name</label>
+                                    <input type="text" [maxlength]="50" id="Branchname" class="form-control"
+                                        placeholder="Enter branch name" formControlName="BankBranch" maxlength="48">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="BankAddress"  id="BankAddress" class="form-label">Bank
+                                        address</label>
+                                    <input type="text" [maxlength]="50" id="BankAddress" class="form-control"
+                                        placeholder="Enter bank address" formControlName="BankAddress" maxlength="48">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="BankCity" id="BankCity" class="form-label">Bank
+                                        city</label>
+                                    <input type="text" id="BankCity" class="form-control"
+                                        placeholder="Enter bank city" formControlName="BankCity" maxlength="48">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="BankState" id="BankState" class="form-label">Bank
+                                        state</label>
+                                    <input type="text" id="BankState" class="form-control"
+                                        placeholder="Enter bank state" formControlName="BankState" maxlength="48">
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="Bankname" class="form-control"
+                                         placeholder="Enter Bank name">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtStreet/Building/Loc" id="lblStreet/Building/Loc"
+                                        class="form-label">Bank name</label>
+                                    <input type="text" id="txtStreet/Building/Loc" class="form-control"
+                                         placeholder="Enter street/building/loc">
+                                </div>
+                            </div> -->
+                            <!-- <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtWebsite" id="lblWebsite" class="form-label">Website</label>
+                                    <input type="text" id="txtWebsite"  class="form-control" placeholder="Enter website"
+                                        formControlName="Website">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtOracleVendorCode" id="lblOracleVendorCode" class="form-label">Oracle
+                                        vendor code</label>
+                                    <input type="text" id="txtOracleVendorCode" class="form-control"
+                                        formControlName="OracleVendorCode" placeholder="Enter oracle vendor code">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="txtOracleVendorSite" id="lblOracleVendorSite" class="form-label">Oracle
+                                        vendor site</label>
+                                    <input type="text" id="txtOracleVendorSite" class="form-control"
+                                        formControlName="OracleVendorSite" placeholder="Enter oracle vendor site">
+                                </div>
+                            </div> -->
+                            <!-- <div class="col-12 col-md-4 col-xl-3 align-items-end d-flex">
+                                <div class="mb-3">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="itemFIFOorder" checked>
+                                        <label class="form-check-label" for="itemFIFOorder">
+                                            Active
+                                        </label>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+                        <h6 class="card-title">Concern person details</h6>
+                        <div class="row">
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtPrimaryContact" id="lblOracleVendorSite" class="form-label">Primary
+                                        contact person<span
+                                            [ngClass]="{'text-danger': !PrimaryContactPerson}"> *</span></label>
+                                    <input type="text" id="txtPrimaryContact" class="form-control"
+                                        formControlName="PrimaryContactPerson" placeholder="Enter primary contact person"
+                                        maxlength=50
+                                        [ngClass]="(suppliersForm.get('PrimaryContactPerson')?.hasError('required')) && suppliersForm.get('PrimaryContactPerson')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('PrimaryContactPerson')?.hasError('required') && suppliersForm.get('PrimaryContactPerson')?.touched">
+                                        <span class="text-danger mt-4px d-block">Primary contact person is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtDesignation" id="lblDesignation" class="form-label">Designation<span
+                                            [ngClass]="{'text-danger': !PrimaryContactPersonDesignation}"> *</span></label>
+                                    <input type="txtDesignation" id="manufacturerCatalogNo" class="form-control"
+                                        formControlName="PrimaryContactPersonDesignation" placeholder="Enter designation"
+                                        maxlength=50
+                                        [ngClass]="(suppliersForm.get('PrimaryContactPersonDesignation')?.hasError('required')) && suppliersForm.get('PrimaryContactPersonDesignation')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('PrimaryContactPersonDesignation')?.hasError('required') && suppliersForm.get('PrimaryContactPersonDesignation')?.touched">
+                                        <span class="text-danger mt-4px d-block">Designation is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtMobileNumber" id="lblMobileNumber" class="form-label">Mobile number<span
+                                            [ngClass]="{'text-danger':  !suppliersForm.value.PrimaryContactPersonMobileNo}"> *</span></label>
+                                    <input type="text" id="txtMobileNumber" class="form-control"
+                                        formControlName="PrimaryContactPersonMobileNo" placeholder="Enter mobile number"
+                                        minlength=10 maxlength=10 (keypress)="matcher($event)" on-focusout="isDuplicateEmailOrMobile()"
+                                        [ngClass]="(suppliersForm.get('PrimaryContactPersonMobileNo')?.hasError('required')) && suppliersForm.get('PrimaryContactPersonMobileNo')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('PrimaryContactPersonMobileNo')?.hasError('required') && suppliersForm.get('PrimaryContactPersonMobileNo')?.touched">
+                                        <span class="text-danger mt-4px d-block">Mobile number is required!</span>
+                                    </ng-container>
+                                    <span class="text-danger position-absolute"
+                                    *ngIf="suppliersForm.value.PrimaryContactPersonMobileNo?.length <=9 && suppliersForm.value.PrimaryContactPersonMobileNo !=null && !suppliersForm.get('PrimaryContactPersonMobileNo')?.hasError('required')">
+                                      Enter valid mobile number!
+                                </span>
+                                <span class="text-danger position-absolute"
+                                    *ngIf="suppliersForm.value.PrimaryContactPersonMobileNo?.length >9&&suppliersForm.get('PrimaryContactPersonMobileNo')?.touched && isDuplicate &&!SupplierGuid">
+                                    Mobile number already exists!
+                                </span>
+                    
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtEmailId" id="lblEmailId" class="form-label">Email id<span
+                                            [ngClass]="{'text-danger': !PrimaryContactPersonEmailId}"> *</span></label>
+                                    <input type="text" [maxlength]="50" id="txtEmailId" class="form-control"
+                                        formControlName="PrimaryContactPersonEmailId" placeholder="Enter email Id"
+                                        [ngClass]="(suppliersForm.get('PrimaryContactPersonEmailId')?.hasError('required')) && suppliersForm.get('PrimaryContactPersonEmailId')?.touched ? 'is-invalid' : ''">
+                                    <ng-container
+                                        *ngIf="suppliersForm.get('PrimaryContactPersonEmailId')?.hasError('required') && suppliersForm.get('PrimaryContactPersonEmailId')?.touched">
+                                        <span class="text-danger mt-4px d-block">Email id is required!</span>
+                                    </ng-container>
+                                    <span class="text-danger"
+                                        *ngIf="suppliersForm.get('PrimaryContactPersonEmailId')?.invalid && !suppliersForm.get('PrimaryContactPersonEmailId')?.hasError('required')">
+                                        Enter valid email!
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtSecondaryContact" id="lblSecondaryContact" class="form-label">Secondary
+                                        contact person</label>
+                                    <input type="text" [maxlength]="50" id="txtSecondaryContact" class="form-control"
+                                        formControlName="SecondaryContactPerson"
+                                        placeholder="Enter secondary contact person" maxlength=50>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtDesignation" id="lblDesignation" class="form-label">Designation</label>
+                                    <input type="text" [maxlength]="50" id="txtDesignation" class="form-control"
+                                        formControlName="SecondaryContactPersonDesignation" placeholder="Enter designation"
+                                        maxlength=50>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtMobileNumber" id="lblMobileNumber" class="form-label">Mobile
+                                        number</label>
+                                    <input type="text" id="txtMobileNumber" class="form-control"
+                                        formControlName="SecondaryContactPersonMobileNo" placeholder="Enter mobile number"
+                                        minlength=10 maxlength=10 (keypress)="matcher($event)">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="txtEmailId" id="lblEmailId" class="form-label">Email id</label>
+                                    <input type="text" [maxlength]="50" id="txtEmailId" class="form-control"
+                                        formControlName="SecondaryContactPersonEmailId" placeholder="Enter email id">
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+                        <h6 class="card-title">GST Details</h6>
+                        <div class="row">
+                            <div class="col-12 col-md-3">
+                                <div class="mb-3">
+                                    <label for="txtGSTState" id="lblGSTState" class="form-label">State
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': suppliersForm.value.GSTStateGuid?.length ==''}"> *</span> -->
+                                        </label>
+                                    <select class="form-select" id="txtGSTState" formControlName="GSTStateGuid"
+                                        [ngClass]="(suppliersForm.get('GSTStateGuid')?.hasError('required')) && suppliersForm.get('GSTStateGuid')?.touched ? 'is-invalid' : ''">
+                                        <option selected disabled value="">Select state</option>
+                                        <option *ngFor="let centerStateType of LstCenterStateType"
+                                            [value]="centerStateType.CenterStateTypeGuid">{{centerStateType.State}}
+                                        </option>
+                                    </select>
+                                    <!-- <ng-container
+                                        *ngIf="suppliersForm.get('GSTStateGuid')?.hasError('required') && suppliersForm.get('GSTStateGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">State is required!</span>
+                                    </ng-container> -->
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="mb-3">
+                                    <label for="txtAddress" id="lblAddress" class="form-label">Address
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': !Address}"> *</span> -->
+                                        </label>
+                                    <input type="text" [maxlength]="150" id="txtAddress" class="form-control" placeholder="Enter address"
+                                        formControlName="Address"
+                                        [ngClass]="(suppliersForm.get('Address')?.hasError('required')) && suppliersForm.get('Address')?.touched ? 'is-invalid' : ''">
+                                    <!-- <ng-container
+                                        *ngIf="suppliersForm.get('Address')?.hasError('required') && suppliersForm.get('Address')?.touched">
+                                        <span class="text-danger mt-4px d-block">Address is required!</span>
+                                    </ng-container> -->
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <div class="mb-3">
+                                    <label for="txtGSTNNo" id="lblGSTNNo" class="form-label">GSTIN
+                                        <!-- <span
+                                            [ngClass]="{'text-danger': !suppliersForm.value.GSTNo}"> *</span> -->
+                                        </label>
+                                    <input type="text" id="txtGSTNNo" class="form-control" placeholder="Enter GSTIN"
+                                        [maxlength]="15" formControlName="GSTNo" (input)="onInput($event)"
+                                        [ngClass]="(suppliersForm.get('GSTNo')?.hasError('required')) && suppliersForm.get('GSTNo')?.touched ? 'is-invalid' : ''">
+                                    <!-- <ng-container
+                                        *ngIf="suppliersForm.get('GSTNo')?.hasError('required') && suppliersForm.get('GSTNo')?.touched ? 'is-invalid' : ''">
+                                        <span class="text-danger mt-4px d-block">GSTIN is required!</span>
+                                    </ng-container> -->
+                                    <ng-container *ngIf="suppliersForm.value.GSTNo!=null && u.GSTNo.invalid && !suppliersForm.get('GSTNo')?.hasError('required')">
+                                        <span class="text-danger mt-4px d-block">Enter valid GSTIN!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 col-md-3">
+                                <div class="mt-28">
+                                    <button type="button" class="btn btn-primary me-2">Add</button>
+                                </div>
+                            </div> -->
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+                        <h6 class="card-title">Terms & Conditions</h6>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="txtGSTNNo" id="lblGSTNNo" class="form-label">Payment terms</label>
+                                    <textarea class="form-control" id="itemDescription" rows="3" [maxlength]="150"
+                                        formControlName="PaymentTerms" placeholder="Enter payment terms"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="txtTaxes" id="lblTaxes" class="form-label">Taxes</label>
+                                    <textarea class="form-control" id="txtTaxes" rows="3" [maxlength]="150"
+                                        formControlName="Taxes" placeholder="Enter taxes"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="txtDeliveryTerms" id="lblDeliveryTerms" class="form-label">Delivery
+                                        terms</label>
+                                    <textarea class="form-control" id="txtDeliveryTerms" rows="3" [maxlength]="150"
+                                        formControlName="DeliveryTerms" placeholder="Enter delivery terms"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="txtVendorToNotes" id="lblVendorToNotes" class="form-label">Supplier to
+                                        notes</label>
+                                    <textarea class="form-control" id="txtVendorToNotes" rows="3" [maxlength]="150"
+                                        formControlName="VendorToNotes" placeholder="Enter Supplier to notes"></textarea>
+                                </div>
+                            </div>
+                            <!-- <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="itemName" class="form-label">Credit Limit</label>
+                                    <input type="text" id="itemName" class="form-control" placeholder="In months">
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </ng-container>
+                <!--Shimmer UI -->
+                    <div class="p-4"><app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers></div>
+                    <!--Shimmer UI -->
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-sm-12 text-end">
+                            <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                                (click)="openXlModal(consumptionUnit)">Reset</button>
+                            <button type="button" id="btnSave" class="btn btn-primary submit"
+                                [disabled]="suppliersForm.invalid || !FormChanged || (totalCount&&!SupplierGuid)||isDuplicate || isEmailDuplicate"
+                                (click)="SaveSupplierDetails()">{{SupplierGuid?'Update':'Save'}}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Manufacturer -->
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p> Do you want to reset supplier details?</p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');closeSuppliers()">Yes</button>
+    </div>
+</ng-template>

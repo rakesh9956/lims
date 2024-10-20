@@ -1,0 +1,277 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">STOCK STATEMENT REPORT</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body pb-0">
+                <h6 class="card-title">STOCK STATEMENT REPORT</h6>
+                <form *ngIf="!shimmerVisible">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Centers</label>
+                                    <ng-select [items]="centerList" [closeOnSelect]="true" [searchable]="true"
+                                        bindLabel="CenterName" bindValue="CenterGuid" placeholder="Select centers"
+                                        [formControl]="CenterclearControl" [notFoundText]="'No center found!'"
+                                        (change)="filterData($event)">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <ng-select [items]="LocationList" bindLabel="CenterLocationName"
+                                    [formControl]="clearControl" (clear)="Onremove()"
+                                    [notFoundText]="'No location found!'" bindLabel="CenterLocationName"
+                                    bindValue="CenterLocationGuid" placeholder="Select locations"
+                                    (change)="filterData($event)">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                            <div class="mb-3">
+                                <label class="form-label">Items</label>
+                                <ng-select [items]="Allitems" bindLabel="ItemName" [formControl]="ItemclearControl"
+                                    (clear)="Onremove()" [notFoundText]="'No items found!'" bindValue="ItemGuid"
+                                    placeholder="Select Item" (change)="selectItem($event)">
+                                    <ng-template #optionTemplate let-item="item">
+                                        <span [title]="item.ItemName">{{ item.ItemName }}</span>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <ng-container *ngTemplateOutlet="optionTemplate; context: { item: item }"></ng-container>
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>                        
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">From
+                                    Date
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [formControl]="clearFromControl" (dateSelect)="selectFromDate($event)"
+                                        ngbDatepicker #d="ngbDatepicker" [maxDate]="calender.getToday()">
+                                    <button class="input-group-text" type="button" (click)="d.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                            <div class="mb-3">
+                                <label for="itemExpiryDate" class="form-label">To
+                                    Date <span [ngClass]="{'text-danger': ToDate == ''}">*</span></label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [formControl]="cleardateControl" (dateSelect)="selectToDate($event)"
+                                        [minDate]="selectfromDate" ngbDatepicker #d2="ngbDatepicker"
+                                        [maxDate]="calender.getToday()">
+                                    <button class="input-group-text" type="button" (click)="d2.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-2 text-end">
+                                <button class="btn btn-link btn-sm text-underline p-0" (click)="removeDates()"
+                                    *ngIf="ToDate">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="!shimmerVisible">
+                            <div class="col-sm-12 text-end flex-wrap">
+                                <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                                    (click)="getStatusReportData()" [disabled]="isDisable || noDataFound">Get Report
+                                    Data</button>
+                                <!-- <button type="button" class="btn btn-primary submit mt-2 mt-sm-0" (click)="getStockLedgerReports('excel')"[disabled]="isDisable || noDataFound">Get Report Excel</button> -->
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+                </form>
+
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+
+            <ng-container *ngIf="stockStatusReports?.length != 0">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-4">
+                    <h6 class="card-title">{{ 'STOCK STATEMENT REPORT' | uppercase }}</h6>
+                    <div class="row" *ngIf="stockStatusReports?.length != 0">
+                        <div class="col-sm-12 text-end">
+                            <button type="button" class="btn btn-outline-primary me-2 btn-sm mt-sm-0"
+                                [disabled]="isDisable||  noDataFound" (click)="getStatusReportData('pdf')">Get Report
+                                PDF</button>
+                            <button type="button" class="btn btn-primary submit btn-sm mt-sm-0"
+                                [disabled]="isDisable ||  noDataFound" (click)="getStatusReportData('excel')">Get Report
+                                Excel </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3 border bg-light mx-4">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <double-scroll>
+                                <div style="max-height: 600px; overflow-y: auto;">
+                                    <div class="table-responsive table bg-white" *ngIf="this.IsStore==false || serviceAuth.LoggedInUser.STORE=='false'; else StoreDateContent "
+                                        style="position: sticky; top: 0; background-color: hsl(0, 0%, 100%); box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                        <ngx-datatable  [scrollbarH]="true" #table class="bootstrap"
+                                            [rows]="stockStatusReports" [loadingIndicator]="loadingIndicator"
+                                            [columnMode]="ColumnMode.force" rowHeight="auto">
+                                            <ngx-datatable-column [width]="50" name="s.No">
+                                                <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                    <span>{{ rowIndex + 1 }}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Stock Id"
+                                                prop="StockId"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item name"
+                                                prop="ItemName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Item name"
+                                                prop="VendorItemName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Item code"
+                                                prop="ApolloItemCode"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="DepartmentTypeName"
+                                                prop="DepartmentTypeName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="UOM"
+                                                prop="MajorUnitName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor"
+                                                prop="SupplierName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Code"
+                                                prop="SupplierCode"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="150" name="Location"
+                                                prop="Location"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="ManufactureName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Department"
+                                                prop="SubCategoryTypeName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Catalog No"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Batch no"
+                                                prop="BatchNumber"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Expiry Date"
+                                                prop="ExpiryDate">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{  row?.ExpiryDate ?row?.ExpiryDate?.slice(0,10) : "N/A"}}</span>
+                                                </ng-template></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Receive Quantity"
+                                                prop="ReceiveQty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Remaining Quantity"
+                                                prop="StockinHand"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Consume Quantity"
+                                                prop="ConsumeQuantity"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Return Quantity"
+                                                prop="ReturnQuantity"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Received by"
+                                                prop="UserName"></ngx-datatable-column>
+                                        </ngx-datatable>
+                                        
+                                    </div>
+                                    <ng-template  #StoreDateContent >
+                                    <div class="table-responsive table bg-white" 
+                                    style="position: sticky; top: 0; background-color: hsl(0, 0%, 100%); box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;" >
+                                        <ngx-datatable #StoreDate [scrollbarH]="true" #table class="bootstrap"
+                                            [rows]="stockStatusReports" [loadingIndicator]="loadingIndicator"
+                                            [columnMode]="ColumnMode.force" rowHeight="auto">
+                                            <ngx-datatable-column [width]="50" name="s.No">
+                                                <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                    <span>{{ rowIndex + 1 }}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Stock Id"
+                                                prop="StockId"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item name"
+                                                prop="ItemName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Item name"
+                                                prop="VendorItemName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Item code"
+                                                prop="ApolloItemCode"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="DepartmentType"
+                                                prop="DepartmentTypeName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="UOM"
+                                                prop="MajorUnitName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor"
+                                                prop="SupplierName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Vendor Code"
+                                                prop="SupplierCode"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="150" name="Location"
+                                                prop="Location"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Manufacturer"
+                                                prop="ManufactureName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Department"
+                                                prop="SubCategoryTypeName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Catalog No"
+                                                prop="CatalogNo"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Batch no"
+                                                prop="BatchNumber"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Expiry Date"
+                                                prop="ExpiryDate">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span> {{ row?.ExpiryDate ?row?.ExpiryDate?.slice(0,10) : "N/A" }} </span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Stock in"
+                                                prop="StockinHand"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Scrap Quantity"
+                                                prop="ScrapQuantity"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Unit price"
+                                                prop="UnitPrice"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Total price"
+                                                prop="StockinHand">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span> {{ row?.StockinHand * row?.UnitPrice || "N/A"}} </span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Post by"
+                                                prop="UserName"></ngx-datatable-column>
+                                        </ngx-datatable>
+                                    </div>
+                                    </ng-template>
+                                </div>
+                            </double-scroll>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="card-footer">
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+    </div>
+</div>

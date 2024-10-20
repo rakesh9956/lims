@@ -1,0 +1,83 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import * as moment from 'moment';
+import { AuthenticationService } from 'src/app/core/Services/authentication.service';
+
+
+@Component({
+  selector: 'app-not-verified',
+  templateUrl: './not-verified.component.html',
+  styleUrls: ['./not-verified.component.scss']
+})
+export class NotVerifiedComponent implements OnInit {
+  /**
+ * Type:Properties 
+ * Declare all the intermediate properies 
+ */
+  userGuid: any;
+  updatedDate: any;
+  isVerified: boolean;
+  verifyEmail: boolean = false;
+  /**
+   * 
+   * @param authenticationService 
+   */
+  constructor(private authenticationService: AuthenticationService,
+    private route: ActivatedRoute) { }
+  /**
+   * Type : Angular hook 
+   * this method is used for on page load functions
+   * 
+   */
+  ngOnInit(): void {
+    this.userGuid = this.route.snapshot.params.UserGuid;
+    this.checkVerificationTime();
+  }
+  /**
+ * Type: ngOnInit calls
+ * 
+ */
+  checkVerificationTime() {
+    this.authenticationService.GetUserByGuid(this.userGuid).subscribe(
+      (data) => {
+        this.updatedDate = data?.UpdatedDt == null ? data?.CreatedDt : data?.UpdatedDt;
+        const now = new Date();
+        const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+        let time = new Date(utc).getTime() - new Date(this.updatedDate).getTime();
+        console.log('updatedDate', this.updatedDate)
+        console.log('time', time)
+        this.isVerified = Math.round(((time % 86400000) % 3600000) / 60000) > 5 ? true : false
+        if (this.isVerified == false) {
+          this.updateVerificationStatus();
+        }
+      })
+  }
+  /**
+ * Type : Intemediate Service Call
+ * this is fuction is used to update emailconfirm
+ */
+  updateVerificationStatus() {
+    this.authenticationService.UpdateEmailConfirmed(this.userGuid).subscribe(
+      (data: any) => {
+        if (data.status.toLowerCase() === "success") {
+        }
+      },
+      (err: HttpErrorResponse) => {
+      })
+  }
+  /**
+ * Type : Intemediate Service Call
+ * this is fuction is send email verification based on time
+ */
+  ResndVerification() {
+    const now = new Date();
+    const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+    let newUpdatedDate = moment(utc).format('YYYY-MM-DD[T]HH:mm:ss');
+    this.authenticationService.ResendEmail(newUpdatedDate, this.userGuid).subscribe((res: any) => {
+    this.verifyEmail = true;  
+    })
+
+  }
+
+}

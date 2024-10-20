@@ -1,0 +1,554 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Users</a></li>
+        <li class="breadcrumb-item active" aria-current="page">All Users</li>
+    </ol>
+</nav>
+
+<!-- <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">ALL ITEMS</h4>
+          <p class=“text-muted”>Read the <a href="https://github.com/swimlane/ngx-datatable" target="_blank"> Official Ngx-datatable Documentation </a>for a full list of instructions and other options.</p>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+<!-- <div class="row">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div class="mobile-mb-2">ALL USERS</div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0" (click)="AddItem()" routerLink="/user-management/new-user"><span
+                                class="feather icon-plus"></span> Add User</button>
+                                <button class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0" (click)="AddItem()" routerLink="/user-management/b2b-user"><span
+                                    class="feather icon-plus"></span> Add Client</button>        
+                        <button (click)="GetAllUsersExcel();" class="btn btn-primary btn-sm w-100 ms-2 mobile-btn" ><span
+                                class="feather icon-arrow-up"></span> Export Users</button>
+                    </div>
+                </h6>
+
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div
+                        class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                                <span class="text-muted text-small flex-shrink-0" 
+                                *ngIf="totalCount > 0">{{(pageSize*(pageNumber-1))+1}}-{{totalCount>pageSize*pageNumber?pageSize*pageNumber:totalCount}}
+                                    of {{totalCount}} </span>
+                            <select *ngIf="totalCount > 0" name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm mw-80px ms-0 ms-sm-2 mb-1 mb-sm-0 h-38"
+                                (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                            <input type="text" class="form-control form-select-sm mb-1 mb-sm-0 ms-0 ms-sm-2 h-38"
+                                maxlength="50" placeholder="Search"
+                                (keyup)="changeSearch($event)" />
+                            <ng-select [items]="lstCenter" bindLabel="CompanyName"
+                                placeholder="Search by center name" notFoundText="No centers found" [ngModel]="CompanyName"  [inputAttrs]="{maxlength:'48'}"
+                                class="ng-select-custom maxW-250  mb-2 mb-sm-0 w-100 ms-0 ms-sm-2" bindValue="CompanyName" bindValue="CenterGuid"  appendTo="body"
+                                 (ngModelChange)="ChangeEventForCenter($event)">
+                                </ng-select>
+
+                            <ng-select [items]="centers" 
+                            placeholder="Search by status" notFoundText="status not found" [ngModel]="CompanyStatus" [inputAttrs]="{maxlength:'48'}"
+                            class="ng-select-custom maxW-250  mb-2 mb-sm-0 w-100 ms-0 ms-sm-2" appendTo="body"
+                             (ngModelChange)="statuschange($event)">
+                        </ng-select>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <hr>
+            </div>
+
+            <double-scroll>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>User name</th>
+                            <th>Mobile</th>
+                            <th>Head quarters</th>                          
+                            <th>Centers</th>
+                            <th>Location</th>
+                            <th>Roles</th>
+                            <th>Created date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="usersList !=null && !shimmerVisible">
+                            <tr *ngFor="let cen of usersList">
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.EmployeeName}}">{{cen.EmployeeName}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.UserName}}">{{cen.UserName}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.Mobile}}">{{cen.Mobile?cen.Mobile:'N/A'}}</span>
+                                </td>                                                          
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.Headquarters}}">{{cen.Headquarters?cen.Headquarters:'N/A'}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.Center}}">{{cen.Center?cen.Center:'N/A'}}</span>
+                                </td>   
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.StoreLocation}}">{{cen.StoreLocation}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span title="{{cen.Roles}}">{{cen.Roles}}</span>
+                                </td> 
+                                <td class="truncate" style="max-width: 300px;">
+                                    <span title="{{cen.CreatedDate}}">{{cen.CreatedDate | date : 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 150px;">
+                                    <span [ngClass]="{'text-danger': cen.IsDeleted==true, 'text-success':  cen.IsDeleted==false }"
+                                        title="{{cen.IsDeleted==false || cen.Roles=='ADMIN'?'Active':'InActive'}}">{{cen.IsDeleted==false?'Active':'InActive'}}</span>
+                                </td>
+                                <td class="truncate" style="max-width: 300px;">
+                                    <span title="{{1}}">1</span>
+                                </td>
+                                <td>
+                                    <span
+                                        [ngClass]="{'text-warning': loc.ApprovalStatus=='0', 'text-info': loc.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                        {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                        "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                    </span>
+
+                                    <div class="border-secondary border text-secondary bg-white badge-mini badge" *ngIf="this.created==true">{{quotation.ApprovalStatus== "0"?'Created':''}}</div>
+                                    <div class="border-primary border text-primary bg-white badge-mini badge"  *ngIf="this.checked==true">{{quotation.ApprovalStatus== "1"?'Checked':''}}</div>
+                                     <div class="border-success border text-success bg-white badge-mini badge" *ngIf="this.approved==true">{{quotation.ApprovalStatus== "2"?'Approved':''}}
+                                    </div> 
+                                </td>
+                                <td>
+                                    <div class="d-flex">
+
+                                            <div aria-labelledby="actionsDropdown">
+                                                <button class="btn btn-primary btn-xs me-1"
+                                                     (click)="OnSelectUser(cen)"><span
+                                                        class="feather icon-edit"></span> Edit</button>
+
+                                            </div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-container *ngIf="shimmerVisible">
+                            <tr *ngFor="let dummyLoop of [].constructor(5)">
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                              <td>
+                                <div class="shimmerBG line"></div>
+                              </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </double-scroll>
+        </div>
+        <div class="cartd-footer"  *ngIf="usersList!= null">
+            <div class="d-flex justify-content-center my-3 pe-3">
+                <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                    [(page)]="pageNumber" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                    [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+            </div>
+        </div>
+        <ng-container *ngIf="usersList == null && !shimmerVisible">
+       <div class="minH-500 d-flex align-items-center justify-content-center">
+                <div class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center">
+                        <i class="feather icon-alert-circle fs-37"></i>
+                        <span class="larger-font">No users found!</span>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+</div> -->
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body p-0">
+                <ng-container >
+                    <div class="example">
+                        <ul ngbNav #defaultNav="ngbNav"  [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                            <li (click)="GetAllUsers()" [ngbNavItem]="1">
+                                <a ngbNavLink >All Users</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>All Users</div>
+                                        <!-- <div class="d-flex align-items-center text-end">
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchlowStockItem" (input)="filterLowStockItems()" maxlength="48" />
+                                            <button class="btn btn-primary btn-sm w-75 ms-2"
+                                                routerLink="/items/new-item"><span class="feather icon-plus"></span> Add
+                                                Item</button>
+                                        </div> -->
+                                    </h6>
+                                    <double-scroll>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>User name</th>
+                                                    <th>Mobile</th>
+                                                    <th>Head quarters</th>                          
+                                                    <th>Centers</th>
+                                                    <th>Location</th>
+                                                    <th>Roles</th>
+                                                    <th>Created date</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container *ngIf="usersList !=null && !shimmerVisible">
+                                                    <tr *ngFor="let cen of usersList">
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.EmployeeName}}">{{cen.EmployeeName}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.UserName}}">{{cen.UserName}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Mobile}}">{{cen.Mobile?cen.Mobile:'N/A'}}</span>
+                                                        </td>                                                          
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Headquarters}}">{{cen.Headquarters?cen.Headquarters:'N/A'}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Center}}">{{cen.Center?cen.Center:'N/A'}}</span>
+                                                        </td>   
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.StoreLocation}}">{{cen.StoreLocation}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Roles}}">{{cen.Roles}}</span>
+                                                        </td> 
+                                                        <td class="truncate" style="max-width: 300px;">
+                                                            <span title="{{cen.CreatedDate}}">{{cen.CreatedDate | date : 'dd/MM/yyyy'}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span [ngClass]="{'text-danger': cen.IsDeleted==true, 'text-success':  cen.IsDeleted==false }"
+                                                                title="{{cen.IsDeleted==false || cen.Roles=='ADMIN'?'Active':'InActive'}}">{{cen.IsDeleted==false?'Active':'InActive'}}</span>
+                                                        </td>
+                                                        <!-- <td>
+                                                            <span
+                                                                [ngClass]="{'text-warning': loc.ApprovalStatus=='0', 'text-info': loc.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                                                {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                                                "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                                            </span>
+                        
+                                                            <div class="border-secondary border text-secondary bg-white badge-mini badge" *ngIf="this.created==true">{{quotation.ApprovalStatus== "0"?'Created':''}}</div>
+                                                            <div class="border-primary border text-primary bg-white badge-mini badge"  *ngIf="this.checked==true">{{quotation.ApprovalStatus== "1"?'Checked':''}}</div>
+                                                             <div class="border-success border text-success bg-white badge-mini badge" *ngIf="this.approved==true">{{quotation.ApprovalStatus== "2"?'Approved':''}}
+                                                            </div> 
+                                                        </td> -->
+                                                        <td>
+                                                            <div class="d-flex">
+                        
+                                                                    <div aria-labelledby="actionsDropdown">
+                                                                        <button class="btn btn-primary btn-xs me-1"
+                                                                             (click)="OnSelectUser(cen)"><span
+                                                                                class="feather icon-edit"></span> Edit</button>
+                        
+                                                                    </div>
+                        
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <ng-container *ngIf="shimmerVisible">
+                                                    <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                        </table>
+                                    </double-scroll>
+                                <div class="cartd-footer"  *ngIf="usersList!= null">
+                                    <div class="d-flex justify-content-center my-3 pe-3">
+                                        <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                                            [(page)]="pageNumber" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                                            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                        
+                                    </div>
+                                </div>
+                                <ng-container *ngIf="usersList == null && !shimmerVisible">
+                               <div class="minH-500 d-flex align-items-center justify-content-center">
+                                        <div class="py-5 text-muted">
+                                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center">
+                                                <i class="feather icon-alert-circle fs-37"></i>
+                                                <span class="larger-font">No users found!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                </ng-template>
+                            </li>
+                            <li (click)="GetAllUsers('B2B')" [ngbNavItem]="2">
+                                <a ngbNavLink >All Clients</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="card-title d-flex align-items-center justify-content-between">
+                                        <div>All Clients</div>
+                                        <!-- <div class="d-flex align-items-center text-end">
+                                            <input type="text" class="form-control form-select-sm" placeholder="Search"
+                                                [(ngModel)]="searchlowStockItem" (input)="filterLowStockItems()" maxlength="48" />
+                                            <button class="btn btn-primary btn-sm w-75 ms-2"
+                                                routerLink="/items/new-item"><span class="feather icon-plus"></span> Add
+                                                Item</button>
+                                        </div> -->
+                                    </h6>
+                                    <double-scroll>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>User name</th>
+                                                    <th>Mobile</th>
+                                                    <th>Head quarters</th>                          
+                                                    <th>Centers</th>
+                                                    <th>Location</th>
+                                                    <th>Roles</th>
+                                                    <th>Created date</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container *ngIf="filteredClients !=null && !shimmerVisible">
+                                                    <tr *ngFor="let cen of filteredClients">
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.EmployeeName}}">{{cen.EmployeeName}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.UserName}}">{{cen.UserName}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Mobile}}">{{cen.Mobile?cen.Mobile:'N/A'}}</span>
+                                                        </td>                                                          
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Headquarters}}">{{cen.Headquarters?cen.Headquarters:'N/A'}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Center}}">{{cen.Center?cen.Center:'N/A'}}</span>
+                                                        </td>   
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.StoreLocation}}">{{cen.StoreLocation}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span title="{{cen.Roles}}">{{cen.Roles}}</span>
+                                                        </td> 
+                                                        <td class="truncate" style="max-width: 300px;">
+                                                            <span title="{{cen.CreatedDate}}">{{cen.CreatedDate | date : 'dd/MM/yyyy'}}</span>
+                                                        </td>
+                                                        <td class="truncate" style="max-width: 150px;">
+                                                            <span [ngClass]="{'text-danger': cen.IsDeleted==true, 'text-success':  cen.IsDeleted==false }"
+                                                                title="{{cen.IsDeleted==false || cen.Roles=='ADMIN'?'Active':'InActive'}}">{{cen.IsDeleted==false?'Active':'InActive'}}</span>
+                                                        </td>
+                                                        <!-- <td class="truncate" style="max-width: 300px;">
+                                                            <span title="{{1}}">1</span>
+                                                        </td> -->
+                                                        <!-- <td>
+                                                            <span
+                                                                [ngClass]="{'text-warning': loc.ApprovalStatus=='0', 'text-info': loc.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                                                {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                                                "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                                            </span>
+                        
+                                                            <div class="border-secondary border text-secondary bg-white badge-mini badge" *ngIf="this.created==true">{{quotation.ApprovalStatus== "0"?'Created':''}}</div>
+                                                            <div class="border-primary border text-primary bg-white badge-mini badge"  *ngIf="this.checked==true">{{quotation.ApprovalStatus== "1"?'Checked':''}}</div>
+                                                             <div class="border-success border text-success bg-white badge-mini badge" *ngIf="this.approved==true">{{quotation.ApprovalStatus== "2"?'Approved':''}}
+                                                            </div> 
+                                                        </td> -->
+                                                        <td>
+                                                            <div class="d-flex">
+                        
+                                                                    <div aria-labelledby="actionsDropdown">
+                                                                        <button class="btn btn-primary btn-xs me-1"
+                                                                             (click)="OnSelectUser(cen)"><span
+                                                                                class="feather icon-edit"></span> Edit</button>
+                        
+                                                                    </div>
+                        
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <ng-container *ngIf="shimmerVisible">
+                                                    <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                      <td>
+                                                        <div class="shimmerBG line"></div>
+                                                      </td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                        </table>
+                                    </double-scroll>
+                                <div class="cartd-footer"  *ngIf="filteredClients!= null">
+                                    <div class="d-flex justify-content-center my-3 pe-3">
+                                        <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                                            [(page)]="pageNumber" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                                            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                        
+                                    </div>
+                                </div>
+                                <ng-container *ngIf="filteredClients == null && !shimmerVisible">
+                               <div class="minH-500 d-flex align-items-center justify-content-center">
+                                        <div class="py-5 text-muted">
+                                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center">
+                                                <i class="feather icon-alert-circle fs-37"></i>
+                                                <span class="larger-font">No Clients found!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                </ng-template>
+                            </li>
+                            <div class="action-btns hasTabs d-flex align-items-center justify-content-end">
+                                <button class="ms-auto navbar-toggler filter-button" type="button"
+                                    (click)="isMenuCollapsed = !isMenuCollapsed">
+                                    <i class="feather icon-filter size-18"></i>
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0" (click)="AddItem()" routerLink="/user-management/new-user"><span
+                                        class="feather icon-plus"></span> Add User</button>
+                                        <button class="btn btn-outline-primary btn-sm ms-2 flex-shrink-0" (click)="AddItem()" routerLink="/user-management/b2b-user"><span
+                                            class="feather icon-plus"></span> Add Client</button>        
+                                <button (click)="GetAllUsersExcel();" class="btn btn-primary btn-sm w-100 ms-2 mobile-btn" ><span
+                                        class="feather icon-arrow-up"></span> Export Users</button>
+                            </div>
+                        </ul>
+                        <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                            <div
+                                class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 me-2 justify-content-end">
+                                <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                                        <span class="text-muted text-small flex-shrink-0" 
+                                        *ngIf="totalCount > 0">{{(pageSize*(pageNumber-1))+1}}-{{totalCount>pageSize*pageNumber?pageSize*pageNumber:totalCount}}
+                                            of {{totalCount}} </span>
+                                    <select *ngIf="totalCount > 0" name="rowLimit" id="rowLimit"
+                                        class="form-select form-select-sm mw-80px ms-0 ms-sm-2 mb-1 mb-sm-0 h-38"
+                                        (change)="ChangeEvent($event)">
+                                        <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                                    </select>
+                                    <input type="text" class="form-control form-select-sm mb-1 mb-sm-0 ms-0 ms-sm-2 h-38"
+                                        maxlength="50" placeholder="Search"
+                                        (keyup)="changeSearch($event)" />
+                                    <ng-select [items]="lstCenter" bindLabel="CompanyName"
+                                        placeholder="Search by center name" notFoundText="No centers found" [ngModel]="CompanyName"  [inputAttrs]="{maxlength:'48'}"
+                                        class="ng-select-custom maxW-250  mb-2 mb-sm-0 w-100 ms-0 ms-sm-2" bindValue="CompanyName" bindValue="CenterGuid"  appendTo="body"
+                                         (ngModelChange)="ChangeEventForCenter($event)">
+                                        </ng-select>
+        
+                                    <ng-select [items]="centers" 
+                                    placeholder="Search by status" notFoundText="status not found" [ngModel]="CompanyStatus" [inputAttrs]="{maxlength:'48'}"
+                                    class="ng-select-custom maxW-250  mb-2 mb-sm-0 w-100 ms-0 ms-sm-2" appendTo="body"
+                                     (ngModelChange)="statuschange($event)">
+                                </ng-select>
+        
+                                </div>
+                            </div>
+                        </div>
+                        <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+                    </div>
+                </ng-container> 
+                 <!--Shimmer UI -->
+                <!-- <div class="p-4"><app-shimmers *ngIf="shimmerVisible" [type]="'table'"></app-shimmers></div> -->
+                <!--Shimmer UI -->               
+            </div>
+            <!-- No records found UI -->
+        </div>

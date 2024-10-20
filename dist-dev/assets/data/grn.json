@@ -1,0 +1,41 @@
+[
+    {
+      "id": 0,
+      "grnNo": 45,
+      "poNo": 1030,
+      "invoiceNo": 78988,
+      "challanNo": 124787987235,
+      "supplier": "Mac Dealer",
+      "grnDate": "02-01-2022",
+      "grossAmt": 50050,
+      "discAmt": 200,
+      "taxAmt": 2200,
+      "netAmt": 120300
+    },
+    {
+      "id": 1,
+      "grnNo": 45,
+      "poNo": 1030,
+      "invoiceNo": 78988,
+      "challanNo": 124787987235,
+      "supplier": "Harvey Specter",
+      "grnDate": "05-03-2022",
+      "grossAmt": 50050,
+      "discAmt": 200,
+      "taxAmt": 2200,
+      "netAmt": 120300
+    },
+    {
+      "id": 2,
+      "grnNo": 45,
+      "poNo": 1030,
+      "invoiceNo": 78988,
+      "challanNo": 124787987235,
+      "supplier": "Jhonson Dealer",
+      "grnDate": "02-10-2022",
+      "grossAmt": 50050,
+      "discAmt": 200,
+      "taxAmt": 2200,
+      "netAmt": 120300
+    }
+  ]

@@ -1,0 +1,729 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/grn">GRN</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{this.InvoiceGuid =='' ?'GRN Against PO':'Edit GRN Against PO'}}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                    <form [formGroup]="InvoiceDetailForm">
+                        <h6 class="card-title">GRN Against PO</h6>
+                        <div class="mb-3" *ngIf="InvoiceGuid">
+                            <label for="LedgerTransactionNo" class="form-label">GRN No: 
+                                <strong>{{this.GRNdetails[0].LedgerTransactionNo}}</strong></label>
+                        </div>
+                    <ng-container *ngIf="!EditshimmerVisible">
+                         <div class="row">
+                            <div class="col-12  col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerName" class="form-label">GRN location</label>
+                                    <!-- <select class="form-select" id="manufacturerName" formControlName="CenterLocationGuid"  [attr.disabled]="this.InvoiceDetailForm.value.InvoiceGuid!?'':null"
+                                        (change)="GetPOnumber($event);search($event);">
+                                        <option selected disabled value="" >Select Location</option>
+                                        <option *ngFor="let data of CenterLocacityList" [value]="data.CenterLocationGuid">
+                                            {{data.CenterLocationName}}
+                                        </option>
+                                     <option value="2">Manufacturer 2</option>
+                                        <option value="3">Manufacturer 3</option>
+                                    </select> -->
+                                    <ng-select [items]="CenterLocacityList" bindLabel="CenterLocationName"
+                                        bindValue="CenterLocationGuid" [(ngModel)]="locationGuid" [notFoundText]="'No location found!'"
+                                        placeholder="Search by location name" formControlName="CenterLocationGuid"
+                                        (change)="GetPOnumber($event)" [readonly]="InvoiceGuid"
+                                        class="ng-select-custom-250min" [inputAttrs]="{ maxlength:'50' }">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-12  col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerName" class="form-label">Suppliers</label>
+                                    <ng-select [items]="uniqueList" bindLabel="VendorName" bindValue=""
+                                        [(ngModel)]="selectedVender" placeholder="Search by suppliers name"
+                                        formControlName="SupplierName" (change)="GetVenderdetails($event)" [notFoundText]="'No suppliers found!'"
+                                        [readonly]="InvoiceGuid" class="ng-select-custom-250min"
+                                        [inputAttrs]="{ maxlength:'50' }">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-12  col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerName" class="form-label">Order number</label>
+                                    <!-- <select class="form-select" id="manufacturerName" formControlName="PurchaseOrderNo"  [attr.disabled]="this.InvoiceDetailForm.value.InvoiceGuid!?'':null"
+                                        (change)="GetSupplier($event,index);">
+                                        <option selected disabled value="">Select Order Number</option>
+                                        <option *ngFor="let data of uniqueList" [value]="data.PurchaseOrderNo">
+                                            {{data.PurchaseOrderNo}}/ {{data.VendorName}}
+                                        </option>
+                                      <option value="2">Manufacturer 2</option>
+                                        <option value="3">Manufacturer 3</option>
+                                    </select>  -->
+                                    <!-- <ng-select [items]="VenderDetails" bindLabel="PurchaseOrderNo" [readonly]="InvoiceGuid"
+                                        placeholder="Search by purchase order no."  formControlName="PONumber" [multiple]=true
+                                        [closeOnSelect]="false" [searchable]="true" class="ng-select-custom-250min" (change)="changePoNumber($event)"
+                                        [inputAttrs]="{ maxlength:'50' }"> 
+                                    </ng-select> -->
+                                    <ng-multiselect-dropdown
+                                        formControlName="PONumber"
+                                        [placeholder]="'Search by purchase order no.'"
+                                        [settings]="dropdownSettings"
+                                        [data]="VenderDetails"
+                                        bindLabel="PurchaseOrderNo"
+                                        [readonly]="InvoiceGuid"  (onDeSelect)="onItemSelect($event)" >
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4 col-md-4 col-lg-3 d-flex align-items-end">
+                                <div class="mb-3">
+                                    <button class="btn-primary btn"
+                                        (click)="GetSupplier(InvoiceDetailForm.value.PONumber,index)"
+                                        [disabled]="InvoiceGuid!=''||!InvoiceDetailForm.get('PONumber')?.value||InvoiceDetailForm.get('PONumber')?.value==0 || !InvoiceDetailForm.get('SupplierName')?.value || !InvoiceDetailForm.get('CenterLocationGuid')?.value"><span
+                                            class="feather icon-search"></span> Search</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <hr />
+                            </div>
+                        </div>
+                        <h6 class="card-title">Order Details</h6>
+                        <div class="row">
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label">Order date
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" outsideDays="hidden"
+                                            formControlName="ApprovedDate" ngbDatepicker readonly #d="ngbDatepicker"
+                                            >
+                                        <!-- <button class="input-group-text" type="button" (click)="d.toggle()">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="itemCode" class="form-label">Order number</label>
+                                    <input type="text" id="itemCode" class="form-control" readonly
+                                        formControlName="PONumber" placeholder="Enter number">
+                                </div>
+                            </div> -->
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="mb-3">
+                                    <label for="SupplierName" class="form-label">Supplier</label>
+                                    <input type="text" id="SupplierName" class="form-control" readonly
+                                        formControlName="SupplierName" placeholder="Enter supplier">
+                                </div>
+                            </div>
+                            <div class="col-12  col-md-4 col-lg-3">
+                                <!-- <div class="mb-3">
+                                    <label for="UserName" class="form-label">Users</label>
+                                    <ng-select [items]="userList" bindLabel="UserName" bindValue="UserGuid" 
+                                         placeholder="Search by user name" (change)="onUserGuidChange($event)"
+                                        formControlName="UserGuid" [notFoundText]="'No users found!'"
+                                        class="ng-select-custom-250min"
+                                        [inputAttrs]="{ maxlength:'50' }" [disabled]="isEdit">
+                                    </ng-select>
+                                </div> -->
+                                <div class="mb-3">
+                                    <label for="UserName" class="form-label">Users</label>
+                                    <ng-select [items]="userList" bindLabel="UserName" bindValue="UserGuid"
+                                         placeholder="Search by User name"
+                                        formControlName="UserGuid" (change)="onUserGuidChange($event)" [notFoundText]="'No users found!'"
+                                        [readonly]="InvoiceGuid && GrnStatus=='Checked'" class="ng-select-custom-250min"
+                                        [inputAttrs]="{ maxlength:'50' }">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <hr />
+                            </div>
+                        </div>
+                    </ng-container>
+                    <app-shimmers *ngIf="EditshimmerVisible" [type]="'form-2'"></app-shimmers>
+                        <ng-container *ngIf="!EditshimmerVisible">
+                            <h6 class="card-title">Item Details</h6>
+                        <div>
+                            <ng-container>
+                                <ng-container>
+                                    <div class="row">
+                                        <div class="col-md-12 stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                        <!-- <div class="table-responsive"> -->
+                                                        <div style="max-height: 420px; overflow-y: scroll;">
+                                                            <table class="table bg-white">
+                                                                <thead style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                                                    <tr>
+                                                                        <th>New Batch</th>
+                                                                        <th class="freeze-col">Item</th>
+                                                                        <th>Vendor Item Name</th>
+                                                                        <th>Barcode</th>
+                                                                        <th>Batch No.
+                                                                            <span [ngClass]="{'text-danger':!InvoiceDetailForm.value.BatchNumber}"> *</span>
+                                                                        </th>
+                                                                        <th>Expiry on
+                                                                            <span [ngClass]="{'text-danger':!InvoiceDetailForm.value.ExpiryDate}"> *</span>
+                                                                        </th>
+                                                                        <th>Purchased Qty</th>
+                                                                        <th>Rate <span class="rupee">&#8377;</span></th>
+                                                                        <th>Paid Qty</th>
+                                                                        <!-- <th>Extra Free Qty</th> -->
+                                                                        <th>Discount %</th>
+                                                                        <th>item Id</th>
+                                                                        <th>Item Code</th>
+                                                                        <th>Catalog No.</th>
+                                                                        <th>Converter</th>
+                                                                        <th>Consume Unit</th>
+                                                                        <th>CGST %</th>
+                                                                        <th>SGST %</th>
+                                                                        <th>IGST % </th>
+                                                                        <!-- <th>UTGST %</th> -->
+                                                                        <th>Dis. Amt. <span class="rupee">&#8377;</span></th>
+                                                                        <th>Total GST Amt. <span class="rupee">&#8377;</span>
+                                                                        </th>
+                                                                        <th>Buy Price <span class="rupee">&#8377;</span></th>
+                                                                        <th>Net AMT. <span class="rupee">&#8377;</span></th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr formArrayName="ListGRNItems"
+                                                                        *ngFor="let item of addItemslist.controls; let i = index">
+                                                                        <ng-container [formGroupName]="i">
+                                                                            <td>
+                                                                                <button (click)="AddItemsList(i)" class="btn btn-icon-text btn-link p-0" [disabled]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IsButtonShow==false" >
+                                                                                    <span
+                                                                                        class="link-icon feather icon-plus fs-5 me-1"
+                                                                                        ></span>
+                                                                                    Add
+                                                                                </button>
+                                                                            </td>
+                                                                            <td class="freeze-col">{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ItemName}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].VendorItemName}}</td>
+                                                                            <td><input type="text" class="form-control"
+                                                                                formControlName="BarcodeNo"
+                                                                                [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].BarcodeNo"
+                                                                                style="width:100px; padding-inline: 5px;" placeholder="Barcode No."/>
+                                                                        </td>
+                                                                        <td><input type="text" class="form-control"
+                                                                                formControlName="BatchNumber" required
+                                                                                [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].BatchNumber"
+                                                                                style="width:100px; padding-inline: 5px;" placeholder="Batch No." />
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="input-group" style="width: 150px">
+                                                                                <input class="form-control"
+                                                                                    placeholder="dd-mm-yyyy" name="dp"
+                                                                                    readonly ngbDatepicker
+                                                                                    [minDate]="newDate"
+                                                                                    [required]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IsExpirable==false"
+                                                                                    [disabled]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IsExpirable==true"
+                                                                                    formControlName="ExpiryDate"
+                                                                                    #d3="ngbDatepicker"
+                                                                                    [container]="'body'">
+                                                                                <button class="input-group-text"
+                                                                                    type="button"
+                                                                                    (click)="(this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IsExpirable==true)?'':d3.toggle()">
+                                                                                    <i
+                                                                                        class="feather icon-calendar icon-md text-muted"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].InstialCount}}</td>
+                                                                        <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ItemRate}}
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text" class="form-control"
+                                                                                formControlName="ReleasedCount"
+                                                                                id="ReleasedCount"
+                                                                                (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"
+                                                                                style="width:70px; padding-inline: 5px;"
+                                                                                [min]="0" (input)="ChangePrice(i,0)"
+                                                                                (ngModelChange)="onReleasedCountChange($event, i)" [ngModelOptions]="{standalone: true}"
+                                                                                [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ReleasedCount" />
+                                                                        </td>
+                                                                        <!-- <td>
+                                                                                <input type="number" readonly class="form-control h-34"
+                                                                                    style="width:70px; padding-inline: 5px;" />
+                                                                            </td> -->
+                                                                        <td>
+                                                                            <!--    {{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].DiscountPercentage}} -->
+                                                                            <input type="number" class="form-control"
+                                                                                style="width:70px; padding-inline: 5px;"
+                                                                                formControlName="DiscountPercentage"
+                                                                                [min]="0" [max]="100"
+                                                                                (ngModelChange)="onDiscountChange($event, i)"
+                                                                                [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].DiscountPercentage"
+                                                                                (input)="ChangePrice(i,item)" />
+                                                                        </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ItemId}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ItemCode}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].CatalogNo}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].Converter}}
+                                                                            </td>
+                                                                            <td></td>
+                                                                                <!-- <input type="number" class="form-control h-34"
+                                                                                        style="width:70px; padding-inline: 5px;"
+                                                                                        formControlName="IGSTPer" [min]="0"
+                                                                                        [max]="100"
+                                                                                        [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IGSTPer"
+                                                                                        (input)="ChangePrice(i)" /> -->
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].CGSTPer}}
+                                                                                <!-- <input type="number" class="form-control h-34"
+                                                                                        style="width:70px; padding-inline: 5px;"
+                                                                                        (input)="ChangePrice(i)" [min]="0"
+                                                                                        [max]="100" formControlName="CGSTPer"
+                                                                                        [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].CGSTPer" />-->
+                                                                            </td>
+                                                                            <td> {{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].SGSTPer}}
+                                                                                <!--   <input type="number" class="form-control h-34"
+                                                                                        style="width:70px; padding-inline: 5px;"
+                                                                                        formControlName="SGSTPer" [min]="0"
+                                                                                        [max]="100"
+                                                                                        [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].SGSTPer"
+                                                                                        (input)="ChangePrice(i)" /> -->
+                                                                            <!-- </td> -->
+                                                                            <td> {{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].IGSTPer}}
+                                                                                <!--   <input type="number" class="form-control h-34"
+                                                                                           style="width:70px; padding-inline: 5px;"
+                                                                                           formControlName="SGSTPer" [min]="0"
+                                                                                           [max]="100"
+                                                                                           [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].SGSTPer"
+                                                                                           (input)="ChangePrice(i)" /> -->
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].DiscountAmount |  exactNumbers}}
+                                                                                <!-- <input type="number" class="form-control h-34"
+                                                                                        style="width:75px" readonly
+                                                                                        [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].DiscountAmount"
+                                                                                        (input)="ChangePrice(i)" /> -->
+                                                                            </td>
+                                                                            <td
+                                                                                [value]="this.InvoiceDetailForm.get('ListGRNItems')?.value[i].TaxAmount">
+                                                                                {{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].TaxAmount |  exactNumbers}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].NetAmount  |  exactNumbers}}
+                                                                            </td>
+                                                                            <td>{{this.InvoiceDetailForm.get('ListGRNItems')?.value[i].TotalAmount |   exactNumbers}}
+                                                                            </td>
+                                                                            <td>
+                                                                                <a
+                                                                                    class="btn btn-outline-primary btn-xs me-1" target="_blank"
+                                                                                    [routerLink]="['/items/view-item',this.InvoiceDetailForm.get('ListGRNItems')?.value[i].ItemGuid]"><span
+                                                                                        class="feather icon-eye"></span> View
+                                                                            </a>
+                                                                                <button *ngIf="addItemslist.controls.length!=1" class="btn btn-outline-danger btn-xs me-1" (click)="removeitem(i,item)"
+                                                                                    title="Delete item">
+                                                                                    <i class="feather icon-trash"
+                                                                                        ></i> Delete
+                                                                                </button>
+                                                                            </td>
+                                                                        </ng-container>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <!-- </div> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                        </ng-container>
+                        <app-shimmers *ngIf="EditshimmerVisible" [type]="'table'"></app-shimmers>
+                     
+                        <ng-container *ngIf="!EditshimmerVisible">
+                            <h6 class="card-title">Invoice Details</h6>
+                        <div>
+                            <div class="row">
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Invoice number<span
+                                                [ngClass]="{'text-danger': !InvoiceDetailForm.value.InvoiceNumber}">
+                                                *</span></label>
+                                        <div class="position-relative">
+                                            <input type="text" id="itemName" class="form-control"
+                                                placeholder="Enter invoice number" formControlName="InvoiceNumber"
+                                                [maxlength]="20" (input)="changeInvoice($event)"
+                                                [ngClass]="(InvoiceDetailForm.get('InvoiceNumber')?.hasError('required')) && InvoiceDetailForm.get('InvoiceNumber')?.touched ? 'is-invalid' : ''">
+                                                <div class="spinLoader" *ngIf="SpinnerCheck">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                     d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                                    </svg>
+                                                </div>
+                                        </div>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('InvoiceNumber')?.hasError('required') && InvoiceDetailForm.get('InvoiceNumber')?.touched">
+                                            <span class="text-danger mt-4px d-block">Invoice number is required!</span>
+                                        </ng-container>
+                                        <span class="text-danger mt-4px d-block">{{ISinvoice}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemExpiryDate" class="form-label ">Invoice date<span
+                                                [ngClass]="{'text-danger': !InvoiceDetailForm.value.InvoiceDate }"> *</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <input class="form-control" placeholder="dd-mm-yyyy" name="dp" ngbDatepicker
+                                                readonly #d1="ngbDatepicker" formControlName="InvoiceDate"
+                                                (dateSelect)="onFromDateSelect($event)" [maxDate]="newDate"
+                                                [ngClass]="(InvoiceDetailForm.get('InvoiceDate')?.hasError('required')) && InvoiceDetailForm.get('InvoiceDate')?.touched ? 'is-invalid' : ''">
+                                            <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                                <i class="feather icon-calendar icon-md text-muted"></i>
+                                            </button>
+                                        </div>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('InvoiceDate')?.hasError('required') && InvoiceDetailForm.get('InvoiceDate')?.touched">
+                                            <span class="text-danger mt-4px d-block">Invoice date is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemHSNCode" class="form-label">Challan number</label>
+                                        <input type="text" id="itemHSNCode" class="form-control"
+                                            placeholder="Enter challan number" formControlName="ChallanNumber"
+                                            [maxlength]="20"
+                                            [ngClass]="(InvoiceDetailForm.get('ChallanNumber')?.hasError('required')) && InvoiceDetailForm.get('ChallanNumber')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('ChallanNumber')?.hasError('required') && InvoiceDetailForm.get('ChallanNumber')?.touched">
+                                            <span class="text-danger mt-4px d-block">Challan number is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemExpiryDate" class="form-label">Challan date
+                                               </label>
+                                        <div class="input-group">
+                                            <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                                formControlName="ChallanDate" readonly
+                                                (dateSelect)="FromDateSelect($event)" [maxDate]="newDate" ngbDatepicker
+                                                #d2="ngbDatepicker"
+                                                [ngClass]="(InvoiceDetailForm.get('ChallanDate')?.hasError('required')) && InvoiceDetailForm.get('ChallanDate')?.touched ? 'is-invalid' : ''">
+                                            <button class="input-group-text" type="button" (click)="d2.toggle()">
+                                                <i class="feather icon-calendar icon-md text-muted"></i>
+                                            </button>
+                                        </div>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('ChallanDate')?.hasError('required') && InvoiceDetailForm.get('ChallanDate')?.touched">
+                                            <span class="text-danger mt-4px d-block">Challan date is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemSpecialization" class="form-label">Gate entry no</label>
+                                        <input type="text" id="itemSpecialization" class="form-control" [maxlength]="20"
+                                            placeholder="Enter gate entry no" formControlName="GateEntryNo"
+                                            [ngClass]="(InvoiceDetailForm.get('GateEntryNo')?.hasError('required')) && InvoiceDetailForm.get('GateEntryNo')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('GateEntryNo')?.hasError('required') && InvoiceDetailForm.get('GateEntryNo')?.touched">
+                                            <span class="text-danger mt-4px d-block">Gate entry no is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemSpecialization" class="form-label">
+                                            Frieght amt
+                                        </label>
+                                        <input type="number" id="itemSpecialization" class="form-control"
+                                             (input)="ChangeNetAmt($event)"
+                                            placeholder="Enter frieght" formControlName="Frieght"
+                                            [ngClass]="(InvoiceDetailForm.get('Frieght')?.hasError('required')) && InvoiceDetailForm.get('Frieght')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('Frieght')?.hasError('required') && InvoiceDetailForm.get('Frieght')?.touched">
+                                            <span class="text-danger mt-4px d-block">Frieght is required!</span>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('Frieght')?.hasError('pattern') && InvoiceDetailForm.get('Frieght')?.touched">
+                                            <!-- <span class="text-danger mt-4px d-block">Maximum 10 digits allowed!</span> -->
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemMakeModel" class="form-label">Octroi amt</label>
+                                        <input type="number" id="itemMakeModel" class="form-control" 
+                                              (input)="ChangeNetAmt($event)"
+                                            placeholder="Enter octroi" formControlName="Octroi"
+                                            [ngClass]="(InvoiceDetailForm.get('Octroi')?.hasError('required')) && InvoiceDetailForm.get('Octroi')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('Octroi')?.hasError('required') && InvoiceDetailForm.get('Octroi')?.touched">
+                                            <span class="text-danger mt-4px d-block">Octroi is required!</span>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('Octroi')?.hasError('pattern') && InvoiceDetailForm.get('Octroi')?.touched">
+                                            <!-- <span class="text-danger mt-4px d-block">Maximum 10 digits allowed!</span> -->
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemSpecialization" class="form-label">Round off amt</label>
+                                        <input type="number" id="itemSpecialization" class="form-control" 
+                                             
+                                            (input)="ChangeNetAmt($event)" placeholder="Enter round off"
+                                            formControlName="RoundOff"
+                                            [ngClass]="(InvoiceDetailForm.get('RoundOff')?.hasError('required')) && InvoiceDetailForm.get('RoundOff')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('RoundOff')?.hasError('required') && InvoiceDetailForm.get('RoundOff')?.touched">
+                                            <span class="text-danger mt-4px d-block">Round off is required!</span>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('RoundOff')?.hasError('pattern') && InvoiceDetailForm.get('RoundOff')?.touched">
+                                            <!-- <span class="text-danger mt-4px d-block">Maximum 10 digits allowed!</span> -->
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemMakeModel" class="form-label">GRN amount<span
+                                                [ngClass]="{'text-danger': !InvoiceDetailForm.value.NetTotal}">
+                                                *</span></label>
+                                        <input type="number" id="itemMakeModel" class="form-control"
+                                            placeholder="Enter GRN amount" formControlName="NetTotal" readonly
+                                            [ngClass]="(InvoiceDetailForm.get('NetTotal')?.hasError('required')) && InvoiceDetailForm.get('NetTotal')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('NetTotal')?.hasError('required') && InvoiceDetailForm.get('NetTotal')?.touched">
+                                            <span class="text-danger mt-4px d-block">GRN amount state is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemSpecialization" class="form-label">Invoice amount<span
+                                                [ngClass]="{'text-danger': !InvoiceDetailForm.value.InvoiceAmount}">
+                                                *</span></label>
+                                        <input type="number" id="itemSpecialization" class="form-control"
+                                            placeholder="Enter invoice amount" formControlName="InvoiceAmount" [min]="0"
+                                             (keypress)="matcher($event,'')"
+                                            [ngClass]="(InvoiceDetailForm.get('InvoiceAmount')?.hasError('required')) && InvoiceDetailForm.get('InvoiceAmount')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('InvoiceAmount')?.hasError('required') && InvoiceDetailForm.get('InvoiceAmount')?.touched">
+                                            <span class="text-danger mt-4px d-block">Invoice amount is required!</span>
+                                        </ng-container >
+                                        <ng-container *ngIf="InvoiceDetailForm.value.InvoiceAmount!=InvoiceDetailForm.value.NetTotal && InvoiceDetailForm.value.InvoiceAmount">
+                                            <span class="text-danger mt-4px d-block">Match Invoice amount and GRN amount!</span>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('InvoiceAmount')?.hasError('pattern') && InvoiceDetailForm.get('InvoiceAmount')?.touched">
+                                            <!-- <span class="text-danger mt-4px d-block">Maximum 10 digits allowed!</span> -->
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="itemMakeModel" class="form-label">Narration<span
+                                                [ngClass]="{'text-danger': !InvoiceDetailForm.value.Narration}">
+                                                *</span></label>
+                                        <input type="text" id="itemMakeModel" class="form-control"
+                                            placeholder="Enter narration" formControlName="Narration" [maxlength]="50"
+                                            [ngClass]="(InvoiceDetailForm.get('Narration')?.hasError('required')) && InvoiceDetailForm.get('Narration')?.touched ? 'is-invalid' : ''">
+                                        <ng-container
+                                            *ngIf="InvoiceDetailForm.get('Narration')?.hasError('required') && InvoiceDetailForm.get('Narration')?.touched">
+                                            <span class="text-danger mt-4px d-block">Narration is required!</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-12  col-md-4 col-lg-3 d-flex align-items-end">
+                                    <div class="mb-3">
+                                        <button class="btn-primary btn"
+                                            (click)="openBasicModal(invoiceItem);Isdisable=true;filterInvoice()"
+                                            ><span class="feather icon-plus"></span> Add
+                                            Invoice</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 stretch-card"
+                                    *ngIf="IsDocumentShow==false">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table bg-white">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>File type</th>
+                                                            <th>Invoice name</th>
+                                                            <th [width]="20">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr formArrayName="ListInvoiceDocuments"
+                                                            *ngFor="let document of InvoiceDocuments.controls; let i = index">
+                                                            <ng-container [formGroupName]="i">
+                                                                <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">{{this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].OriginalFileName}}
+                                                                </td>
+                                                                <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">{{this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].FileName}}
+                                                                </td>
+                                                                <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">
+                                                                    <button class="btn btn-outline-primary btn-xs me-1"
+                                                                        (click)="openBasicModal(previewItem);PreviewInvoice(this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].FilePath)"><span
+                                                                            class="feather icon-eye"></span> View
+                                                                    </button>
+                                                                    <button class="btn btn-outline-danger btn-xs me-1"
+                                                                        (click)="remove(i)"><span
+                                                                            class="feather icon-trash-2"></span> Delete
+                                                                    </button>
+                                                                </td>
+                                                            </ng-container>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <app-shimmers *ngIf="EditshimmerVisible" [type]="'form-2'"></app-shimmers>
+                        </ng-container>
+                          <app-shimmers *ngIf="EditshimmerVisible" [type]="'table'"></app-shimmers>
+                    </form>
+                <!--Shimmer UI -->
+               
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end ">
+                        <div class="text-end d-flex align-items-end flex-end flex-column flex-sm-row">
+                            <div class="form-check mr-2 mb-2">
+                                <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                    [(ngModel)]="Isprintbarcode" (ngModelChange)="Click()">
+                                <label class="form-check-label" for="itemFIFOorder">
+                                    Print Barcode
+                                </label>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary me-2" (click)="FormReset()"
+                                    [disabled]="!FormChanged">Reset</button>
+                                <button type="button"[disabled]="!FormChanged || InvoiceDetailForm.invalid" class="btn btn-primary submit" (click)="InvoiceDetails();"
+                                    >{{InvoiceGuid?'Update':'Save'}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Machine -->
+<ng-template #invoiceItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add invoice</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');isFileUplodad=false;filterInvoice() "
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="InvoiceDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Upload Invoice</label>
+                        <input #fileInput type="file" id="upload-resume" fileToUpload class="form-control"
+                            accept=".docx, .doc, .pdf, application/pdf" (change)="UplodeInvoice($event);"
+                            placeholder="Enter consumption unit">
+                        <span class="text-danger" *ngIf="isFileUplodad">{{ShowPdfFile}}</span>
+                    </div>
+                    <h6 class="card-title mb-2">File details</h6>
+                    <div>
+                        <div>
+                            <ng-container>
+                                <ng-container>
+                                    <div class="row">
+                                        <div class="col-md-12 stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table bg-white">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>File type</th>
+                                                                    <th>File name</th>
+                                                                    <th [width]="20">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr formArrayName="ListInvoiceDocuments"
+                                                                    *ngFor="let document of InvoiceDocuments.controls; let i = index">
+                                                                    <ng-container [formGroupName]="i">
+                                                                        <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">{{this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].OriginalFileName}}
+                                                                        </td>
+                                                                        <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">{{this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].FileName}}
+                                                                        </td>
+                                                                        <td *ngIf="!this.InvoiceDetailForm.get('ListInvoiceDocuments')?.value[i].IsDeleted"> <button
+                                                                                class="btn btn-outline-danger btn-xs me-1"
+                                                                                (click)="remove(i)"><span
+                                                                                    class="feather icon-trash-2"></span>
+                                                                            </button></td>
+                                                                    </ng-container>
+                                                                </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button> -->
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');IsDocumentShow=false;AddDocument()" [disabled]="Isdisable">Add</button>
+    </div>
+</ng-template>
+<!-- Modal -->
+
+<!-- Preview Modal Popup -->
+<ng-template #previewItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Preview invoice</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="widget-content">
+            <div class="default-form">
+                <div class="row form">
+                    <ngx-doc-viewer [url]="Document" viewer="url" style="width:100%;height:75vh;">
+                        <div>Loading</div>
+                    </ngx-doc-viewer>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- <div class="col-sm-12">
+                <div>Preview will displayed here...</div>
+             </div> -->
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+    </div>
+</ng-template>
+<!-- Modal -->

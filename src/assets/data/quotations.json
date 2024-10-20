@@ -1,0 +1,18 @@
+[
+    {
+        "item-code": 0,
+        "itemName": "Paracetmal",
+        "itemCategory": "Medical industry",
+        "itemId": "A1",
+        "hsnCode": "78956234",
+        "catalogNo": "1102",    
+        "gstTax": "18%",    
+        "categoryType": "General",    
+        "departmentType": "Bio Chemistry",    
+        "manufacturer": "Johnson & Johnson",    
+        "machine": "Ultrasound machines",    
+        "is-expirable": true,    
+        "expiry-date": "08/02/2023"
+      }
+
+  ]
