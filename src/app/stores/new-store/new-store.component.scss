@@ -1,0 +1,68 @@
+.ml-2{
+    margin-left: 8px;
+}
+.visbility-nonev{
+visibility: hidden;
+}
+.justify-content-between{
+    justify-content: space-between;
+}
+
+.flex-end{
+    justify-content: flex-end;
+ }
+ .mr-2{
+    margin-right: 20px;
+ }
+ .h-34{
+   height: 34px;
+ }
+//  .ng-select {
+//    display: initial;
+// }
+
+.shimmerBG {
+   animation-duration: 2.2s;
+   animation-fill-mode: forwards;
+   animation-iteration-count: infinite;
+   animation-name: shimmer;
+   animation-timing-function: linear;
+   background: #ddd;
+   background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+   background-size: 1200px 100%;
+ }
+ 
+ .formLable{
+   height: 10px;
+   width: 100px;
+   border-radius: 6px;
+ }
+ .formInput{
+   height: 15px;
+   width: 80%;
+   border-radius: 6px;
+   line-height: 56px;
+ }
+ .line {
+   height: 15px;
+   width: 100%;
+   border-radius: 4px;
+ }
+ @-webkit-keyframes shimmer {
+   0% {
+     background-position: -100% 0;
+   }
+   100% {
+     background-position: 100% 0;
+   }
+ }
+ 
+ @keyframes shimmer {
+   0% {
+     background-position: -1200px 0;
+   }
+   100% {
+     background-position: 1200px 0;
+   }
+ }
+ 

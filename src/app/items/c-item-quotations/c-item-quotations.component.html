@@ -1,0 +1,319 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body" *ngIf="itemQuotationData.length != 0">
+                <double-scroll>
+                    <table class="table">
+                        <thead >
+                            <tr>
+                                <th>Quotation no</th>
+                                <th>From date</th>
+                                <th>To date</th>
+                                <th>Supplier name</th>
+                                <th>Supplier address</th>
+                                <th>GSTN no</th>
+                                <th title="Delivery Location Count">DL Count</th>
+                                <th>Status</th>
+                                <th>Status of Quotation Item</th>
+                                <th>Item Name</th>
+                                <th>Pack Size</th>
+                                <th>UOM</th>
+                                <th>Rate ₹</th>
+                                <th>Discount %</th>
+                                <th>CGST%</th>
+                                <th>SGST%</th>
+                                <th>IGST%</th>
+                                <th>Buy Price ₹</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="itemQuotationData !=null">
+                                <tr *ngFor="let quotation of itemQuotationData">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.QuotationNo}}">{{quotation.QuotationNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span
+                                            title="{{quotation.FromDate | date: 'dd - MM - yyyy'}}">{{quotation.FromDate
+                                            | date: 'dd - MM - yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.ToDate | date: 'dd - MM - yyyy'}}">{{quotation.ToDate |
+                                            date: 'dd - MM - yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.SupplierName}}">{{quotation.SupplierName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{quotation.SupplierAddress}}">{{quotation.SupplierAddress}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.GSTNNo}}">{{quotation.GSTNNo}}</span>
+                                    </td>                                    
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span
+                                            title="{{quotation.DeliveryLocationCount}}">{{quotation.DeliveryLocationCount}}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            [ngClass]="{'text-warning': quotation.ApprovalStatus=='0', 'text-info': quotation.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                            {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                            "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                        [ngClass]="{'text-danger':quotation.ItemCancel,'text-success': !quotation.ItemCancel}"
+                                           >
+                                            {{quotation.ItemCancel?'Cancel':'Active'}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title=" {{quotation.ItemName}}">
+                                          {{quotation.ItemName}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title=" {{quotation.PackSize}}">
+                                          {{quotation.PackSize}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title=" {{quotation.MajorUnitName}}">
+                                          {{quotation.MajorUnitName}}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span title="{{quotation.Rate}}">
+                                          {{quotation.Rate}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title="{{quotation.DiscountPer}}">
+                                          {{quotation.DiscountPer}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title="{{quotation.CGSTPer==0?'--':quotation.CGSTPer}}">
+                                          {{quotation.CGSTPer==0?'--':quotation.CGSTPer}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title="{{quotation.SGSTPer==0?'--':quotation.SGSTPer}}">
+                                          {{quotation.SGSTPer==0?'--':quotation.SGSTPer}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title="{{quotation.IGSTPer}}">
+                                          {{quotation.IGSTPer}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span title="  {{quotation.BuyPrice}}">
+                                          {{quotation.BuyPrice}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <!-- <tr  *ngFor="let dummyLoop of [].constructor(10)">
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="1152">1152</span>
+                        </td>
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="2023 - 04 - 29">2023 - 04 - 29</span>
+                        </td>
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="2023 - 05 -27">2023 - 05 -27</span>
+                        </td>
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="PEACE INDIA LIMITED">PEACE INDIA LIMITED</span>
+                        </td>
+                        <td class="truncate" style="max-width: 300px;">
+                            <span
+                                title="Railway Station ShankerpallyDoor No.3-5/A sy No .96 & 97 Near shankerpally">Railway
+                                Station ShankerpallyDoor No.3-5/A sy No .96 & 97 Near shankerpally</span>
+                        </td>
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="3388BCE1667R1ZA">3388BCE1667R1ZA</span>
+                        </td>
+                        <td class="truncate" style="max-width: 150px;">
+                            <span title="TELANGANA">TELANGANA</span>
+                        </td>
+                        <td class="truncate" style="max-width: 300px;">
+                            <span title="YODA LIFELINE DIAGNOSTICS IT DEPT">YODA LIFELINE
+                                DIAGNOSTICS IT DEPT</span>
+                        </td>
+                        <td>
+                            <span class="text-success"> Approved </span>
+                        </td>
+                        <td>
+                            <div class="d-flex"><button class="btn btn-outline-primary btn-xs me-1"><span
+                                        class="feather icon-zoom-in"></span></button>
+                                <div>
+                                    <button id="actionsDropdown" placement="bottom" container="body"
+                                        popoverclass="dataTableActions" class="btn btn-secondary btn-xs"
+                                        ng-reflect-placement="bottom" ng-reflect-container="body"
+                                        ng-reflect-popover-class="dataTableActions"
+                                        ng-reflect-ngb-popover="[object Object]" fdprocessedid="ydxjhh">Actions</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr> -->
+                            <!-- <ng-container *ngIf="quotationsList !=null">
+                        <tr *ngFor="let quotation of quotationsList">
+                            <td class="truncate" style="max-width: 150px;">
+                                <span title="{{quotation.QuotationNo}}">{{quotation.QuotationNo}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 150px;">
+                                <span
+                                    title="{{quotation.FromDate | date: 'yyyy - MM - dd'}}">{{quotation.FromDate
+                                    | date: 'yyyy - MM - dd'}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 150px;">
+                                <span title="{{quotation.ToDate | date: 'yyyy - MM -dd'}}">{{quotation.ToDate |
+                                    date: 'yyyy - MM -dd'}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 150px;">
+                                <span title="{{quotation.SupplierName}}">{{quotation.SupplierName}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 300px;">
+                                <span title="{{quotation.SupplierAddress}}">{{quotation.SupplierAddress}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 150px;">
+                                <span title="{{quotation.GSTNNo}}">{{quotation.GSTNNo}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 150px;">
+                                <span
+                                    title="{{quotation.DeliveryStateName}}">{{quotation.DeliveryStateName}}</span>
+                            </td>
+                            <td class="truncate" style="max-width: 300px;">
+                                <span
+                                    title="{{quotation.DeliveryLocationName}}">{{quotation.DeliveryLocationName}}</span>
+                            </td>
+                            <td>
+                                <span
+                                    [ngClass]="{'text-warning': quotation.ApprovalStatus=='0', 'text-info': quotation.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                    {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                    "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                </span>
+                            </td>
+                        </tr>
+                    </ng-container> -->
+
+                            <!-- No records found UI -->
+                            <ng-container *ngIf="quotationsList == null">
+                                <tr>
+                                    <td colspan="10" class="py-5 text-muted">
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            <i class="feather icon-alert-circle fs-4"></i>
+                                            <span>No quotations found!</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="itemQuotationData.length==0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                <div  class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                        <i class="feather icon-alert-circle fs-2"></i>
+                        <span>No Quotations found!</span>
+                    </div>
+                </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<!-- Modal-->
+<ng-template #xlModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Supplier Quotation Detail</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="container-fluid d-flex justify-content-between mt-4 flex-sm-row flex-column">
+        <div class="col-lg-5 ps-0">
+            <p class="mt-1 mb-1"><span class="fw-bold">Quotation No</span>:{{this.quotationDetails[0].QuotationNo}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Vendor Name</span>: {{this.quotationDetails[0].SupplierName}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">State</span>:{{supplierStateName}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Delivery
+                    State</span>:{{deliveryState}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Created By</span>:{{this.quotationDetails[0].CreatedBy}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Checked By</span>: {{this.quotationDetails[0].CheckedByName}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Approved By</span>:{{this.quotationDetails[0].ApprovedByName}}
+            </p>
+        </div>
+        <div class="col-lg-4 pe-0 text-sm-end">
+            <p class="mb-1"><span class="fw-bold">Quotation Reference
+                    No:</span>{{this.quotationDetails[0].QuotationRefNo}} </p>
+            <p class="mb-1"><span class="fw-bold">Vendor Address:</span> {{this.quotationDetails[0].SupplierAddress}} ,
+                Hyderabad.</p>
+            <p class="mb-1"><span class="fw-bold">GSTN No:</span> {{this.quotationDetails[0].GSTNNo}}</p>
+            <p class="mb-1"><span class="fw-bold">From Date:</span> {{this.quotationDetails[0].FromDate |
+                date:'dd-MM-yy'}} <span class="fw-bold">To
+                    Date:</span> {{this.quotationDetails[0].ToDate | date:'dd-MM-yy'}} </p>
+            <p class="mb-1"><span class="fw-bold">Created Date:</span> {{this.quotationDetails[0].CreateDate |
+                date:'dd-MM-yy'}}</p>
+            <p class="mb-1"><span class="fw-bold">Checked Date:</span> {{this.quotationDetails[0].CheckedDate |
+                date:'dd-MM-yy'}}</p>
+            <p class="mb-1"><span class="fw-bold">Approved Date:</span> {{this.quotationDetails[0].ApprovedDate |
+                date:'dd-MM-yy'}}</p>
+        </div>
+    </div>
+    <div class="modal-body">
+        <double-scroll>
+            <!-- <div class="table-responsive pt-3"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <th>Delivery Location</th>
+                        <th>Item Category Name</th>
+                        <th>Item Name</th>
+                        <th>HSN Code</th>
+                        <th>Manufacture Name</th>
+                        <th>Machine Name</th>
+                        <th>Rate</th>
+                        <th>Discount %</th>
+                        <th>SGST %</th>
+                        <th>CGST %</th>
+                        <th>IGST %</th>
+                        <th>Buy Price</th>
+                        <!-- <th>SGST Price</th>
+                            <th>CGST Price</th>
+                            <th>Total Price</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let quotations of quotationDetails">
+                        <td>{{deliveryLocationName}}</td>
+                        <td>{{quotations.ItemCategoryName}}</td>
+                        <td>{{quotations.ItemName}}</td>
+                        <td>{{quotations.HSNCode?quotations.HSNCode:'N/A'}}</td>
+                        <td>{{quotations.ManufactureName}}</td>
+                        <td>{{quotations.MachineName}}</td>
+                        <td>{{quotations.Rate}}</td>
+                        <td>{{quotations.DiscountPer}}</td>
+                        <td>{{quotations.SGSTPer}}</td>
+                        <td>{{quotations.CGSTPer}}</td>
+                        <td>{{quotations.IGSTPer}}</td>
+                        <td>{{quotations.BuyPrice}}</td>
+                        <!-- <td>{{quotations.MachineName}}</td>
+                            <td>{{quotations.MachineName}}</td>
+                            <td>{{quotations.MachineName}}</td> -->
+                    </tr>
+                </tbody>
+            </table>
+            <!-- </div> -->
+        </double-scroll>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    </div>
+</ng-template>
+<!-- Modal -->

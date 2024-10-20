@@ -1,0 +1,325 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">Issue Report</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body pb-0">
+                <!-- <h6 class="card-title">Issue From Location </h6> -->
+                <form *ngIf="!shimmerVisible">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Center</label>
+                                <ng-select [items]="CenterList" bindLabel="CenterName" bindValue="CenterGuid"
+                                    [closeOnSelect]="true" [notFoundText]="'No center found!'"
+                                    placeholder="Search by center" (change)="filterData($event)" [searchable]="true"
+                                    [formControl]="CenterclearControl">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label for="purchasedUnit"
+                                    class="form-label d-flex justify-content-between">Location</label>
+                                <ng-select [items]="LocationList" bindLabel="CenterLocationName"
+                                    bindValue="CenterLocationGuid" [closeOnSelect]="true"
+                                    [notFoundText]="'No location found!'" placeholder="Search by  location"
+                                    (change)="filterData($event)" [searchable]="true" [formControl]="clearControl"
+                                    (clear)="removeLocation()">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <!-- <label for="itemExpiryDate" class="form-label d-flex justify-content-between">From Date
+                                     </label> -->
+                                <label class="form-label">From Date <span [ngClass]="{'text-danger':FromDate==''}">
+                                        *</span></label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [formControl]="clearFromDateControl" ngbDatepicker #d="ngbDatepicker"
+                                        (dateSelect)="selectFromDate($event)" [maxDate]="calendar.getToday()">
+                                    <button class="input-group-text" type="button" (click)="d.toggle()">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                            <div class="mb-3">
+                                <label class="form-label">To Date <span [ngClass]="{'text-danger':ToDate=='' }">
+                                        *</span>
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                        [minDate]="selectedFromDate" ngbDatepicker #d2="ngbDatepicker"
+                                        (dateSelect)="selectToDate($event)" [formControl]="cleardateControl">
+                                    <button class="input-group-text" type="button" (click)="FromDate?d2.toggle():''">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-2 text-end">
+                                <button class="btn btn-link btn-sm text-underline p-0" (click)="clearFilters()"
+                                    *ngIf="FromDate">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="!shimmerVisible">
+                            <div class="col-sm-12 text-end flex-wrap">
+                                <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                                    (click)="getIssueReports()" [disabled]="isDisable || noDataFound">Get Report
+                                    Data</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+
+                    <!-- <h6 class="card-title" >Item Details</h6> -->
+                    <div class="row">
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Category Type</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select category type</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Department Type</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select department type</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Item Category</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select category</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Machine</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select machine</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Items</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select Items</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Date Option</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select date option</option>
+                                    <option value="1">Recieved date</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Issue type</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select Issue type</option>
+                                    <option value="1">Recieved date</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">Indent Number</label>
+                                <input type="text" id="manufacturerConverter" class="form-control"
+                                    placeholder="Enter Indent number">
+                            </div>
+                        </div> -->
+
+                    </div>
+
+                </form>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <!-- No records found! -->
+                <ng-template [ngIf]="noDataFound && !shimmerVisible">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+                <!-- No records found! -->
+            </div>
+            <ng-container *ngIf="IssueList?.length != 0">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-4">
+                    <h6 class="card-title">{{ 'Issue Report' | uppercase }} </h6>
+                    <div class="row" *ngIf="IssueList?.length != 0">
+                        <div class="col-sm-12 text-end">
+                            <button type="button" class="btn btn-outline-primary btn-sm submit me-2 mt-sm-0"
+                                (click)="getIssueReports('pdf')" [disabled]="isDisable || noDataFound ">Get Report
+                                PDF</button>
+                            <button type="button" class="btn btn-primary btn-sm submit mt-sm-0"
+                                (click)="getIssueReports('excel')" [disabled]="isDisable || noDataFound ">Get Report
+                                Excel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3 border bg-light mx-4">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <double-scroll>
+                                <div style="max-height: 600px; overflow-y: auto;">
+                                    <div class="table-responsive table bg-white">
+                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="IssueList"
+                                            [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                            rowHeight="auto">
+                                            <ngx-datatable-column [width]="50" name="s.No">
+                                                <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                    <span>{{ rowIndex + 1 }}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Indent"
+                                                prop="IndentNo"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Material Issue Number"
+                                                prop="MaterialIssueNo"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Vendor Batch Number"
+                                                prop="VendorBatchNumber">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.VendorBatchNumber || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Issues By Name"
+                                                prop="IssuedByName">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.IssuedByName || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Issue Date"
+                                                prop="CreatedDt">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.CreatedDt | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Received By Name"
+                                                prop="ReceiveByUserName">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.ReceiveByUserName || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Received By Date"
+                                                prop="ReceiveDate">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.ReceiveDate | date:"dd-MM-yyyy" || "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="180" name="Dispatch Location"
+                                                prop="ToLocation"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Receive Location"
+                                                prop="FromLocation"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Item Name"
+                                                prop="ItemName"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Request Quantity"
+                                                prop="ReqQty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Issue Quantity"
+                                                prop="SendQty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Receive Quantity"
+                                                prop="ReceiveQty"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Return Quantity"
+                                                prop="ReceiveQty==0?'0':RejectQuantity">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row.ReceiveQty==0?'0':row.RejectQuantity}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Rate (Rs)"
+                                                prop="Rate"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Buy Price (Rs)"
+                                                prop="ReceiveAmt"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Discount Amt (Rs)"
+                                                prop="DiscountAmount"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="80" name="Tax  (%)"
+                                                prop="TaxPer"></ngx-datatable-column>
+                                            <ngx-datatable-column [width]="120" name="Issue Amt (Rs)"
+                                                prop="ReceiveAmt">
+                                                <ng-template ngx-datatable-cell-template let-row="row" >
+                                                    <span>{{ row?.ReceiveAmt * row?.SendQty|| "N/A"}}</span>
+                                                </ng-template>
+                                            </ngx-datatable-column>
+                                        </ngx-datatable>
+
+                                    </div>
+                                </div>
+                            </double-scroll>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="card-footer">
+                <!--Shimmer UI -->
+                <ng-container *ngIf="shimmerVisible">
+                    <tr *ngFor="let dummyLoop of [].constructor(1)"
+                        class="align-items-end align-self-end d-flex justify-content-end">
+                        <td>
+                            <div class="d-flex text-end">
+                                <div class="shimmerBG line" style="margin-right: 5px;width: 126px;height: 38px;"></div>
+                                <div class="shimmerBG line" style="width: 126px;height: 38px;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+        </div>
+    </div>
+</div>

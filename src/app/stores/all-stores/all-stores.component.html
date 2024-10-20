@@ -1,0 +1,229 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Locations</a></li>
+        <li class="breadcrumb-item active" aria-current="page">All locations</li>
+    </ol>
+</nav>
+
+<!-- <div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">ALL ITEMS</h4>
+        <p class=“text-muted”>Read the <a href="https://github.com/swimlane/ngx-datatable" target="_blank"> Official Ngx-datatable Documentation </a>for a full list of instructions and other options.</p>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>{{authservice.LoggedInUser.STORE==true || authservice.LoggedInUser.STORE=='true' ?'STORES / DEPARTMENTS':'DEPARTMENT'}}</div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <!-- Toggle the value of the property when the toggler button is clicked. -->
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <ng-container *ngIf="Store=='true' || Store==true">
+                            <button class="btn btn-primary btn-sm flex-shrink-0 ms-2"
+                                (click)="addStore('AddStore')"><span class="feather icon-plus"></span> Add
+                                location</button>
+                        </ng-container>
+                    </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
+                    <div
+                        class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                                                        <span class="text-muted text-small me-0 me-sm-2 flex-shrink-0"
+                            *ngIf="locations?.length>0">{{(pageSize*(pageNumber-1))+1}}-{{totalCount>pageSize*pageNumber?pageSize*pageNumber:totalCount}}
+                                of {{totalCount}} </span>
+                            <select *ngIf="locations?.length>0" name="rowLimit" id="rowLimit"
+                                class="form-control form-select h-34 ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                            <!-- <input  type="text" class="form-control form-select-sm" placeholder="Search" /> -->
+                            <input type="text" class="form-control mb-2 mb-sm-0 w-100 ms-0 ms-sm-2"
+                               [maxLength]="80" placeholder="Search" (ngModelChange)="onSearchLocation($event)"[(ngModel)]="keywordName" />
+                             <ng-select [items]="stores" bindLabel="CompanyName" bindValue="CompanyName"
+                                placeholder="Search by center name" notFoundText="No centers found" [ngModel]="location" 
+                                (change)="onSearchCentres($event)"
+                                class="ng-select-custom maxW-250  mb-2 mb-sm-0 w-100 ms-0 ms-sm-2" appendTo="body">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+               
+                <double-scroll *ngIf="locations != null && locations.length > 0 && !shimmerVisible">
+                    <!-- <div class="table-responsive"> -->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Store/Department</th>
+                                <th>Type</th>
+                                <th>Center</th>
+                                <th>Contact person</th>
+                                <th>Contact Person No</th>
+                                <th>Address</th>
+                                <th>State</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="locations !=null && !shimmerVisible">
+                                <tr *ngFor="let loc of locations">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{loc.Location}}">{{loc.Location}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span class="badge bg-primary" *ngIf="loc.IsStore">Store</span>
+                                        <span class="badge bg-success" *ngIf="!loc.IsStore">Department</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{loc.Center}}">{{loc.Center}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{loc.ContactPerson}}">{{loc.ContactPerson}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{loc.ContactPersonNo}}">{{loc.ContactPersonNo}}</span>
+                                    </td>
+
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{loc.StoreLocationAddress}}">{{loc.StoreLocationAddress}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{loc.State}}">{{loc.State}}</span>
+                                    </td>
+                                    <!-- <td class="truncate" style="max-width: 300px;">
+                                    <span title="{{1}}">1</span>
+                                </td> -->
+                                    <!-- <td>
+                                    <span
+                                        [ngClass]="{'text-warning': loc.ApprovalStatus=='0', 'text-info': loc.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                        {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                        "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                                    </span>
+
+                                    <div class="border-secondary border text-secondary bg-white badge-mini badge" *ngIf="this.created==true">{{quotation.ApprovalStatus== "0"?'Created':''}}</div>
+                                    <div class="border-primary border text-primary bg-white badge-mini badge"  *ngIf="this.checked==true">{{quotation.ApprovalStatus== "1"?'Checked':''}}</div>
+                                     <div class="border-success border text-success bg-white badge-mini badge" *ngIf="this.approved==true">{{quotation.ApprovalStatus== "2"?'Approved':''}}
+                                    </div> 
+                                </td> -->
+                                    <td>
+                                        <div class="d-flex">
+                                            <div ngbDropdown>
+                                                <button class="btn btn-secondary btn-xs" id="actionsDropdown" [disabled]="Store=='false' || Store==false"
+                                                    placement="bottom" container="body" [ngbPopover]="dataTableActions"
+                                                    popoverClass="dataTableActions">Actions <span
+                                                        class="feather icon-chevron-down"></span></button>
+                                                    <ng-template #dataTableActions>
+                                                        <div aria-labelledby="actionsDropdown">
+                                                            <button class="border-bottom" ngbDropdownItem
+                                                                (click)="getGuid(loc)"><span
+                                                                    class="feather icon-edit"></span> Edit</button>
+                                                            <!-- <button class="border-bottom" ngbDropdownItem
+                                                       ><span class="feather icon-printer"></span> Print</button>
+                                                    <button class="border-bottom" ngbDropdownItem
+                                                        ><span class="feather icon-download"></span> Download</button>   -->
+                                                            <button class="border-bottom" ngbDropdownItem
+                                                                (click)="openBasicModal(locationDelete);deleteLocation(loc);"><span
+                                                                    class="feather icon-edit"></span> Delete</button>
+                                                        </div>
+                                                    </ng-template>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                            <ng-container *ngIf="shimmerVisible">
+                                <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                        </tbody>
+                    </table>
+                    <!-- </div> -->
+                </double-scroll>
+            </div>
+            <div class="cartd-footer">
+                <div class="d-flex justify-content-center my-3 pe-3" *ngIf="!IsShow && !shimmerVisible">
+                    <!-- <pagination-controls (pageChange)="GetAllData($event)"></pagination-controls> -->
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                        [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->
+</div>
+
+<ng-template #locationDelete let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Location</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label"> Do you want to delete
+                        <strong>{{ storeName }}</strong> ?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');DeleteLocation()">Yes</button>
+    </div>
+</ng-template>
+<ng-container *ngIf="IsShow && !shimmerVisible">
+    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+      <div class="py-5 text-muted">
+        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+          <i class="feather icon-alert-circle fs-2"></i>
+          <span>No locations found!</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+ 

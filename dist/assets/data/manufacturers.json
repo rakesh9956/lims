@@ -1,0 +1,23 @@
+[
+    {
+      "id": 0,
+      "name": "Ramsey Cummings",
+      "contactPerson": "Sam",
+      "contactNo": 5246473,
+      "status": "Active"
+    },
+    {
+      "id": 1,
+      "name": "Corell",
+      "contactPerson": "Harris",
+      "contactNo": 4695462,
+      "status": "Inactive"
+    },
+    {
+      "id": 2,
+      "name": "Steve",
+      "contactPerson": "Harvey",
+      "contactNo": 9806265,
+      "status": "Active"
+    }
+  ]

@@ -1,0 +1,442 @@
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body" *ngIf="this.alItemListData.length!=0">
+                <h6 class="card-title">Activity History</h6>
+                <div id="content">
+                    <ul class="timeline">
+                        <!-- <li data-date="Purchase Order" class="event">
+                            <h3 class="title">#6588888</h3>
+                            <p>14/04/2023 04:55 PM</p>
+                        </li> -->
+                        <li data-date="Supplier" class="event" *ngFor="let supplier of Supplierslist">
+                            <h3 class="title" class="title c-pointer" 
+                             (click)="openBasicXlModal(supplerItems);supplierFilterData(supplier.SupplierGuid)">
+                                {{supplier.SupplierName}}
+                            </h3>
+                            <p>{{supplier.CreatedDt  |date:' dd-MM-yyyy h:mm:ss'}}</p>                           
+                        </li>
+
+                        <li data-date="Quotation" class="event" *ngFor="let quotation of alItemQuotationData">
+                            <h3 class="title" class="title c-pointer"
+                                (click)="openBasicXlModal(quotationItems);QuotationDataFilter(quotation.QuotationGuid)">
+                                {{quotation.QuotationNo}}
+                                ({{quotation.SupplierName}})</h3>
+                            <p>{{quotation.CreatedDt |date:' dd-MM-yyyy h:mm:ss'}}</p>
+                            <span
+                                [ngClass]="{'text-warning': quotation.ApprovalStatus=='0', 'text-info': quotation.ApprovalStatus=='1', 'text-success': quotation.ApprovalStatus=='2'}">
+                                {{quotation.ApprovalStatus== "0" ?'Created':quotation.ApprovalStatus==
+                                "1"?'Checked':quotation.ApprovalStatus== "2"?'Approved':''}}
+                            </span>
+                        </li>
+                        <li data-date="Indent" class="event" *ngFor="let pi of alItemIndentData">
+                            <h3 class="title" class="title c-pointer"
+                                (click)="openBasicXlModal(indentsItems);indentFilterData(pi.IndentGuid)">{{pi.IndentNo}}
+                            </h3>
+                            <p>{{pi.CreatedDt |date:' dd-MM-yyyy h:mm:ss'}}</p>
+                            <span
+                                [ngClass]="{'text-warning': pi.FromRights=='FromRights', 'text-info': pi.FromRights=='Checked', 'text-success': pi.FromRights=='Approved'}">
+                                {{pi.FromRights}}
+                            </span>
+                        </li>
+                        <li data-date="Purchase Order" class="event" *ngFor="let po of alItemPurchaseData">
+                            <h3 class="title c-pointer"
+                                (click)="openBasicXlModal(recievedItems);PurchaseOrderGuid(po.PurchaseOrderGuid)">
+                                {{po.PurchaseOrderNo}}</h3>
+                            <p>{{po.CreatedDate | date:'dd-MM-yyyy h:mm:ss'}}</p>
+                            <span class="truncate" style="max-width: 150px;">
+                                <span title="{{po.Status}}"
+                                    [ngClass]="{ 'text-info': po.Status=='Checked', 'text-success': po.Status== 'Approved'}">{{po.Status}}
+                                </span>
+                            </span>
+                        </li>
+                        <li data-date="GRN" class="event" *ngFor="let grn of alItemGrnData">
+                            <h3 class="title" class="title c-pointer"
+                            (click)="openBasicXlModal(grnItems);grnFilterData(grn.GrnGuid)">{{grn.LedgerTransactionNo}}</h3>
+                            <p>{{grn.CreatedDt | date:'dd-MM-yyyy h:mm:ss'}}</p>
+                            <span class="truncate" style="max-width: 150px;">
+                                <span title="Status" class="text-info">{{grn.Iscancel== true
+                                    ?'Cancel':grn.IsPost==false?'Unpost':grn.IsPost== true?'Post':''}}</span>
+                            </span>
+                        </li>
+                        <li data-date="SI" class="event" *ngFor="let si of alItemSiData">
+                            <h3 class="title" class="title c-pointer" (click)="openBasicLgModal(siItems);SiFilterData(si.SIGuid)">{{si.SINo}}</h3>
+                            <p>{{si.CreatedDt | date:'dd-MM-yyyy h:mm:ss'}}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="this.alItemListData.length==0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No activity history found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="cartd-footer">
+                <!-- <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Purchase Order Details Modal Popup-->
+<ng-template #recievedItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Purchase Order Details</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">Purchase Order No:</label>
+            <p class="text-muted">{{alItemPurchaseDetails[0].PurchaseOrderNo}}</p>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Name:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].SupplierName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Store Name:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].LocationName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">No.of Items:</label>
+                <p class="text-muted">{{alItemPurchaseData.length}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Price:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].Price}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Created Date:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].CreatedDate | date:'dd-MM-yyyy'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Created By:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].CreatedBy}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Checked Date:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].POCheckedDate | date:'dd-MM-yyyy'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Checked By:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].POCheckedByName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Approved Date:</label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].POApprovedDate | date:'dd-MM-yyyy'}}</p>
+            </div>
+
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Approved by: </label>
+                <p class="text-muted">{{alItemPurchaseDetails[0].POAppprovedByName}}</p>
+            </div>
+
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Status </label>
+               <div>
+                <span
+                [ngClass]="{ 'text-info': alItemPurchaseDetails[0].Status=='Checked', 'text-success': alItemPurchaseDetails[0].Status== 'Approved'}">
+                {{alItemPurchaseDetails[0].Status}}
+            </span>
+               </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');PurchaseOrderGuid([])">Close</button>
+        <!-- <button type="button" class="btn btn-primary"
+            (click)="modal.close('by: Save button')">Save</button> -->
+    </div>
+</ng-template>
+<!-- Modal Popup-->
+
+<!-- Suppliers  Details Modal Popup-->
+<ng-template #supplerItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Suppliers </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Name:</label>
+            <p class="text-muted">{{this.supplierFilterDetails[0].SupplierName}}</p>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Category:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].SupplierCategory}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Code:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].SupplierCode}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Type:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].SupplierTypeName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Address:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].Street}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Primary Contact Person:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].PrimaryContactPerson}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Contact No:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].PrimaryContactPersonMobileNo}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Email:</label>
+                <p class="text-muted">{{this.supplierFilterDetails[0].PrimaryContactPersonEmailId}}</p>
+            </div>
+            <!-- <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Status </label>
+                <p class="text-muted">Active</p>
+            </div> -->
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Close</button>
+    </div>
+</ng-template>
+<!-- Modal Popup-->
+
+<!-- Quotations  Details Modal Popup-->
+<ng-template #quotationItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Quotation Details </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">Quotation No:</label>
+            <p class="text-muted">{{this.quotationFilterData[0].QuotationNo}}</p>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">From Date:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].FromDate | date:'dd-MM-yyyy'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">To Date:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].ToDate | date:'dd-MM-yyyy'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier name:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].SupplierName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier address:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].SupplierAddress}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">GST No:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].GSTNNo}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase" title="DL Count">DL Count:</label>
+                <p class="text-muted">{{this.quotationFilterData[0].DeliveryLocationCount}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Status </label>
+
+                <div
+                    [ngClass]="{'text-warning': this.quotationFilterData[0].ApprovalStatus=='0', 'text-info':  this.quotationFilterData[0].ApprovalStatus=='1', 'text-success':  this.quotationFilterData[0].ApprovalStatus=='2'}">
+                    {{ this.quotationFilterData[0].ApprovalStatus== "0" ?'Created':
+                    this.quotationFilterData[0].ApprovalStatus==
+                    "1"?'Checked': this.quotationFilterData[0].ApprovalStatus== "2"?'Approved':''}}
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Close</button>
+    </div>
+</ng-template>
+<!-- Modal Popup-->
+
+<!-- GRN  Details Modal Popup-->
+<ng-template #grnItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">GRN Details </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">Ledger Transaction No:</label>
+            <p class="text-muted">{{this.grnFilterDetails[0].LedgerTransactionNo}}</p>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Purchase Order No</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].PurchaseOrderNo}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Invoice No:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].InvoiceNo}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Chalan No:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].ChalanNo}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Supplier Name:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].SupplierName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">GRN Date:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].GRNDate | date:'dd-MM-yyyy'}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Gross Amount:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].GrossAmount}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Location:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].Location}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Discount Amount:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].DiscountOnTotal}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Tax Amount:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].TaxAmount}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Net Amount:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].NetAmount}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Status </label>
+               <div>
+                <span class="truncate" style="max-width: 150px;">
+                    <span title="Status" class="text-info">{{this.grnFilterDetails[0].Iscancel== true
+                        ?'Cancel':this.grnFilterDetails[0].IsPost==false?'Unpost':this.grnFilterDetails[0].IsPost== true?'Post':''}}</span>
+                </span>
+               </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Close</button>
+    </div>
+</ng-template>
+<!-- Modal Popup-->
+
+<!-- SI  Details Modal Popup-->
+<ng-template #siItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">SI Details </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">SI No:</label>
+            <p class="text-muted">{{this.grnFilterDetails[0].SINo}}</p>       
+            <div class="mt-3 col-sm-4 col-xl-4">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Request Location:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].FromLocation}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-4">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Indent Location:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].StoreName}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-4">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Request Quantity:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].RequesteQty}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-4">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">Received Quantity:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0].ReceiveQty}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-4">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">In Hand Quantity:</label>
+                <p class="text-muted">{{this.grnFilterDetails[0]?.NewQty}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Close</button>
+    </div>
+</ng-template>
+<!-- Modal Popup-->
+
+<!-- Indent  Details Modal Popup-->
+<ng-template #indentsItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Indent Details </h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <label class="tx-11 fw-bolder mb-0 text-uppercase">INDENT NO:</label>
+            <p class="text-muted">{{this.indentFilterDetails[0].IndentNo}}</p>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">INDENT FROM LOCATION:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].IndentFromLocation}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">INDENT TO LOCATION:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].IndentToLocation}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">INDENTTYPE:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].IndentType}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">NARRATION:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].Narration}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">CREATED BY:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].CreatedBy}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">CHECKED BY:</label>
+                <p class="text-muted">{{this.indentFilterDetails[0].CheckedUserName?this.indentFilterDetails[0].CheckedUserName:'Not Checked'}} </p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">CHECKED DATE:</label>
+                <p class="text-muted" *ngIf="this.indentFilterDetails[0].CheckedDate!='0001-01-01T00:00:00'">{{this.indentFilterDetails[0].CheckedDate |date:' dd-MM-yyyy'}} </p>
+                <p class="text-muted" *ngIf="this.indentFilterDetails[0].CheckedDate == '0001-01-01T00:00:00'">N/A</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">APPROVED BY </label>
+                <p class="text-muted">{{this.indentFilterDetails[0].CheckedUserName?this.indentFilterDetails[0].CheckedUserName:'Notapproved'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">APPROVED DATE </label>
+                <p class="text-muted" *ngIf="this.indentFilterDetails[0].ApprovedDate">{{this.indentFilterDetails[0].CheckedDate |date:' dd-MM-yyyy'}} </p>
+                <p class="text-muted" *ngIf="">{{this.indentFilterDetails[0].ApprovedDate?this.indentFilterDetails[0].ApprovedDate:'Not Approved Date'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">EXPECTED DATE </label>
+                <p class="text-muted">{{this.indentFilterDetails[0].ExpectedDate|date:' dd-MM-yyyy'}}</p>
+            </div>
+            <div class="mt-3 col-sm-4 col-xl-3">
+                <label class="tx-11 fw-bolder mb-0 text-uppercase">STATUS</label>
+               <div>
+                <span
+                [ngClass]="{'text-warning': this.indentFilterDetails[0].FromRights.toLowerCase()=='maker','text-info': this.indentFilterDetails[0].FromRights=='Checked', 'text-success': this.indentFilterDetails[0].FromRights=='Approved'}">
+                {{this.indentFilterDetails[0].FromRights}}
+            </span>
+               </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Close</button>
+    </div>
+</ng-template>
+<!-- Modal Popup-->

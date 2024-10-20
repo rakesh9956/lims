@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body" *ngIf="itemGrntData.length!=0">
+                <double-scroll>
+                    <table class="table">
+                        <thead >
+                            <tr>
+                                <th>Ledger Transaction No</th>
+                                <th>Purchase Order No</th>
+                                <th>Invoice No</th>
+                                <th>Chalan No</th>
+                                <th>Supplier Name</th>
+                                <th>GRN date</th>
+                                <th>&#8377; Buy price</th>
+                                <th>&#8377; Discount amount</th>
+                                <th>&#8377; TAX amount</th>
+                                <th>&#8377; Net amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="itemGrntData !=null">
+                                <tr *ngFor="let grn of  itemGrntData">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Ledger Transaction No">{{grn.LedgerTransactionNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Purchase Order No">{{grn.PurchaseOrderNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 120px;">
+                                        <span title="Invoice No">{{grn.InvoiceNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="Chalan No">{{grn.ChalanNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Supplier Name">{{grn.SupplierName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="GRN date">{{grn.GRNDate | date:'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Gross amount">{{grn.GrossAmount}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Discount amount">{{grn.DiscountOnTotal}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="TAX amount">{{grn.TaxAmount}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Net amount">{{grn.NetAmount}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="Status" class="text-info">{{grn.Iscancel== true ?'Cancel':grn.IsPost==false?'Unpost':grn.IsPost== true?'Post':''}}</span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="itemGrntData.length == 0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                <div  class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                        <i class="feather icon-alert-circle fs-2"></i>
+                        <span>No GRNs found!</span>
+                    </div>
+                </div>
+                </div>
+            </ng-container>
+            <div class="cartd-footer" *ngIf="itemGrntData.length!=0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,16 @@
+:host {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-visibility-block {
+  .password-visibility-icon {
+      position: absolute;
+      top: 6px;
+      right: 15px;
+      width: 25px;
+      padding: 0;
+  }
+}

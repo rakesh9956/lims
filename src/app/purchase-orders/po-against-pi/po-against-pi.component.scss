@@ -1,0 +1,37 @@
+.wd-80 {
+  width: 80px;
+}
+
+.PasteContent::before {
+  content: "Paste image";
+  position: absolute;
+  color: #bdb9b9;
+  pointer-events: none; /* This prevents the pseudo-element from being selected */
+}
+
+.freeze-col-1 {
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 2;
+  background: #fff;
+}
+
+.freeze-col-2 {
+  position: sticky;
+  left: 100px;
+  width: 150px;
+  min-width: 150px;
+  z-index: 2;
+  background: #fff;
+}
+
+.pi-items.row > * {
+    padding-left: 0 !important;
+}
+
+.max-w-200 {
+    max-width: 200px;
+}
+

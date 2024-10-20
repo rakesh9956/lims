@@ -1,0 +1,922 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/grn">GRN</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">SI Batch Creation And Dispatch</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body p-0">
+                <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                    <ng-container *ngIf="Store==true || Store=='true'">
+                        <li [ngbNavItem]="1">
+                            <a ngbNavLink (click)="GetBatchDetails();addItemslist.clear();ClearFilter()">Create Batch
+                                No</a>
+                            <ng-template ngbNavContent>
+                                <form [formGroup]="IndentItemsDetailForm" *ngIf="!shimmerVisible">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6">
+                                            <div class="mb-3">
+                                                <label for="manufacturerName"
+                                                    class="form-label d-flex justify-content-between">Request Location
+                                                </label>
+                                                <!-- <select class="form-select" id="manufacturerName">
+                                                    <option selected disabled>Select Location</option>
+                                                    <option value="data.Location"  *ngFor="let data of lstFromLocations">{{data.Location}}</option>
+                                                </select>    -->
+                                                <ng-select [items]="lstFromLocations" bindLabel="RequestLocation"
+                                                    bindValue="LocationGuid" class="ng-select-custom-250min"
+                                                    [formControl]="clearControl" placeholder="Select request location"
+                                                    (change)="GetSIIndent($event)">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <div class="mb-3">
+                                                <label for="machineName" class="form-label">Dispatch Location</label>
+                                                <ng-select [items]="indentList" bindLabel="ToLocation"
+                                                    [formControl]="TolocationControl" bindValue="LocationGuid"
+                                                    class="ng-select-custom-250min" placeholder="Select dispatch location"
+                                                    (change)="GetSIInde($event)">
+                                                </ng-select>
+                                                <!-- <select class="form-select" id="machineName">
+                                                    <option selected disabled>Select supplier</option>
+                                                    <option value="1">Machine 1</option>
+                                                    <option value="2">Machine 2</option>
+                                                    <option value="3">Machine 3</option>
+                                                </select> -->
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-3">
+                                            <div class="mb-3">
+                                                <label for="itemExpiryDate"
+                                                    class="form-label d-flex justify-content-between"> Issue
+                                                     From Date </label>
+                                                <div class="input-group">
+                                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                                        ngbDatepicker #d1="ngbDatepicker" [maxDate]="minDate" readonly
+                                                        [formControl]="clearControl"
+                                                        (dateSelect)="selectFromDate($event)">
+                                                    <button class="input-group-text" type="button"
+                                                        (click)="d1.toggle()">
+                                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-3">
+                                            <div class="mb-3">
+                                                <label for="itemExpiryDate"
+                                                    class="form-label d-flex justify-content-between">Issue To Date</label>
+                                                <div class="input-group">
+                                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                                        ngbDatepicker #d2="ngbDatepicker"
+                                                        [minDate]="SelectedIssueFromDate" readonly
+                                                        [formControl]="clearIssuedateControl"
+                                                        (dateSelect)="selectToDate($event)">
+                                                    <button class="input-group-text" type="button"
+                                                        (click)="IssueFromDate?d2.toggle():''">
+                                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-12 col-md-4 col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="purchasedUnit"
+                                                class="form-label d-flex justify-content-between">Status</label>
+                                            <select class="form-select" id="purchasedUnit">
+                                                <option selected disabled>Select status</option>
+                                                <option value="1">Recieved</option>
+                                                <option value="2">Pending</option>
+                                                <option value="3">All</option>
+                                            </select>
+                                        </div>
+                                    </div> -->
+                                        <div class="col-12 col-md-4 col-lg-3">
+                                            <div class="mb-3">
+                                                <label for="manufacturerCatalogNo" class="form-label">Store Indent
+                                                    No.</label>
+                                                <input type="text" [value]="Keyword" (keyup)="Search($event)" id="manufacturerCatalogNo"
+                                                    class="form-control" placeholder="Search by indent no.">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
+                                            <div class="mb-3">
+                                                <button (click)="ClearFilter();isAllCheckbox=false"
+                                                    class="btn btn-link btn-sm text-underline p-0">Clear
+                                                    filters</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end">
+                                            <button [disabled]="IsSearchShow" class="btn-primary btn"
+                                                (click)="setvalue();">
+                                                <span class="feather icon-search"></span> Search
+                                            </button>
+                                        </div>
+
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+                                    <h6 class="card-title">Issue Detail</h6>
+                                    <div class="row">
+                                        <div class="col-md-12 stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table bg-white">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="freeze-col-1">S.NO</th>
+                                                                    <th class="new-batch-col header">
+                                                                        <input type="checkbox" [(ngModel)]="isAllCheckbox" [ngModelOptions]="{standalone: true}" (change)="selectAllItems($event)" [disabled]="addItemslist.length==0"/>
+                                                                        New Batch
+                                                                    </th>
+                                                                    <th class="freeze-col-3">Item Name</th>
+                                                                    <th>Vendor Item Name</th>
+                                                                    <th>Indent No.</th>
+                                                                    <th>Indent Date</th>
+                                                                    <!-- <th>Dispatch From Location</th>
+                                                                    <th>Dispatch To Location</th> -->
+                                                                    <th>Request Quantity</th>
+                                                                    <th>In House Unit</th>
+                                                                    <th>Status</th>
+                                                                    <!-- <th>Action</th> -->
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr formArrayName="LisIndentItems"
+                                                                    *ngFor="let item of addItemslist.controls; let i = index">
+                                                                    <ng-container [formGroupName]="i">
+                                                                        <td class="freeze-col-1">{{i+1}}.</td>
+                                                                        <td class="new-batch-col body">
+                                                                            <input type="checkbox"
+                                                                              [disabled]="(ToindentList | expirydatesFilter: addItemslist.value[i]?.ItemGuid : addItemslist.value[i]?.IndentNo).length === 0 || this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].NewQty==0"
+                                                                              (change)="SelectedBatch($event, item, i+1)"
+                                                                              [checked]="(ToindentList | expirydatesFilter: addItemslist.value[i]?.ItemGuid : addItemslist.value[i]?.IndentNo).length === 0 || this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].NewQty==0?null:this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].IsSelected">
+                                                                          </td>
+                                                                          
+                                                                        <td class="freeze-col-3">{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].ItemName}}
+                                                                        </td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].VendorItemName}}</td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].IndentNo}}
+                                                                        </td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].CreatedDt
+                                                                            | date:'dd-MM-yyyy'}}
+                                                                        </td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].ReqQty}}
+                                                                        </td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].NewQty}}
+                                                                        </td>
+                                                                        <td>{{this.IndentItemsDetailForm.get('LisIndentItems')?.value[i].FromRights}}
+                                                                        </td>
+                                                                        <td></td>
+                                                                    </ng-container>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer p-2">
+                                                    <div class="d-flex justify-content-end">
+                                                        <button class="btn btn-primary"
+                                                            *ngIf="this.IndentItemsDetailForm.get('LisIndentItems')?.value.length!=0"
+                                                            [disabled]="selectedBatch.length == 0"
+                                                            (click)="openBackDropCustomClass(batchItems);selectitems();checkAllItemsChecked=false">Create
+                                                            batch </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ng-container *ngIf="addItemslist.controls.length<=0 && !shimmerVisible">
+                                        <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                            <div class="py-5 text-muted">
+                                                <div
+                                                    class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                    <i class="feather icon-alert-circle fs-2"></i>
+                                                    <span>No SI Indents Found!</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </form>
+                                <!--Shimmer UI -->
+                                <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                                <!--Shimmer UI -->
+                            </ng-template>
+                        </li>
+                    </ng-container>
+                    <li [ngbNavItem]="tabId">
+                        <a ngbNavLink (click)="Keyword='';GetBatchDetails();Itemslist.clear();">Pending Dispatch</a>
+                        <ng-template ngbNavContent>
+                            <form [formGroup]="IndentItemsDetailForm">
+                                <h6 class="card-title mt-3">Pending Dispatch</h6>
+                                <ng-container *ngIf="!shimmerVisible">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 col-xl-3">
+                                            <div class="mb-3">
+                                                <label for="itemExpiryDate"
+                                                    class="form-label d-flex justify-content-between">From Date
+                                                </label>
+                                                <div class="input-group">
+                                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                                        [formControl]="clearfromdateControl" ngbDatepicker
+                                                        #d1="ngbDatepicker" [readOnly]="true" [maxDate]="minDate"
+                                                        (dateSelect)=" SelectstartDate($event)">
+                                                    <button class="input-group-text" type="button"
+                                                        (click)="d1.toggle()">
+                                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6 col-xl-3">
+                                            <div class="mb-3">
+                                                <label for="itemGSTTax"
+                                                    class="form-label d-flex justify-content-between">To
+                                                    Date</label>
+                                                <div class="input-group">
+                                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp"
+                                                        [formControl]="cleardateControl" ngbDatepicker
+                                                        #d="ngbDatepicker" [readOnly]="true"
+                                                        [minDate]="selectedFromDate" [(ngModel)]="selectedToDate"
+                                                        (dateSelect)=" SelectEndDate($event)">
+                                                    <button class="input-group-text" type="button"
+                                                        (click)="FromDate?d.toggle():''">
+                                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-6 col-xl-3">
+                                            <div class="mb-3">
+                                                <label for="keyword" class="form-label">MIN Number</label>
+                                                <input type="text" id="keyword" (keyup)="ChangeSearch($event)"
+                                                    [value]="Keyword" class="form-control"
+                                                    placeholder="Enter MIN number">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
+                                            <div class="mb-3">
+                                                <button (click)="Remove()"
+                                                    class="btn btn-link btn-sm text-underline p-0">Clear
+                                                    filters</button>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-12 col-md-6 col-xl-3 d-flex" *ngIf="newBatchNumberList.length!=0">
+                                            <div class="d-flex align-items-center gap-2 mt-0 mt-md-2 mb-3 mb-md-0">
+                                                <span
+                                                    class="text-muted text-small flex-shrink-0 align-self-center">{{(RowCount*(PageNumber-1))+1}}-{{totalCount>RowCount*PageNumber?RowCount*PageNumber:totalCount}}
+                                                    of
+                                                    {{totalCount}} </span>
+                                                <select name="rowLimit"
+                                                    class="form-control form-select me-1 h-34 w-100 w-md-75"
+                                                    (change)="ChangeEvent($event)">
+                                                    <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}
+                                                    </option>
+                                                </select> -->
+                                        <!-- <div class="flex-shrink-0">
+                                                    <button class="btn-primary btn"><span class="feather icon-search"></span>
+                                                        Search</button>
+                                                </div> -->
+                                        <!-- </div>
+                                        </div> -->
+                                    </div>
+                                </ng-container>
+                                <!--Shimmer UI -->
+                                <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                                <!--Shimmer UI -->
+                                <!-- <h6 class="card-title" >Issue Detail</h6> -->
+                                <div class="row">
+                                    <div class="col-md-12 stretch-card">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="text-end">
+                                                    <button type="button" *ngIf="Store==true || Store=='true'" class="btn right btn-primary submit"
+                                                        (click)="openBackDropCustomClass(CorearDetails)"
+                                                        [disabled]="SelectedDispatchItems.length==0"><span
+                                                            class="feather icon-package"></span> Batch Dispatch</button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <!-- <table class="table bg-white">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Batch Number</th>
+                                                                <th>Created By</th>
+                                                                <th>Created Date</th>
+                                                                <th>Items Quantity</th>
+                                                                <th>Status</th>
+                                                                <td>Actions</td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let item of newBatchNumberList; let i = index">
+                                                                <td><input [disabled]="item.DispatchStatus==true"
+                                                                        type="checkbox" [checked]="item.isChecked" (change)="onCheckboxChange(item,$event);SaveGuid(item,i)"></td>
+                                                                <td>{{item.BatchNumber}}</td>
+                                                                <td>{{ item.DispatchStatus && !item.ReceiveByUserName ?
+                                                                    item.DispatchedUser :
+                                                                    !item.DispatchStatus ? item.BatchCreatedUser :
+                                                                    item.DispatchStatus && item.ReceiveByUserName ?
+                                                                    item.ReceivedUser : '' }}
+                                                                </td>
+
+                                                                <td>{{ (item.DispatchStatus && !item.ReceiveByUserName)
+                                                                    ? (item.DispatchDate | date:'dd-MM-yyyy') :
+                                                                    (!item.DispatchStatus ? (item.BatchCreatedDateTime |
+                                                                    date:'dd-MM-yyyy') :
+                                                                    (item.DispatchStatus && item.ReceiveByUserName) ?
+                                                                    (item.ReceiveDate | date:'dd-MM-yyyy') : '') }}
+                                                                </td>
+                                                                <td class="text-primary c-pointer" (click)="openBackDropCustomClass(itemDetails);ShowItems(item)">{{item.Itemcount}}</td>
+                                                                <td
+                                                                    [ngClass]="{'text-warning': item.DispatchStatus === false, 'text-info': item.DispatchStatus== true && item.ReceiveByUserName===null,'text-success': item.DispatchStatus== true && item.ReceiveByUserName!==null}">
+                                                                    {{item.DispatchStatus== true &&
+                                                                    item.ReceiveByUserName===null?'Dispatched':item.DispatchStatus
+                                                                    === false?'BatchCreated':item.DispatchStatus== true
+                                                                    && item.ReceiveByUserName!==null?'Received':''}}
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button"
+                                                                        *ngIf="item.DispatchStatus==true && item.ReceiveByUserName===null"
+                                                                        class="btn btn-outline-primary btn-icon-text"
+                                                                        (click)="openBackDropCustomClass(recievedItems);SetReciveItems(item.BatchNumber)">
+                                                                        <i
+                                                                            class="feather icon-shopping-bag link-icon me-1"></i>
+                                                                        <span class="vertical-align-middle">Recieve
+                                                                            Items</span>
+                                                                    </button>
+                                                                    <button type="button" disabled
+                                                                        *ngIf="item.DispatchStatus== true && item.ReceiveByUserName!==null"
+                                                                        class="btn btn-outline-primary btn-icon-text"
+                                                                        (click)="openBackDropCustomClass(ConsumeItems);SetConsumeItems(item)">
+                                                                        <i class="feather icon-shopping-bag link-icon me-1" ></i>
+                                                                        <span class="vertical-align-middle">Recieve
+                                                                            Items</span>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table> -->
+                                                    <ng-container *ngIf="!shimmerVisible">
+                                                        <ngx-datatable [scrollbarH]="true" #table class="bootstrap"
+                                                            [rows]="BatchNumberLst"
+                                                            [loadingIndicator]="loadingIndicator"
+                                                            [columnMode]="ColumnMode.force" [limit]="40"
+                                                            rowHeight="auto">
+                                                            <ngx-datatable-column name="#" [sortable]="false">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <input type="checkbox"
+                                                                        [disabled]="row.DispatchStatus==true"
+                                                                        type="checkbox" [checked]="row.isChecked"
+                                                                        (change)="onCheckboxChange(row,$event);SaveGuid(row,row)" />
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="120" name="Min Number"
+                                                            prop="MaterialIssueNo"></ngx-datatable-column>
+                                                            <ngx-datatable-column name="Received Location"
+                                                                prop="FromLocation">
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column name="Dispatch Location">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <ng-container>
+                                                                        {{ row.ToLocation==null?'N/A':row.ToLocation}}
+                                                                    </ng-container>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="100" name="Created By">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <ng-container
+                                                                        *ngIf="row.DispatchStatus && !row.ReceiveByUserName">
+                                                                        {{ row.DispatchedUser }}
+                                                                    </ng-container>
+                                                                    <ng-container *ngIf="!row.DispatchStatus">
+                                                                        {{ row.BatchCreatedUser }}
+                                                                    </ng-container>
+                                                                    <ng-container
+                                                                        *ngIf="row.DispatchStatus && row.ReceiveByUserName">
+                                                                        {{ row.ReceivedUser }}
+                                                                    </ng-container>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="120" name="CREATED DATE">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    {{ (row.DispatchStatus && !row.ReceiveByUserName)
+                                                                    ? (row.DispatchDate | date:'dd-MM-yyyy')
+                                                                    : (!row.DispatchStatus ? (row.BatchCreatedDateTime |
+                                                                    date:'dd-MM-yyyy')
+                                                                    : (row.DispatchStatus && row.ReceiveByUserName)
+                                                                    ? (row.ReceiveDate | date:'dd-MM-yyyy')
+                                                                    : '') }}
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="120" name="Item count"
+                                                                prop="Itemcount">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <div class="text-primary c-pointer"
+                                                                        (click)="openBackDropCustomClass(itemDetails); ShowItems(row)">
+                                                                        {{ row.Itemcount }}
+                                                                    </div>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="120" name="Received date"
+                                                                prop="Itemcount">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <div class="text-primary c-pointer">
+                                                                        {{ row.ReceiveDate=='0001-01-01T00:00:00'?'N/A':row.ReceiveDate | date: 'dd/MM/yyyy' }}
+                                                                    </div>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [width]="120" name="Status"
+                                                                prop="DispatchStatus">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <div [ngClass]="{
+                                                                    'text-warning': row.DispatchStatus === false,
+                                                                    'text-info': row.DispatchStatus === true && row.ReceiveByUserName === null,
+                                                                    'text-success': row.DispatchStatus === true && row.ReceiveByUserName !== null
+                                                                  }">
+                                                                        {{ row.DispatchStatus === true &&
+                                                                        row.ReceiveByUserName === null ? 'Dispatched'
+                                                                        : row.DispatchStatus === false ? 'BatchCreated'
+                                                                        : row.DispatchStatus === true &&
+                                                                        row.ReceiveByUserName !== null ? 'Received'
+                                                                        : ''
+                                                                        }}
+                                                                    </div>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ngx-datatable-column [sortable]="false" [width]="150"
+                                                                name="Actions">
+                                                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                                                    <ng-container
+                                                                        *ngIf="row.DispatchStatus === true && row.ReceiveByUserName === null">
+                                                                        <button type="button"
+                                                                        [disabled]="this.authservice.LoggedInUser.STORE=='true' || this.authservice.LoggedInUser.STORE==true"
+                                                                            class="btn btn-outline-primary btn-icon-text btn-xs"
+                                                                            (click)="openBackDropCustomClass(recievedItems);SetReciveItems(row.BatchNumber,'');">
+                                                                            <i
+                                                                                class="feather icon-shopping-bag link-icon me-1"></i>
+                                                                            <span class="vertical-align-middle">Receive
+                                                                                Items</span>
+                                                                        </button>
+                                                                    </ng-container>
+                                                                    <ng-container
+                                                                        *ngIf="row.DispatchStatus === true && row.ReceiveByUserName !== null">
+                                                                        <button type="button" [disabled]="row.IsReject==true || row.TotalRejectQuantity==0|| row.TotalRejectQuantity==null"
+                                                                            class="btn btn-outline-primary btn-icon-text btn-xs"
+                                                                            (click)="openBackDropCustomClass(ReturnitemDetails);SetStoreRecive(row);this.AcceptQty=''">
+                                                                            <i 
+                                                                                class="feather icon-shopping-bag link-icon me-1"></i>
+                                                                            <span class="vertical-align-middle">{{row.TotalRejectQuantity==null||row.TotalRejectQuantity==0?'Receive Items':'Accept/Reject'}} </span>
+                                                                        </button>
+                                                                    </ng-container>
+                                                                </ng-template>
+                                                            </ngx-datatable-column>
+                                                            <ng-container *ngIf="Store==true || Store=='true'">
+                                                                <ngx-datatable-column [sortable]="false" [width]="200"
+                                                                    name="Download">
+                                                                    <ng-template ngx-datatable-cell-template
+                                                                        let-row="row">
+                                                                        <ng-container>
+                                                                            <button type="button"
+                                                                                class="btn btn-primary btn-xs me-1"
+                                                                                (click)="SetReciveItems(row.BatchNumber,'PDF')">
+                                                                                <i
+                                                                                    class="feather icon-file link-icon"></i>
+                                                                                <span class="vertical-align-middle">
+                                                                                    PDF</span>
+                                                                            </button>
+                                                                        </ng-container>
+                                                                        <ng-container>
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-primary btn-xs"
+                                                                                (click)="SetReciveItems(row.BatchNumber,'XL')">
+                                                                                <i
+                                                                                    class="feather icon-file-text link-icon"></i>
+                                                                                <span class="vertical-align-middle">
+                                                                                    Excel</span>
+                                                                            </button>
+                                                                        </ng-container>
+                                                                    </ng-template>
+                                                                </ngx-datatable-column>
+                                                            </ng-container>
+                                                        </ngx-datatable>
+                                                    </ng-container>
+                                                    <!--Shimmer UI Table -->
+                                                    <div class="p-4"><app-shimmers *ngIf="shimmerVisible"
+                                                            [type]="'table'" [rows]="5" [cols]="10"></app-shimmers>
+                                                    </div>
+                                                    <!--Shimmer UI Table -->
+                                                </div>
+                                                <ng-container *ngIf="newBatchNumberList.length==0 && !shimmerVisible">
+                                                    <div
+                                                        class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                                        <div class="py-5 text-muted">
+                                                            <div
+                                                                class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                                                <i class="feather icon-alert-circle fs-2"></i>
+                                                                <span>No Pending Dispatch Items Found!</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <!-- Pagination UI -->
+                                            <div class="d-flex justify-content-center my-3 pe-3"
+                                                *ngIf="newBatchNumberList.length!=0">
+                                                <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount"
+                                                    (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                                                    [rotate]="false" [pageSize]="itemsPerPage" [(page)]="PageNumber"
+                                                    [boundaryLinks]="boundaryLinks" [size]="size">
+                                                </ngb-pagination>
+                                            </div>
+                                            <!-- Pagination UI -->
+                                            <div class="card-footer">
+                                                <div class="text-end">
+                                                    <button type="button" *ngIf="Store==true|| Store=='true' " class="btn right btn-primary submit"
+                                                        (click)="openBackDropCustomClass(CorearDetails)"
+                                                        [disabled]="SelectedDispatchItems.length==0"><span
+                                                            class="feather icon-package"></span> Batch Dispatch
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </ng-template>
+                    </li>
+                </ul>
+
+                <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #batchItems let-modal>
+    <div class="modal-header modal-xl">
+        <h5 class="modal-title" id="exampleModalLabel">Create Batch Number</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');CleareItems()"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="IndentItemsDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" (change)="onSelectAllItems($event)" [checked]="checkAllItemsChecked"></th>
+                                    <td>Item S.No</td>
+                                    <td></td>
+                                    <td class="freeze-col-1">Item Name</td>
+                                    <td>Vendor Item Name</td>
+                                    <td>Request Quantity</td>
+                                    <td>In House Unit</td>
+                                    <td>Batch number</td>
+                                    <td>Batch expiry date</td>
+                                    <td>Batch Quantity</td>
+                                    <td>Number of boxes</td>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr formArrayName="selectIndentItems"
+                                    *ngFor="let item of Itemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <td><input type="checkbox" (change)="SelectItem($event,item,i)" 
+                                            [(ngModel)]="this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].Ischecked" [ngModelOptions]="{standalone: true}"
+                                            [disabled]="IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.IsExpirable==false ?  isCheckboxDisabled(IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.BatchExpiryDate?.slice(0, 10)) : false">
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].SelectedItemIndex}}</td>
+                                        <td *ngIf="(selecteditems | datesFilter: IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.ItemGuid).length > 1 
+                                            && ((selecteditems | datesFilter: IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.ItemGuid)[0]?.BatchExpiryDate !== null) 
+                                            && !this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].addButton ; else emptyTd">
+                                            <button class="btn btn-link p-0" (click)="onSelectItems(item)"
+                                            [disabled]="this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].IsAddSelected">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="link-icon feather icon-plus fs-5 me-1"></span>
+                                                    <span>Add</span>
+                                                </div>
+                                            </button>
+                                        </td>
+                                            <ng-template #emptyTd>
+                                                <td></td>
+                                            </ng-template>                              
+                                        <td class="freeze-col-1">
+                                            {{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].ItemName}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].VendorItemName?this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].VendorItemName:'N/A'}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].ReqQty}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].NewQty}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].BatchNumber}}
+                                        </td>
+                                        <td>
+                                            <ng-container *ngIf="(selecteditems | datesFilter: IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.ItemGuid)[0]?.BatchExpiryDate != null">
+                                                <ng-select appendTo='.modal-body'
+                                                    [inputAttrs]="{ maxlength: '48' }"
+                                                    [items]="selecteditems | datesFilter: IndentItemsDetailForm.get('selectIndentItems')?.value[i]?.ItemGuid?.toString()"
+                                                    [searchable]="true"
+                                                    bindLabel="BatchExpiryDate"
+                                                    placeholder="Select Expiry Date"
+                                                    formControlName="BatchExpiryDates"
+                                                    (change)="onSelectExpiryDates($event,i)">
+                                                </ng-select>
+                                            </ng-container>
+                                        </td>
+                                        <td><input type="text" class="form-control h-34"
+                                                style="width:70px; padding-inline: 5px;" formControlName="BatchQuantity"
+                                                 (keyup)="BatchQuantity($event,i)" (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"
+                                                [value]="this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].BatchQuantity" />
+                                        </td>
+                                        <td><input type="number" class="form-control h-34"
+                                                style="width:70px; padding-inline: 5px;" formControlName="NumberOfBox"
+                                                required [min]="1"
+                                                [value]="this.IndentItemsDetailForm.get('selectIndentItems')?.value[i].NumberOfBox" />
+                                        </td>
+                                        <td *ngIf="Itemslist.controls.length!=1"><button
+                                                class="btn btn-outline-danger btn-xs me-1" (click)="remove(i)"><span
+                                                    class="feather icon-trash-2"></span>
+                                            </button></td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');CleareItems()">Cancel</button>
+        <button type="button" class="btn btn-primary"  [disabled]="!isAnyValueFilled"
+            (click)="SaveBatch();this.IndentItemsDetailForm.get('selectIndentItems')?.invalid ? (null)  : modal.close('by: Save button');this.IndentItemsDetailForm.get('selectIndentItems')?.invalid ? (null)  :defaultNav.select(2)">Save</button>
+    </div>
+</ng-template>
+
+<div class="modal-xl">
+    <ng-template #recievedItems let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Received items</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon');Reciveditems=[];"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <td>Item Name</td>
+                                    <td>Vendor Item Name</td>
+                                    <td>Dispatch Quantity</td>
+                                    <!-- <td>In House Unit</td> -->
+                                    <td>Quantity</td>
+                                    <!-- <td>Batch Number</td> -->
+                                    <td>Expiry Date</td>
+                                    <td>Number of boxes</td>
+                                    <td>Return Quantity</td>
+                                    <td>Reject for reason</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of Reciveditems;let i = index">
+                                    <td>{{item.ItemName}}</td>
+                                    <td>{{item.VendorItemName?item.VendorItemName:'N/A'}}</td>
+                                    <td>{{item.ReceiveQty}}</td>
+                                    <!-- <td>{{item.StockInQty}}</td> -->
+                                    <td><input type="text" (keyup)="setvalidation(item,i,$event)" [min]="0"
+                                        (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46" class="form-control"
+                                            [(ngModel)]="item.SendQty" style="width:70px;"></td>
+                                            <!-- <td>{{item.BatchNumber}}</td> -->
+                                            <td>
+                                                {{ item.Expiredate !='0001-01-01T00:00:00' ? (item.Expiredate | date:'dd-MM-yyyy') : 'N/A' }}
+                                              </td>
+                                            <td>{{item.NoOfBox}}</td>
+                                            <td><input type="text" readonly (keyup)="setrejuctquntity(item,i,$event)" [min]="0"
+                                                [(ngModel)]="item.RejectQuantity"  (keypress)="restrictCharectors($event)" class="form-control" style="width:70px;"></td>
+                                            <td><textarea (keyup)="setreoson(item,i,$event)" class="form-control h-38" row="5"
+                                                [ngClass]="item.isReturn?'is-invalid':''"></textarea>
+                                        </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary"
+                (click)="modal.close('by: cancel button');Reciveditems=[]">Cancel</button>
+            <button type="button" class="btn btn-primary" [disabled]="ButtonDisable"
+                (click)="SaveReciveDetails();modal.close('by: Save button')">Save</button>
+        </div>
+    </ng-template>
+</div>
+
+
+<ng-template #ConsumeItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Consume items</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');ConsumeItemslist.clear();"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="IndentItemsDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <td>Item Name</td>
+                                    <td>Batch Number</td>
+                                    <td>Consume Quantity</td>
+                                    <td>Units</td>
+                                    <td>Reason For Use</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr formArrayName="ConsumeDetailItems"
+                                    *ngFor="let item of ConsumeItemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ItemName}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].BatchNumber}}
+                                        </td>
+                                        <td>{{this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ConsumeQuantity}}
+                                        </td>
+                                        <td><input class="form-control" style="width:100px" formControlName="Units"
+                                                [value]="this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].Units"
+                                                type="text"></td>
+                                        <td><textarea class="form-control h-38" row="5" formControlName="ReasonForUse"
+                                                [value]="this.IndentItemsDetailForm.get('ConsumeDetailItems')?.value[i].ReasonForUse"></textarea>
+                                        </td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');ConsumeItemslist.clear()">Cancel</button>
+        <!-- <button type="button" class="btn btn-primary"
+            (click)="modal.close('by: Save button');SaveConsumeItems()">Save</button> -->
+    </div>
+</ng-template>
+
+<ng-template #CorearDetails let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Dispatch Items</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="IndentItemsDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <td>Item Name</td>
+                                    <td>Vendor Item Name</td>
+                                    <td>Batch Number</td>
+                                    <td>CourierName</td>
+                                    <td>AWBNumber</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of SelectedDispatchItems; let i = index">
+                                    <ng-container>
+                                        <td>{{item.ItemName}}
+                                        </td>
+                                        <td>{{item.VendorItemName?item.VendorItemName:'N/A'}}
+                                        </td>
+                                        <td>{{item.BatchNumber}}
+                                        </td>
+                                        <!-- formControlName="CourierName" -->
+                                        <td><input type="text" class="form-control h-34"
+                                                (input)="DispatchDetails(i,$event,'CourierName')" />
+                                        </td>
+                                        <!-- formControlName="AWBNumber" -->
+                                        <td><input type="text" class="form-control h-34"
+                                                (input)="DispatchDetails(i,$event)" />
+                                        </td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button');">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="modal.close('by: Save button');Savedispatch()"
+            [disabled]="SelectedDispatchItems.length==0">Save</button>
+    </div>
+</ng-template>
+
+<ng-template #itemDetails let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Item Details</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="IndentItemsDetailForm">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <td>Item Name</td>
+                                    <td>Vendor Item Name</td>
+                                    <td>Request Quantity</td>
+                                    <td>Dispatch Quantity</td>
+                                    <td>Number Of Box</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let i of BatchTotalItems">
+                                    <td>{{i.ItemName}}</td>
+                                    <td>{{i.VendorItemName?i.VendorItemName:'N/A'}}</td>
+                                    <td>{{i.ReqQty}}</td>
+                                    <td>{{i.SendQty}}</td>
+                                    <td>{{i.NoOfBox}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button')">Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #ReturnitemDetails let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Accepet/Reject Items</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <td>Item Name</td>
+                                    <td>Received Quantity</td>
+                                    <td>Return Quantity</td>
+                                    <td>Accept Quantity</td>
+                                    <td>Reject Reason</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let itm of IndetguidOutput;let i = index">
+                                    <td>{{itm.ItemName}}</td>
+                                    <td>{{itm.ReceiveQty}}</td>
+                                    <td>{{itm.RejectQuantity}}</td>
+                                    <td><input type="text" [(ngModel)]="itm.AcceptQty" (keyup)="SetAcceptQuantity($event,itm,i)"  (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46" [min]="0"
+                                         class="form-control" style="width:70px;"></td>
+                                    <td>{{itm.RejectReason}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: cancel button')">Cancel</button>
+            <button type="button" class="btn btn-primary" [disabled]="RejectDisable" (click)="modal.close('by: Save button');SaveStoreReceive();">Save</button>
+    </div>
+</ng-template>

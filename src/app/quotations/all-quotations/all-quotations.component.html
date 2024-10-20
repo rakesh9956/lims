@@ -1,0 +1,876 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="items">All quotations</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div class="mb-2 mb-sm-0">ALL QUOTATIONS</div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <!-- Toggle the value of the property when the toggler button is clicked. -->
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-shrink-0 ms-2" (click)="goToQuotationPage()"
+                            [disabled]="shimmerVisible"
+                            *ngIf="roles?.toLowerCase()?.includes('Maker'.toLowerCase())">NEW QUOTATION</button>
+                        <button class="btn btn-primary btn-sm flex-shrink-0 ms-2" (click)="GetAllQuotationsExcel()"
+                            [disabled]="shimmerVisible"><span class="feather icon-arrow-up"></span>EXPORT
+                            QUOTATIONS</button>
+                    </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
+                    <div
+                        class="d-flex flex-column flex-xl-row align-items-xl-center gap-3 mt-2 mt-xl-0 justify-content-between">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label d-flex justify-content-between">From
+                                        Date
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control" placeholder="dd-mm-yyyy" name="dp" ngbDatepicker
+                                            [(ngModel)]="removeFromDate" readonly #d1="ngbDatepicker"
+                                            (dateSelect)="selectFromDate($event)">
+                                        <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="itemExpiryDate" class="form-label d-flex justify-content-between">To Date
+                                </label>
+                                <div class="input-group">
+                                    <input class="form-control" placeholder="dd-mm-yyyy" name="dp" [minDate]="minDate"
+                                        [(ngModel)]="removeTodate" [readonly]="toDate=='' || toDate"
+                                        (dateSelect)="selectToDate($event)" ngbDatepicker #d2="ngbDatepicker">
+                                    <button class="input-group-text" type="button" (click)="fromDate?d2.toggle():''">
+                                        <i class="feather icon-calendar icon-md text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="item" class="form-label d-flex justify-content-between">Status</label>
+                                <!-- <ng-select [items]="itemOptionsOrders1" bindLabel="status" [multiple]=true  [notFoundText]="'No status found'"
+                                [inputAttrs]="{maxlength: '48'}"
+                                    [closeOnSelect]="true" placeholder="Select Item" (change)="FiltersCheck($event)">
+                                </ng-select> -->
+
+                                <ng-select (change)="FiltersCheck($event)" [multiple]=true placeholder="Select status"
+                                    class="ngquotatin" [(ngModel)]="selectedStatus" [inputAttrs]="{maxlength: '48'}">
+                                    <ng-option *ngFor="let item of  itemOptionsOrders" [value]="item.status">
+                                        {{item.status}}
+                                    </ng-option>
+                                </ng-select>
+
+                            </div>
+                            <div class="col-md-3 mb-2 align-self-center" *ngIf="fromDate || toDate">
+                                <button class="btn btn-link btn-sm text-underline" (click)="onDataRemove()">Clear
+                                    filters</button>
+                            </div>
+                        </div>
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                            <span *ngIf="quotationsList?.length > 0" class="text-muted text-small flex-shrink-0">
+                                {{ (selectedStatus.length > 0 ? 1 : pageSize * (pageNumber - 1) + 1) }}-
+                                {{ totalCount > pageSize * pageNumber ? pageSize * pageNumber : totalCount }}
+                                of
+                                {{ totalCount }}
+                            </span>
+                            <!-- <span class="me-2 flex-shrink-0 text-capitalize">Display</span> -->
+                            <select name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                *ngIf="quotationsList?.length > 0" (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                            <input type="text" class="form-control form-control-sm minw-200 ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                placeholder="Search" [maxLength]="48" (keyup)="changeSearch($event)"
+                                *ngIf="isDisable==false" />
+
+                            <input type="text" class="form-control form-control-sm minw-200 ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                placeholder="Search" [(ngModel)]="searchTerm" [maxLength]="48"
+                                (input)="filterQuotation()" *ngIf="isDisable==true" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
+                    <div class="row">
+                        <div class="col-sm-4 mb-3">
+                            <label for="itemExpiryDate" class="form-label d-flex justify-content-between">Locations
+                            </label>
+                            <ng-select [items]="locations" [multiple]=true [closeOnSelect]="false" [searchable]="true"
+                                [inputAttrs]="{maxlength: '48'}" [notFoundText]="'No locations found'"
+                                bindLabel="CenterLocationName" bindValue="CenterLocationGuid"
+                                placeholder="Select location" (change)="onlocationFiilters($event)">
+                                <!-- style="min-width: 200px; max-width: 200px; max-height: 35px;" -->
+                            </ng-select>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <label for="itemExpiryDate" class="form-label d-flex justify-content-between">Items
+                            </label>
+                            <ng-select [items]="allItems" [multiple]=true [closeOnSelect]="false" [searchable]="true"
+                                [inputAttrs]="{maxlength: '48'}" [notFoundText]="'No items found'" bindLabel="ItemName"
+                                bindValue="ItemGuid" placeholder="Select Item" (change)="onItemFiilters($event)">
+                            </ng-select>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <label for="itemExpiryDate" class="form-label d-flex justify-content-between">Suppliers
+                            </label>
+                            <ng-select [items]="supplierDetails" [multiple]=true [closeOnSelect]="false"
+                                [searchable]="true" [inputAttrs]="{maxlength: '48'}"
+                                [notFoundText]="'No suppliers found'" bindLabel="SupplierName" bindValue="SupplierGuid"
+                                placeholder="
+                                            Select supplier" (change)="onSupplierFilter($event)">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <double-scroll>
+                    <!-- <div class="table-responsive"> -->
+                    <table class="table">
+                        <thead *ngIf="quotationsList != null">
+                            <tr>
+                                <th></th> 
+                                <th>Quotation No</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>Status</th>
+                                <th>Supplier Name</th>
+                                <th>Supplier Address</th>
+                                <th>GSTN No</th>
+                                <th title="Delivery Location Count">DL Count</th>
+                                <th>NO of Items</th>
+                                <!-- <th>Approve reason</th> -->
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="!shimmerVisible && quotationsList !=null">
+                                <tr *ngFor="let quotation of quotationsList">
+                                    <td class="pe-0 text-end" *ngIf="quotation.ModifieDt!='0001-01-01T00:00:00'">
+                                        <span class="feather icon-edit-2 size-18 me-2 text-secondary" title="{{'Edited'}}"></span>
+                                    </td> 
+                                    <td class="pe-0 text-end" *ngIf="quotation.ModifieDt=='0001-01-01T00:00:00'">
+                                    </td> 
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.QuotationNo}}">{{quotation.QuotationNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.FromDate | date: 'dd-MM-yyyy'}}">{{quotation.FromDate
+                                            | date: 'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.ToDate | date: 'dd-MM-yyyy'}}">{{quotation.ToDate |
+                                            date: 'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="quotation.IsCancel==false"
+                                            [ngClass]="quotation.ApprovalStatus=='1'? 'badge bg-info': quotation.ApprovalStatus=='0'? 'badge bg-warning': quotation.ApprovalStatus=='2'? 'badge bg-success':''">
+                                            {{quotation.ApprovalStatus== "0"
+                                            ?'Maker':quotation.ApprovalStatus=="1"?'Checked':quotation.ApprovalStatus==
+                                            "2"?'Approved':''}}
+                                        </span>
+                                        <span *ngIf="quotation.IsCancel==true"
+                                            [ngClass]="quotation.IsCancel==true?'badge bg-danger':''">
+                                            Cancelled
+                                        </span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.SupplierName}}">{{quotation.SupplierName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{quotation.SupplierAddress}}">{{quotation.SupplierAddress}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{quotation.GSTNNo}}">{{quotation.GSTNNo}}</span>
+                                    </td>
+                                    <!-- <td class="truncate" style="max-width: 150px;">
+                                        <span
+                                            title="{{quotation.DeliveryStateName}}">{{quotation.DeliveryStateName}}</span>
+                                    </td> -->
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span
+                                            title="{{quotation.DeliveryLocationCount}}">{{quotation.DeliveryLocationCount}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{quotation.ItemCount}}">{{quotation.ItemCount}}</span>
+                                    </td>
+                                    <!-- <td>{{quotation.ApproveReason}}</td> -->
+                                    <td>
+                                        <div class="d-flex">
+                                            <button class="btn btn-outline-primary btn-xs me-1"
+                                                (click)="openXlModal(xlModal);getQuotationByGuid(quotation);this.activityHistoryArray=[];showActivity=false">
+                                                <span class="feather icon-eye"></span> View
+                                            </button>
+                                            <div ngbDropdown>
+                                                <button class="btn btn-secondary btn-xs" id="actionsDropdown"
+                                                    placement="bottom" container="body" [ngbPopover]="dataTableActions"
+                                                    popoverClass="dataTableActions">Actions <span
+                                                        class="feather icon-chevron-down"></span></button>
+                                                <ng-template #dataTableActions>
+                                                    <div aria-labelledby="actionsDropdown">
+                                                        <button class="border-bottom" ngbDropdownItem
+                                                            *ngIf="(this.authservice.LoggedInUser.DEFAULTROLES == 'STORE ADMIN' || this.authservice.LoggedInUser.DEFAULTROLES == 'ADMIN') ? !quotation.IsCancel : (quotation.ApprovalStatus != 2 && !quotation.IsCancel)&&roles.toLowerCase().includes('Maker'.toLowerCase())"
+                                                            [routerLink]="['/quotations/edit-quotation',quotation.QuotationGuid]"><span
+                                                                class="feather icon-edit"></span> Edit </button>
+                                                        <button *ngIf="!quotation.IsCancel && this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase())"
+                                                            class="border-bottom" ngbDropdownItem
+                                                            (click)="modal.close('by: close icon')"
+                                                            (click)="openBasicModal(CancelQuotation);SelectQuotation(quotation)"><span
+                                                                class="feather icon-x"></span> Cancelled</button>
+
+                                                        <button class="border-bottom" ngbDropdownItem
+                                                            (click)="DownloadPdf(quotation,'print')"><span
+                                                                class="feather icon-printer"></span> Print</button>
+                                                        <button class="border-bottom" ngbDropdownItem
+                                                            (click)="DownloadPdf(quotation,'')"><span
+                                                                class="feather icon-download"></span> Download</button>
+                                                        <div
+                                                            *ngIf="roles.toLowerCase().includes('Checker'.toLowerCase()) && quotation.ApprovalStatus!=2 && quotation.ApprovalStatus!=1">
+                                                            <button class="border-bottom" ngbDropdownItem
+                                                                (click)="openBasicModal(CheckedQuotation);change(quotation,false)"
+                                                                maxlength="200"><span
+                                                                    class="feather icon-check-square"></span> Mark
+                                                                Checked</button>
+                                                        </div>
+                                                        <div
+                                                            *ngIf="roles.toLowerCase().includes('Approval'.toLowerCase()) && quotation.ApprovalStatus==1 && quotation.IsCancel==false">
+                                                            <button class="border-bottom" ngbDropdownItem
+                                                                (click)="openBasicModal(CheckedQuotation);change(quotation,true)"
+                                                                maxlength="200"><span
+                                                                    class="feather icon-thumbs-up"></span> Mark
+                                                                as
+                                                                Approved</button>
+                                                        </div>
+                                                        <!-- <button class="border-bottom" ngbDropdownItem
+                                                            *ngIf="quotation.ApprovalStatus!=2 && quotation.IsCancel==false && this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase())"
+                                                            (click)="openBasicModal(deletequotation);Delquotation(quotation)">
+                                                            <span class="feather icon-trash-2"></span>
+                                                            Delete</button> -->
+
+                                                    </div>
+                                                </ng-template>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                            <ng-container *ngIf="shimmerVisible">
+                                <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="shimmerBG line"></div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <div class="shimmerBG line" style="margin-right: 5px;"></div>
+                                            <div class="shimmerBG line"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                        </tbody>
+                    </table>
+                    <!-- </div> -->
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-template *ngIf="noQuotationFound && !shimmerVisible">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No quotations found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-container *ngIf="isFilterCheck">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No quotations found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="cartd-footer" *ngIf="isDisable==true && quotationsList?.length > 0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <!-- <pagination-controls (pageChange)="GetAllData($event)"></pagination-controls> -->
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                        [(page)]="currentPage" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                        [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+
+            <div class="cartd-footer" *ngIf="isDisable==false && quotationsList?.length > 0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <!-- <pagination-controls (pageChange)="GetAllData($event)"></pagination-controls> -->
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="GetAllData($event)" [maxSize]="maxSize" [rotate]="false"
+                        [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+            <!-- <div class="table-responsive">
+                    <ngx-datatable [scrollbarH]="true" #table class="bootstrap" [rows]="quotationsList"
+                        [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" [footerHeight]="50"
+                        [limit]="10" rowHeight="auto">
+                        <ngx-datatable-column [width]="150" name="Quotation No"
+                            prop="QuotationNo"></ngx-datatable-column>
+                        <ngx-datatable-column name="From Date" prop="FromDate">
+                            <ng-template let-value="value" ngx-datatable-cell-template>{{value | date: 'yyyy - MM - dd'
+                                }}</ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="To Date" prop="ToDate">
+                            <ng-template let-value="value" ngx-datatable-cell-template>{{value | date: 'yyyy - MM - dd'
+                                }}</ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column [width]="200" name="Vendor Name"
+                            prop="SupplierName"></ngx-datatable-column>
+                        <ngx-datatable-column [width]="300" name="Vendor Address"
+                            prop="SupplierAddress"></ngx-datatable-column>
+                        <ngx-datatable-column name="GSTN No" [width]="150" prop="GSTNNo"></ngx-datatable-column>
+                        <ngx-datatable-column name="Delivery State" prop="DeliveryStateName"></ngx-datatable-column>
+                        <ngx-datatable-column name="Delivery Location"
+                            prop="DeliveryLocationName"></ngx-datatable-column>
+
+
+                        <ngx-datatable-column name="Status">
+                            <ng-template let-value="value" ngx-datatable-cell-template>
+                                <!- <div class="border-secondary border text-secondary bg-white badge-mini badge">Created</div> -->
+            <!-- <div class="border-primary border text-primary bg-white badge-mini badge">Checked</div> -->
+            <!-- <div class="border-success border text-success bg-white badge-mini badge">Approved</div>
+                            </ng-template> -->
+            <!-- </ngx-datatable-column> -->
+            <!-- <ngx-datatable-column name="Action">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <div class="d-flex">
+                                    <button class="btn btn-outline-primary btn-xs me-1"
+                                        (click)="openXlModal(xlModal);getQuotationByGuid(row)">
+                                        <span class="feather icon-zoom-in"></span>
+                                    </button>
+                                    <div ngbDropdown>
+                                        <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom"
+                                            container="body" [ngbPopover]="dataTableActions"
+                                            popoverClass="dataTableActions">Actions</button>
+                                        <ng-template #dataTableActions>
+                                            <div aria-labelledby="actionsDropdown">
+                                                <button class="border-bottom" ngbDropdownItem
+                                                    [routerLink]="['/quotations/edit-quotation',row.QuotationGuid]">Edit</button>
+                                                <button class="border-bottom" ngbDropdownItem>Print</button>
+                                                <button class="border-bottom" ngbDropdownItem>Download</button>
+                                                <button class="border-bottom" ngbDropdownItem
+                                                    (click)="onUpdateStatus(row.QuotationGuid,false)">Mark as
+                                                    Checked</button>
+                                                <button class="border-bottom" ngbDropdownItem
+                                                    (click)="onUpdateStatus(row.QuotationGuid,true)">Mark as
+                                                    Approved</button>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable> -->
+            <!-- </div>  -->
+
+        </div>
+    </div>
+</div>
+<!-- Modal-->
+<ng-template #xlModal let-modal>
+    <div class="modal-header">
+        <div class="d-flex gap-2 align-items-center">
+            <button *ngIf="showActivity" (click)="showActivity = false" type="button" class="btn btn-md btn-link p-0 fw-bold">
+                <i class="feather icon-arrow-left"></i>
+                Go Back
+            </button>
+            <h5 class="modal-title" id="exampleModalLabel">{{this.showActivity ? 'Quotation Log History' : 'Supplier Quotation Detail'}}</h5>
+        </div>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="container-fluid d-flex justify-content-between mt-4 flex-sm-row flex-column">
+        <div class="col-lg-5 ps-0">
+            <p class="mt-1 mb-1"><span class="fw-bold">Quotation No</span>:{{this.quotationDetails[0]?.QuotationNo}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Supplier name</span>: {{this.quotationDetails[0]?.SupplierName}}
+            </p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Supplier state</span>:{{supplierStateName}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Delivery
+                    location</span>:{{locationList}}</p>
+            <p class="mt-1 mb-1"><span class="fw-bold">Created by</span>:{{this.quotationDetails[0]?.CreatedBy}}</p>
+            <div *ngIf="this.quotationDetails[0]?.CheckedByName!=null">
+                <p class="mt-1 mb-1"><span class="fw-bold">Checked by</span>:
+                    {{this.quotationDetails[0]?.CheckedByName}}
+                </p>
+            </div>
+            <div *ngIf="this.quotationDetails[0]?.ApprovedByName!=null">
+                <p class="mt-1 mb-1"><span class="fw-bold">Approved
+                        by</span>:{{this.quotationDetails[0]?.ApprovedByName}}
+                </p>
+            </div>
+            <div *ngIf="this.quotationDetails[0]?.IsCancel==true">
+                <p class="mt-1 mb-1"><span class="fw-bold">Cancelled
+                        by</span>:{{this.quotationDetails[0]?.CancelByName}}
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-4 pe-0 text-sm-end">
+            <p class="mb-1"><span class="fw-bold">Quotation reference
+                    No.:</span>{{this.quotationDetails[0]?.QuotationRefNo}} </p>
+            <p class="mb-1"><span class="fw-bold">Supplier address:</span> {{this.quotationDetails[0]?.SupplierAddress}}
+                ,
+                Hyderabad.</p>
+            <p class="mb-1"><span class="fw-bold">GSTN No.:</span> {{this.quotationDetails[0]?.GSTNNo}}</p>
+            <p class="mb-1"><span class="fw-bold">From date:</span> {{this.quotationDetails[0]?.FromDate |
+                date:'dd-MM-yyyy'}} <span class="fw-bold">To
+                    date:</span> {{this.quotationDetails[0]?.ToDate | date:'dd-MM-yyyy'}} </p>
+            <div
+                *ngIf="this.quotationDetails[0]?.CreatedDt !== '0001-01-01T00:00:00' && this.quotationDetails[0]?.CreatedDt != null">
+                <p class="mb-1"><span class="fw-bold">Created date:</span> {{this.quotationDetails[0]?.CreatedDt |
+                    date:'dd-MM-yyyy' }}</p>
+            </div>
+            <div
+                *ngIf="this.quotationDetails[0]?.CheckedDate !== '0001-01-01T00:00:00' && this.quotationDetails[0]?.CheckedDate != null">
+                <p class="mb-1"><span class="fw-bold">Checked date:</span> {{ this.quotationDetails[0]?.CheckedDate |
+                    date:'dd-MM-yyyy' }}</p>
+            </div>
+            <div
+                *ngIf="this.quotationDetails[0]?.ApprovedDate !== '0001-01-01T00:00:00' && this.quotationDetails[0]?.ApprovedDate != null">
+                <p class="mb-1"><span class="fw-bold">Approved date:</span> {{ this.quotationDetails[0]?.ApprovedDate |
+                    date:'dd-MM-yyyy'}}</p>
+            </div>
+            <div
+                *ngIf="this.quotationDetails[0]?.CancelDate !== '0001-01-01T00:00:00' && this.quotationDetails[0]?.IsCancel">
+                <p class="mb-1"><span class="fw-bold">Cancel date:</span> {{this.quotationDetails[0]?.CancelDate |
+                    date:'dd-MM-yyyy' }}</p>
+            </div>
+             <!-- <button class="border-bottom" ngbDropdownItem (click)="openXlModal(activityHistory);onCheckActivityHistory()">Delete</button>
+            <div *ngFor="let key of getKeys(changes)">
+                <div [ngClass]="{'highlight': true}">
+                  
+                  <span >The {{key}} changed to {{changes[key].newValue}} </span> =>
+                  <span class="new-value">{{changes[key].oldValue}}</span>
+                </div>
+            </div> - -->
+        </div>
+    </div>
+    <hr class="my-2"
+        *ngIf="QuotationViewDetails?.CheckedReason || QuotationViewDetails?.ApproveReason || QuotationViewDetails?.CancelReason" />
+
+    <div class="container"
+        *ngIf="QuotationViewDetails?.CheckedReason || QuotationViewDetails?.ApproveReason || QuotationViewDetails?.CancelReason">
+
+        <div class="col-sm-12"><span class="fw-bold"><u>Reason</u> :</span></div>
+        <div class="col-sm-12" *ngIf="QuotationViewDetails?.CheckedReason">
+            <span class="fw-bold">Checked by and reason:</span>
+            {{UserDetails?.CheckedByName}}
+            {{QuotationViewDetails.CheckedReason == null ? "(N/A)" : "(" + QuotationViewDetails.CheckedReason + ")"}}
+        </div>
+
+        <div class="col-sm-12" *ngIf="QuotationViewDetails?.ApproveReason">
+            <span class="fw-bold">Approved by and reason:</span>
+            {{UserDetails?.ApprovedByName}}
+            {{QuotationViewDetails.ApproveReason == null? " (N/A)" : " (" + QuotationViewDetails.ApproveReason + ")"}}
+        </div>
+
+        <div class="col-sm-12" *ngIf="QuotationViewDetails?.CancelReason">
+            <span class="fw-bold">Cancelled by and reason:</span>
+            {{UserDetails?.CancelByName}}
+            {{QuotationViewDetails.CancelReason == null? " (N/A)" : " (" + QuotationViewDetails.CancelReason + ")"}}
+        </div>
+
+    </div>
+    <hr class="my-2" />
+    <div class="d-flex justify-content-end mt-2 me-2" *ngIf="!showActivity && json2.length>0">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="onCheckActivityHistory();showActivity=true">View activity</button>
+    </div>
+    <div class="px-3 mt-2 mb-4">
+        <p *ngIf="showActivity" class="mb-0 fw-bold fs-5">Latest Log</p>
+        <double-scroll>
+            <!-- <div class="table-responsive pt-3"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <!-- <th>Delivery Location</th>
+                        <th>Delivery State</th> -->
+                        <th class="freeze-itemName-col">Item Name</th>
+                        <th>Vendor Item Name</th>
+                        <th>Item Category Name</th>
+                        <th>HSN Code</th>
+                        <th>Catalog No</th>
+                        <th>Manufacturer Name</th>
+                        <th>Pack Size</th>
+                        <th>Machine Name</th>
+                        <th>Rate</th>
+                        <th>Discount %</th>
+                        <th>SGST %</th>
+                        <th>CGST %</th>
+                        <th>IGST %</th>
+                        <th>Item Cancel By</th>
+                        <th>Item Cancel Date</th>
+                        <th class="freeze-buyPrice-col">Buy Price</th>
+                        <!-- <th class="freeze-updated-col">Actions</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let quotations of quotationDetails">
+                        <!-- <td>{{deliveryLocationName}}</td>
+                        <td>{{deliveryState}}</td> -->
+                        <td class="freeze-itemName-col text-wrap max-w-250"><p [ngClass]="{'cancled': quotations.ItemCancel}"> </p>{{quotations.ItemName}}</td>
+                        <td>{{quotations.VendorItemName?quotations.VendorItemName:'N/A'}}</td>
+                        <td>{{quotations.ItemCategoryName}}</td>
+                        <td>{{quotations.HSNCode?quotations.HSNCode:'N/A'}}</td>
+                        <td>{{quotations.CatalogNo?quotations.CatalogNo:'N/A'}}</td>
+                        <td>{{quotations.ManufactureName}}</td>
+                        <td>{{quotations.PackSize}}</td>
+                        <td>{{quotations.MachineName}}</td>
+                        <td>&#8377;{{quotations.Rate}}</td>
+                        <td>{{quotations.DiscountPer}}</td>
+                        <td>{{quotations.SGSTPer == 0?'--': quotations.SGSTPer}}</td>
+                        <td>{{quotations.CGSTPer == 0?'--':quotations.CGSTPer}}</td>
+                        <td>{{quotations.IGSTPer}}</td>
+                        <td>{{quotations?.ItemCancelBy?quotations?.ItemCancelBy:'N/A'}}</td>
+                        <td>{{quotations?.ItemCancelDate? (quotations?.ItemCancelDate | date:'dd-MM-yyyy' ):'N/A'}}</td>
+                        <td class="freeze-buyPrice-col">&#8377;{{quotations.BuyPrice}}</td>
+                        <!-- <td class="freeze-updated-col"><button type="button" class="btn btn-sm btn-outline-primary" (click)="onCheckActivityHistory();showActivity=true">View activity</button></td> -->
+                    </tr>
+                </tbody>
+            </table>
+            <!-- </div> -->
+        </double-scroll>
+        <div class="card" *ngIf="invoiceDocuments.length>0">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table bg-white">
+                        <thead>
+                            <tr>
+                                <th>Invoice name</th>
+                                <th >Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let documents of invoiceDocuments">
+                              <td>{{documents.FileName}}
+                              <td >
+                                <button class="btn btn-outline-primary btn-xs me-1"
+                                    (click)="openBasicModal(previewItem);PreviewInvoice(documents?.FilePath)"><span
+                                        class="feather icon-eye"></span> View
+                                </button>
+                            </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="showActivity" class="mt-4" >
+            <p class="mb-0 fw-bold fs-5">History Log</p>
+            <double-scroll>
+            <!-- <div class="table-responsive pt-3"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <!-- <th>Delivery Location</th>-->
+                        <th class="freeze-itemName-col">Item Name</th>
+                        <th>Vendor Item Name</th>
+                        <th>Item Category Name</th>
+                        <th>HSN Code</th>
+                        <th>Catalog No</th>
+                        <th>Manufacturer Name</th>
+                        <th>Pack Size</th>
+                        <th>Machine Name</th>
+                        <th>Rate</th>
+                        <th>Discount %</th>
+                        <th>SGST %</th>
+                        <th>CGST %</th>
+                        <th>IGST %</th>
+                        <th> Buy Price</th>
+                        <th class="freeze-col-1">Updated At</th>
+                        <th class="freeze-updated-col">Updated By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let activity of activityHistoryArray ; let index=index">
+                        <tr *ngFor="let quotations of activity.quotationsList">
+                            <!-- <td>{{deliveryLocationName}}</td>-->
+                            <td class="freeze-itemName-col">{{quotations.ItemName}}</td>
+                            <td>{{quotations.VendorItemName?quotations.VendorItemName:'N/A'}}</td>
+                            <td>{{quotations.ItemCategoryName}}</td>
+                            <td>{{quotations.HSNCode?quotations.HSNCode:'N/A'}}</td>
+                            <td>{{quotations.CatalogNo?quotations.CatalogNo:'N/A'}}</td>
+                            <td>{{quotations.ManufactureName}}</td>
+                            <td>{{quotations.PackSize}}</td>
+                            <td>{{quotations.MachineName}}</td>
+                            <td>&#8377;{{quotations.Rate}}</td>
+                            <td>{{quotations.DiscountPer}}</td>
+                            <td>{{quotations.SGSTPer == 0?'--': quotations.SGSTPer}}</td>
+                            <td>{{quotations.CGSTPer == 0?'--':quotations.CGSTPer}}</td>
+                            <td>{{quotations.IGSTPer}}</td>
+                            <td>&#8377;{{quotations.BuyPrice}}</td>
+                            <th class="freeze-col-1">{{quotations.CreatedDt + 'Z' | date:'dd-MM-yyyy hh:mm a'}}</th>
+                            <td class="freeze-updated-col">{{quotations.CreatedBy}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+            <!-- </div> -->
+            </double-scroll>
+        <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+        </div> -->
+        </div>
+    </div>
+
+
+    <div class="modal-footer justify-content-center">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Basic mixed styles example">
+            <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+                *ngIf="QuotationViewDetails.ApprovalStatus!=2  && QuotationViewDetails.IsCancel==false &&roles.toLowerCase().includes('Maker'.toLowerCase())"
+                [routerLink]="['/quotations/edit-quotation',QuotationViewDetails.QuotationGuid]">
+                <span class="feather icon-edit"></span> Edit</button>
+
+            <button *ngIf="QuotationViewDetails.IsCancel==false && this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase())" class="btn btn-outline-secondary"
+                (click)="modal.close('by: close icon')"
+                (click)="openBasicModal(CancelQuotation);SelectQuotation(QuotationViewDetails)"><span
+                    class="feather icon-x"></span> Cancelled</button>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+                (click)="DownloadPdf(QuotationViewDetails,'print')">
+                <span class="feather icon-printer"></span> Print</button>
+
+            <button type="button" class="btn btn-secondary" (click)="modal.close('by: close icon')"
+                (click)="DownloadPdf(QuotationViewDetails,'')">
+                <span class="feather icon-download"></span> Download</button>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+                (click)="openBasicModal(CheckedQuotation);" maxlength="200"
+                *ngIf="roles.toLowerCase().includes('Checker'.toLowerCase()) && QuotationViewDetails.ApprovalStatus!=2 && QuotationViewDetails.ApprovalStatus!=1">
+                <span class="feather icon-check-square">
+                </span> Mark as Checked </button>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+                (click)="openBasicModal(CheckedQuotation);changeApproval(quotationGuid,true)" maxlength="200"
+                *ngIf="roles.toLowerCase().includes('Approval'.toLowerCase()) && QuotationViewDetails.ApprovalStatus==1  && QuotationViewDetails.IsCancel==false">
+                <span class="feather icon-check-square">
+                </span> Mark as Approved </button>
+
+            <!-- <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+                (click)="openBasicModal(deletequotation);Delquotation(QuotationViewDetails)"
+                *ngIf="QuotationViewDetails.ApprovalStatus!=2  && QuotationViewDetails.IsCancel==false && this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase())">
+                <span class="feather icon-trash-2"></span>
+                Delete</button> -->
+        </div>
+    </div>
+    <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    </div> -->
+</ng-template>
+<ng-template #deletequotation let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Quotation</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to delete
+                        <strong>{{SupplierName}}</strong> quotation ?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');DeleteQuotation()">Yes</button>
+    </div>
+</ng-template>
+<ng-template #CheckedQuotation let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Remarks</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason=''"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-22">
+                    <label for="reason" class="form-label">Reason:</label>
+                    <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')"
+            (click)="clearReason()">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')"
+            (click)="onUpdateStatus()">
+            Yes
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #CancelQuotation let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Cancel quotation</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason=''"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="reason" class="form-label">Are you sure do you want to Cancel
+                        <strong>{{QuotationNo}}</strong>
+                        Quotation?</label>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="mb-22">
+                    <label for="reason" class="form-label">Reason:</label>
+                    <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')"
+            (click)="clearReason()">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');UpdateQuotationCancel()">Yes</button>
+    </div>
+</ng-template>
+
+
+
+
+
+<ng-template #activityHistory let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Supplier Quotation Detail</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <hr class="my-2" />
+    <div class="modal-body">
+        <double-scroll>
+            <!-- <div class="table-responsive pt-3"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <!-- <th>Delivery Location</th>
+                        <th>Delivery State</th> -->
+                        <th class="freeze-itemName-col">Item Name</th>
+                        <th>Vendor Item Name</th>
+                        <th>Item Category Name</th>
+                        <th>HSN Code</th>
+                        <th>Catalog No</th>
+                        <th>Manufacturer Name</th>
+                        <th>Machine Name</th>
+                        <th>Rate</th>
+                        <th>Discount %</th>
+                        <th>SGST %</th>
+                        <th>CGST %</th>
+                        <th>IGST %</th>
+                        <th class="freeze-buyPrice-col">Buy Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let activity of activityHistoryArray">
+                        <tr *ngFor="let quotations of activity.quotationsList">
+                            <!-- <td>{{deliveryLocationName}}</td>
+                            <td>{{deliveryState}}</td> -->
+                            <td class="freeze-itemName-col">{{quotations.ItemName}}</td>
+                            <td>{{quotations.VendorItemName?quotations.VendorItemName:'N/A'}}</td>
+                            <td>{{quotations.ItemCategoryName}}</td>
+                            <td>{{quotations.HSNCode?quotations.HSNCode:'N/A'}}</td>
+                            <td>{{quotations.CatalogNo?quotations.CatalogNo:'N/A'}}</td>
+                            <td>{{quotations.ManufactureName}}</td>
+                            <td>{{quotations.MachineName}}</td>
+                            <td>&#8377;{{quotations.Rate}}</td>
+                            <td>{{quotations.DiscountPer}}</td>
+                            <td>{{quotations.SGSTPer == 0?'--': quotations.SGSTPer}}</td>
+                            <td>{{quotations.CGSTPer == 0?'--':quotations.CGSTPer}}</td>
+                            <td>{{quotations.IGSTPer}}</td>
+                            <td class="freeze-buyPrice-col">&#8377;{{quotations.BuyPrice}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+            <!-- </div> -->
+        </double-scroll>
+    </div>
+    <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    </div> -->
+</ng-template>
+<ng-template #previewItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Preview invoice</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="widget-content">
+            <div class="default-form">
+                <div class="row form">
+                    <ngx-doc-viewer [url]="Document" viewer="url" style="width:100%;height:75vh;">
+                        <div>Loading</div>
+                    </ngx-doc-viewer>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- <div class="col-sm-12">
+                <div>Preview will displayed here...</div>
+             </div> -->
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+    </div>
+  </ng-template>

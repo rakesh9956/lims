@@ -1,0 +1,461 @@
+<nav class="page-breadcrumb">
+    <div class="d-flex justify-content-between">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a routerLink="/purchase-orders">Purchase Orders</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                New Purchase Order
+            </li>
+        </ol>
+        <button *ngIf="comparingQuotes" class="btn btn-primary btn-sm d-flex align-items-center"
+            routerLink="/quotations/compare-quotations">
+            <span class="feather icon-arrow-left icon-md me-2"></span>
+            <span class="">Go to comparing quotations</span>
+        </button>
+    </div>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Purchase Order</h6>
+                <form [formGroup]="purchaseOrderForm">
+                    <div class="row">
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                            <label for="manufacturerName"
+                                class="form-label d-flex justify-content-between">Category</label>
+                            <select class="form-select" id="manufacturerName" formControlName="CategoryGuid"
+                                [ngClass]="(purchaseOrderForm.get('CategoryGuid')?.hasError('required')) && purchaseOrderForm.get('CategoryGuid')?.touched ? 'is-invalid' : ''">
+                                <option value=null selected disabled>Select category</option>
+                                <option *ngFor="let CategoryList of CategoryDefaultsList"
+                                    [value]="CategoryList.CategoryGuid">
+                                    {{ CategoryList.CategoryTypeName }}
+                                </option>
+                            </select>
+                            <div
+                                *ngIf="purchaseOrderForm.get('CategoryGuid')?.hasError('required') && purchaseOrderForm.get('CategoryGuid')?.touched">
+                                <span class="text-danger mt-4px d-block">Supplier category is required!</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                            <label for="machineName" class="form-label">Supplier Name <span [ngClass]="{'text-danger': !purchaseOrderForm.value.VenderGuid}">*</span></label>
+                            <ng-select [items]="PurchaseSupplierNameList"  [closeOnSelect]="true" [searchable]="true" [readonly]="PurchaseOrderGuid"
+                                bindLabel="SupplierName" bindValue="SupplierGuid" placeholder=" Select supplier name" formControlName="VenderGuid"
+                                (change)="GetSupplierDetails($event)">
+                            </ng-select>
+                            <ng-container
+                                *ngIf="purchaseOrderForm.get('VenderGuid')?.hasError('required') && purchaseOrderForm.get('VenderGuid')?.touched">
+                                <span class="text-danger mt-4px d-block">Supplier name is required!</span>
+                            </ng-container>
+                        </div>
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                            <label for="machineName" class="form-label">Supplier State </label>
+                            <select class="form-select" id="machineName" formControlName="VendorStateGuid">
+                                <option value=null selected disabled>Select state </option>
+                                <option [value]="this.SupplierDetails?this.SupplierDetails?.StateGuid:this.purchaseOrderForm.value.VendorStateGuid">    
+                                    {{ this.SupplierDetails?this.SupplierDetails?.State:this.purchaseOrderDetails?.SupplierState }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                            <label for="manufacturerCatalogNo" class="form-label" >Address </label>
+                            <input type="text" id="manufacturerCatalogNo" class="form-control" readonly
+                                formControlName="VendorAddress" placeholder="Enter address" />
+                        </div>
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                            <label for="manufacturerCatalogNo" class="form-label">GSTN No </label>
+                            <input type="text" id="manufacturerCatalogNo" class="form-control" readonly
+                                formControlName="VendorGSTIN" placeholder=" Enter GSTN No." />
+                        </div>
+
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex ">Delivery
+                                    State <span [ngClass]="{'text-danger': !purchaseOrderForm.value.DeliveryStateGuid}">&nbsp;*</span></label>
+                                <ng-select [items]="StateList"  [closeOnSelect]="true" [searchable]="true"
+                                 bindValue="StateGuid" bindLabel="State"  placeholder="Select state" formControlName="DeliveryStateGuid"
+                                (change)="GetStateDetails(this.purchaseOrderForm.value.DeliveryStateGuid)">
+                            </ng-select>
+                                <ng-container
+                                    *ngIf="purchaseOrderForm.get('DeliveryStateGuid')?.hasError('required') && purchaseOrderForm.get('DeliveryStateGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Delivery state is required!</span>
+                                </ng-container>
+                        </div>
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex ">Delivery
+                                    Center <span [ngClass]="{'text-danger': !purchaseOrderForm.value.DeliveryCenterGuid}">&nbsp;*</span></label>
+                                <ng-select [items]="StateDetails"  [closeOnSelect]="true" [searchable]="true"
+                                 bindValue="CenterGuid" bindLabel="CenterName"  placeholder="Select Center" formControlName="DeliveryCenterGuid"
+                                 (change)="GetDeliveryCenter()">
+                            </ng-select>
+                                <ng-container
+                                    *ngIf="purchaseOrderForm.get('DeliveryCenterGuid')?.hasError('required') && purchaseOrderForm.get('DeliveryCenterGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Delivery center is required!</span>
+                                </ng-container>
+                        </div>
+                        <div class="col-12  col-md-4 col-lg-3 mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex ">Delivery
+                                    Location <span [ngClass]="{'text-danger': !purchaseOrderForm.value.DeliveryLocationGuid}">&nbsp;*</span></label>
+                                <ng-select [items]="DeliveryLocation"  [closeOnSelect]="true" [searchable]="true"
+                                 bindValue="CenterLocationGuid" bindLabel="CenterLocationName"  placeholder="Select Location" formControlName="DeliveryLocationGuid">
+                            </ng-select>
+                                <ng-container
+                                    *ngIf="purchaseOrderForm.get('DeliveryLocationGuid')?.hasError('required') && purchaseOrderForm.get('DeliveryLocationGuid')?.touched">
+                                    <span class="text-danger mt-4px d-block">Delivery location is required!</span>
+                                </ng-container>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <hr />
+                        </div>
+                    </div>
+
+                    <h6 class="card-title">Item Details</h6>
+
+                    <div formArrayName="lstpurchaseOrderItems">
+                        <ng-container *ngFor="let item of addItemslist.controls; let i = index">
+                            <ng-container [formGroupName]="i">
+                                <div class="card mb-3 border bg-light">
+                                    <div class="card-body p-3">
+                                        <div class="row">
+                                            <div class=" col-12 col-md-4 col-lg-3 mb-3">
+                                                <div class=" position-relative">
+                                                    <label for="itemName" class="form-label">Item <span [ngClass]="{'text-danger': this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemGuid==''}">*</span></label>
+                                                    <input type="text" id="itemName"
+                                                        class="form-control autocompleteInput"
+                                                        placeholder="Enter item name" (keyup)="search($event,i)"
+                                                        formControlName="ItemName" autocomplete="on"
+                                                        [ngClass]="{'is-invalid':item.get('ItemName')?.touched && item.get('ItemName')?.invalid}">
+                                                    <div class="card card-body card-block autocompleteBox p-0">
+                                                        <div class="border-bottom p-2"
+                                                            *ngFor="let data of SupplierItems"
+                                                            (click)="OnSelectItem(data,i)">
+                                                            {{ data.ItemName }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-danger position-absolute" *ngIf="isdisable && i">Please
+                                                    select different item!</div>
+                                                    <!-- <div class="text-danger position-absolute" *ngIf="SupplierItems?.length==0">No Items found!</div> -->
+                                            </div>
+                                            <div class=" col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label">PO
+                                                        Type <span [ngClass]="{'text-danger': this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].POTypeGuid==null}">*</span></label>
+                                                    <select class="form-select" id="manufacturerName"
+                                                        [ngClass]="{'is-invalid':item.get('POTypeGuid')?.touched && item.get('POTypeGuid')?.invalid}"
+                                                        formControlName="POTypeGuid">
+                                                        <option selected disabled value=null
+                                                       >
+                                                            Select PO type
+                                                        </option>
+                                                        <option *ngFor="let PODefaultsList of PODefaultsList"
+                                                            [value]="PODefaultsList.Guid">
+                                                            {{PODefaultsList.POName}}
+                                                        </option>
+                                                    </select>
+                                                    <ng-container
+                                                        *ngIf="item.get('POTypeGuid')?.touched && item.get('POTypeGuid')?.invalid">
+                                                        <span class="text-danger mt-4px d-block">POType is
+                                                            required</span>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+
+                                            <div class=" col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label" >Quantity <span [ngClass]="{'text-danger': this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].OrderQuantity==''}">*</span></label>
+                                                    <input type="number" [readonly]="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemGuid==''" [min]="0"
+                                                        class="form-control" formControlName="OrderQuantity"
+                                                        [ngClass]="{'is-invalid':item.get('OrderQuantity')?.touched && item.get('OrderQuantity')?.invalid}"
+                                                        (input)="ItemPricecalculation(this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemGuid,i)">
+                                                    <ng-container
+                                                        *ngIf="item.get('OrderQuantity')?.touched && item.get('OrderQuantity')?.invalid">
+                                                        <span class="text-danger mt-4px d-block">Quantity is
+                                                            required</span>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+                                            <div class=" col-12 col-md-4 col-lg-3 emptyDiv"></div>
+                                            <div class="col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label d-flex justify-content-between">Manufacturer</label>
+                                                    <select class="form-select disabled" id="manufacturerName" disabled>
+                                                        <option selected disabled value=null
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ManufactureName==''">
+                                                            Select manufacturer
+                                                        </option>
+                                                        <option
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ManufactureName">
+                                                            {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ManufactureName
+                                                            }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label d-flex justify-content-between">Category</label>
+                                                    <select class="form-select disabled" id="manufacturerName" disabled>
+                                                        <option selected disabled value=null
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].CategoryTypeName==''">
+                                                            Select category</option>
+                                                        <option
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].CategoryTypeName">
+                                                            {{
+                                                            this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].CategoryTypeName
+                                                            }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label d-flex justify-content-between">Machine</label>
+                                                    <select class="form-select disabled" id="manufacturerName" disabled>
+                                                        <option selected disabled
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName==''">
+                                                            Select machine</option>
+                                                        <option
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName">
+                                                            {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4 col-lg-3">
+                                                <div class="mb-3">
+                                                    <label for="manufacturerName"
+                                                        class="form-label d-flex justify-content-between">PO
+                                                        Size</label>
+                                                    <select class="form-select disabled" id="manufacturerName" disabled>
+                                                        <option selected disabled
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].POSize==''">
+                                                            Select PO Size</option>
+                                                        <option selected disabled
+                                                            *ngIf="this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].POSize">
+                                                            {{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].POSize}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <double-scroll>
+                                                <!-- <div class="table-responsive col-sm-12 px-0 mx-auto" style="max-width: 98%;"> -->
+                                                    <table class="table bg-white">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>HSN Code</th>
+                                                                <th>Purchased Unit</th>
+                                                                <th>Conv Ente</th>
+                                                                <th>Consume Unit</th>
+                                                                <th>Barcode</th>
+                                                                <th>Batch No.</th>
+                                                                <th>Expiry on</th>
+                                                                <th>Rate</th>
+                                                                <th>Paid Qty</th>
+                                                                <th>Extra Free Qty</th>
+                                                                <th>Discount %</th>
+                                                                <th>IGST %</th>
+                                                                <th>CGST %</th>
+                                                                <th>SGST %</th>
+                                                                <th>Dis. Amt.</th>
+                                                                <th>Total GST Amt.</th>
+                                                                <th>Buy Price</th>
+                                                                <th>Net AMT.</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td></td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].HSNCode}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].PurchasedUnit}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].PurchasedUnits}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ConsumptionUnit}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].ItemRate}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].FreeQty}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].DiscountPercentage}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].IGSTPer}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].CGSTPer}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].SGSTPer}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].DiscountAmount}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].TotalGSTAmount}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].NetAmount}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].TotalAmount}}
+                                                                </td>
+                                                                <td>{{this.purchaseOrderForm.get('lstpurchaseOrderItems')?.value[i].MachineName}}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                <!-- </div> -->
+                                            </double-scroll>
+                                            <div class="col-12 mt-3">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="mb-3"
+                                                        (click)="removeItems(i)"
+                                                        *ngIf="i > 0">
+                                                        <button class="btn-danger btn">
+                                                            <span class="feather icon-close"> </span> Remove item
+                                                        </button>
+                                                    </div>
+                                                    <div class="mb-3" (click)="AddItems()"
+                                                        *ngIf="i == addItemslist.controls.length - 1 && SupplierItems?.length>0">
+                                                        <button class="btn-primary btn">
+                                                            <span class="feather icon-plus"> </span> Add item
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+
+
+
+                    <h6 class="card-title">Terms & Conditions</h6>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerName" class="form-label d-flex justify-content-between">
+                                    Payment Term
+                                    <span class="small text-primary cursor-pointer" id="addNewManufacturer"
+                                        (click)="openBasicModal(paymentterm)">Add other</span>
+                                </label>
+                                <select class="form-select" id="manufacturerName" formControlName="PaymentTerm">
+                                    <option selected disabled value=null>Select payment term </option>
+                                    <option
+                                        value="StaticTerm" *ngIf="!this.purchaseOrderForm.value.PaymentTerm">
+                                        100% Payment within 30 days of delivery and submission of invoice with delivery
+                                        acknowledgement</option>
+                                    <option *ngIf="this.purchaseOrderForm.value.PaymentTerm" value={{this.purchaseOrderForm.value.PaymentTerm}} >{{this.purchaseOrderForm.value.PaymentTerm=='StaticTerm'?'100% Payment within 30 days of delivery and submission of invoice with delivery
+                                        acknowledgement':this.purchaseOrderForm.value.PaymentTerm}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerName" class="form-label d-flex justify-content-between">Delivery
+                                    Term 
+                                    <span class="small text-primary cursor-pointer" id="addNewManufacturer" 
+                                        (click)="openBasicModal(deliveryItems)">Add other</span></label>
+                                <select class="form-select" id="manufacturerName" formControlName="DeliveryTerm">
+                                    <option selected disabled value=null>Select delivery term </option>
+                                    <option *ngIf="this.purchaseOrderForm.value.DeliveryTerm" value={{this.purchaseOrderForm.value.DeliveryTerm}}>{{this.purchaseOrderForm.value.DeliveryTerm}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemName" class="form-label">NFA No.</label>
+                                <input type="text" id="itemName" class="form-control" placeholder="Enter NFA no."
+                                    formControlName="NFANo" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="itemDescription" class="form-label">Terms and Conditions </label>
+                                <textarea class="form-control" id="itemDescription" rows="3"
+                                    formControlName="TermsandConditions"
+                                    placeholder="Enter terms and condtions"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #deliveryItems let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add delivery term</h5>
+                            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Delivery Term</label>
+                                        <input type="text" id="itemName" class="form-control" placeholder="Enter delivery term" (input)="addOtherDeliveryTerm($event)"  />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')">Save</button>
+                        </div>
+                    </ng-template>
+                    
+                    <ng-template #paymentterm let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add payment term</h5>
+                            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="itemName" class="form-label">Payment Term</label>
+                                        <input type="text" id="itemName" class="form-control" placeholder="Enter payment term" (input)="addOtherPaymentTerm($event)"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')" >Save</button>
+                        </div>
+                    </ng-template>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged" (click)="FormReset()">Reset </button>
+                        <button type="button" class="btn btn-primary submit" [disabled]="purchaseOrderForm.invalid || !FormChanged || addItemslist.invalid "
+                            (click)="SaveSupplierDetails()">{{PurchaseOrderGuid?'Update':'Save'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Items -->
+
+<!-- Modal -->

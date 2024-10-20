@@ -1,0 +1,17 @@
+.h-38{
+    height: 38px;
+}
+
+
+.freeze-col {
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    z-index: 2;
+    background: #fff;
+  }
+ 
+  .pi-items.row > * {
+    padding-left: 0 !important;
+ }

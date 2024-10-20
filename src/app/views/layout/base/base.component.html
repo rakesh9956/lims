@@ -1,0 +1,38 @@
+<div class="main-wrapper">
+
+  <!-- partial:sidebar -->
+  <div *ngIf="authentication.LoggedInUser.B2BTYPE==false || authentication.LoggedInUser.B2BTYPE=='false'">
+    <app-sidebar></app-sidebar>    
+  </div>
+  <div *ngIf="authentication.LoggedInUser.B2BTYPE==true || authentication.LoggedInUser.B2BTYPE=='true'">
+    <app-no-sidebar></app-no-sidebar>
+  </div>
+  <!-- partial -->
+
+  <div [class]="authentication.LoggedInUser.B2BTYPE==false || authentication.LoggedInUser.B2BTYPE=='false'? 'page-wrapper' : 'page-wrapper no-sidebar' ">
+
+    <!-- partial:navbar -->
+    <app-navbar></app-navbar>
+    <!-- partial -->
+
+    <div class="page-content">
+
+      <!-- Spinner for lazyload modules -->
+      <div *ngIf="isLoading" class="spinner-wrapper">
+        <div class="spinner">Loading...</div>
+      </div>
+
+      <div contentAnimate *ngIf="!isLoading">
+        <router-outlet></router-outlet>
+      </div>
+
+    </div>
+
+    <!-- partial:footer -->
+    <app-footer></app-footer>
+    <!-- partial -->
+
+  </div>
+
+
+</div>

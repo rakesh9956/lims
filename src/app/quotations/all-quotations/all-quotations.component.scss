@@ -1,0 +1,60 @@
+.size-18 {
+  font-size: 18px;
+  color: #6571ff;
+}
+
+.minh-fullscreen {
+  height: calc(100vh - 370px);
+}
+
+.freeze-itemName-col {
+  position: sticky;
+  left: 0;
+  width: 150px;
+  min-width: 200px;
+  z-index: 11;
+  background: #fff;
+}
+
+.freeze-buyPrice-col {
+  position: sticky;
+  right: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 11;
+  background: #fff;
+}
+
+.freeze-updated-col {
+  position: sticky;
+  right: 0;
+  width: 150px;
+  min-width: 150px;
+  z-index: 11;
+  background: #fff;
+}
+
+.highlight {
+  font-weight: bold;
+  color: red;
+}
+
+.old-value {
+  text-decoration: line-through;
+}
+
+.new-value {
+  color: green;
+}
+
+.max-w-250 {
+  max-width: 250px;
+}
+.freeze-itemName-col.text-wrap .cancled {
+border-left: 5px solid red;
+    background: red;
+    width: 2px;
+    height: 60px;
+    position: absolute;
+    transform: translate(-14px, -14px);
+}

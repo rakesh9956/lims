@@ -1,0 +1,197 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Suppliers</a></li>
+        <li class="breadcrumb-item active" aria-current="page">All suppliers</li>
+    </ol>
+</nav>
+
+<!-- <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">ALL ITEMS</h4>
+          <p class=“text-muted”>Read the <a href="https://github.com/swimlane/ngx-datatable" target="_blank"> Official Ngx-datatable Documentation </a>for a full list of instructions and other options.</p>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div class="mb-2 mb-sm-0">SUPPLIERS</div>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <!-- Toggle the value of the property when the toggler button is clicked. -->
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter  size-18"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm w-100 ms-2" routerLink="/suppliers/new-supplier" *ngIf="(Roles.toLowerCase().includes('create'.toLowerCase()))"
+                            (click)="AddSupplier()">
+                            <span class="feather icon-plus"></span> Add supplier</button>
+                    </div>
+                    <!-- <div class="d-flex align-items-center justify-content-end gap-4 flex-shrink-0">
+                        <div class="align-items-center d-flex flex-column flex-sm-row flex-shrink-0">
+                            <span *ngIf="Supplierslist != null" class="text-muted text-small flex-shrink-0 ">
+                                {{(rowCount*(pageNumber-1))+1}}-{{totalCount>rowCount*pageNumber?rowCount*pageNumber:totalCount}}
+                                of
+                                {{totalCount}} </span>
+
+                            <select name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm ms-0 ms-sm-2 mb-1 mb-sm-0"
+                                *ngIf="Supplierslist != null" (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control form-control-sm minw-200 ms-0 ms-sm-2 mb-1 mb-sm-0"
+                            placeholder="Search" [maxLength]="48" (keyup)="updateFilter($event)"
+                            style="min-width: 350px" />
+                        <button class="btn btn-primary btn-sm ms-0 ms-sm-2 flex-shrink-0"
+                            routerLink="/suppliers/new-supplier" (click)="AddSupplier()">
+                            <span class="feather icon-plus"></span> Add supplier
+                        </button>
+                    </div> -->
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div
+                        class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end" *ngIf="TotalCount!=0 ">
+                            <span *ngIf="Supplierslist?.length >0"
+                                class="text-muted text-small me-0 me-sm-2 mb-1 mb-sm-0 flex-shrink-0">{{(rowCount*(pageNumber-1))+1}}-{{totalCount>rowCount*pageNumber?rowCount*pageNumber:totalCount}}
+                                of
+                                {{totalCount}} </span>
+                            <!-- <span class="me-2 flex-shrink-0 text-capitalize">Display</span> -->
+                            <select  *ngIf="Supplierslist?.length >0"name="rowLimit" id="rowLimit"
+                                  class="form-control form-select me-0 me-sm-2 h-34 mb-1 mb-sm-0 "
+                                  (change)="ChangeEvent($event)">
+                            <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                          </select>
+                            <!-- <select name="rowLimit" id="rowLimit" class="form-control form-select me-2 h-34" (change)="ChangeManageuser($event)">
+                            <option value={{item}}  *ngFor="let itemorder of IndentOrder">{{itemorder}}</option>
+                        </select> -->
+                            <!-- <select name="rowLimit" id="rowLimit" class="form-control form-select me-2 h-34"
+                            (change)="ChangeManageuser($event)">
+                            <option value={{item}} *ngFor="let item of IndentOrder">{{item}}</option>
+                        </select> -->
+                            <!-- <span class="me-2 flex-shrink-0 text-lowercase">records per page</span> -->
+                            <input type="text" class="form-control me-0 me-sm-2 h-34 mb-1 mb-sm-0" placeholder="Search"
+                                [(ngModel)]="Keyword" (ngModelChange)="changeSearch($event)" />
+                                <select name="IsActive" id="IsActive" class="form-control form-select me-2 h-34"
+                            (change)="Changeusers($event)">
+                            <option value="" >All</option>
+                            <option value="Active" >Active</option>
+                            <option value="In-Active" >In-Active</option>  
+                            <option value="New" >New</option>                         
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive" *ngIf="Supplierslist != null && Supplierslist.length >0">
+                    <ngx-datatable [scrollbarH]="true" class="bootstrap" [rows]="Supplierslist"
+                        [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" rowHeight="auto">
+                        <ngx-datatable-column name="Supplier name" prop="SupplierName"></ngx-datatable-column>
+                        <ngx-datatable-column name="Supplier category" prop="SupplierCategory"></ngx-datatable-column>
+                        <!--    [sortable]="false"></ngx-datatable-column> -->
+                        <ngx-datatable-column name="Supplier code" prop="SupplierCode"></ngx-datatable-column>
+                        <ngx-datatable-column name="Supplier type" prop="SupplierTypeName"></ngx-datatable-column>
+                        <ngx-datatable-column name="Address" prop="Street"></ngx-datatable-column>
+                        <ngx-datatable-column name="Primary contact person"
+                            prop="PrimaryContactPerson"></ngx-datatable-column>
+                        <ngx-datatable-column name="Contact no"
+                            prop="PrimaryContactPersonMobileNo"></ngx-datatable-column>
+                        <ngx-datatable-column name="Office email id" prop="SupplierEmailId"></ngx-datatable-column>
+                        <ngx-datatable-column name="Status" prop="IsDeleted">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <span [ngStyle]="{'color': (row.IsDeleted == false && row.IsVerified == true) ? 'green' : 
+                                (row.IsDeleted == false && row.IsVerified == false) ? 'blue' : 
+                                (row.IsDeleted == true) ? 'red' : ''}">
+                                    {{ row.IsDeleted == false && row.IsVerified == true ? 'Active' : 
+                                        row.IsDeleted == false && row.IsVerified == false ? 'New' : 
+                                        row.IsDeleted == true ? 'Inactive' : '' }}
+                                </span>
+                            </ng-template>
+                          </ngx-datatable-column>                          
+                        <!-- <ngx-datatable-column name="Approved" prop="isApproved"></ngx-datatable-column> -->
+                        <ngx-datatable-column name="Actions" [width]="215" [sortable]="false">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <div ngbDropdown>
+                                    <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom"
+                                        container="body" popoverClass="dataTableActions"
+                                        [ngbPopover]="dataTableActions">Actions <span
+                                            class="feather icon-chevron-down"></span></button>
+                                    <ng-template #dataTableActions>
+                                        <div aria-labelledby="actionsDropdown">
+                                            <button class="border-bottom" ngbDropdownItem  *ngIf="(Roles.toLowerCase().includes('edit'.toLowerCase()))&& row.IsDeleted==false"
+                                                (click)="OnEditSupplier(row)"><span class="feather icon-edit"></span>
+                                                Edit</button>
+                                            <button class="border-bottom" ngbDropdownItem *ngIf="row.IsDeleted==false&& row.IsVerified==true"
+                                                (click)="Popupfordeletesupplier(deleteSupplier,'md');deleteSupplierDetails(row)"><span
+                                                    class="feather icon-slash"></span> In-Active</button>
+                                            <button class="border-bottom" ngbDropdownItem *ngIf="row.IsVerified==false||row.IsDeleted==true"
+                                                (click)="SendSupplierEmail(row)"><span
+                                                    class="feather icon-mail"></span> Resend Verification</button>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="9"></app-shimmers>
+                <!--Shimmer UI -->
+            </div>
+            <div class="cartd-footer" *ngIf="totalCount > 0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="Supplierslist==null && !shimmerVisible">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No Suppliers found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+</div>
+<ng-template #deleteSupplier let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">In-Active Supplier</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to in-active this
+                        <strong>{{SupplierName}}</strong> Supplier?</label>
+                </div>
+                <div class="mb-3" *ngIf="PendingPoData.length>0">
+                    <label for="itemName" class="form-label">There are active purchase orders for this supplier. in-active option is not available!</label>
+                </div>
+                <div class="mb-3" *ngFor="let item of PendingPoData">
+                    <p>{{item.PurchaseOrderNo}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit" [disabled]="PendingPoData.length>0"
+            (click)="modal.close('by: close icon');DeleteSupplier()">Yes</button>
+    </div>
+</ng-template>

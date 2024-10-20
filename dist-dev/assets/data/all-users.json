@@ -1,0 +1,113 @@
+
+[
+  {
+    "id": 0,
+    "name": "Praveen Manne",
+    "user-name": "praveen",
+    "mobile": "9874563210",    
+    "role": "UI/UX Lead",
+    "store-location": "08-02-2023",   
+    "created-date": "02-02-2023",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 1,
+    "name": "Ravi Kumar",
+    "user-name": "ravi",
+    "mobile": "8008866463",    
+    "role": "UI Developer",    
+    "store-location": "02-02-2023",   
+    "created-date": "25-12-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 2,
+    "name": "Bannu Thomos",
+    "user-name": "bannu",
+    "mobile": "8529637410",    
+    "role": "UI Developer",    
+    "store-location": "25-01-2023",   
+    "created-date": "15-05-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 3,
+    "name": "Shreyas Pangal",
+    "user-name": "shreyas",
+    "mobile": "8529637310",    
+    "role": "UI Developer",    
+    "store-location": "25-01-2023",   
+    "created-date": "05-10-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 4,
+    "name": "Jacob Kuchipudi",
+    "user-name": "jacob",
+    "mobile": "9638527410",    
+    "role": "Mananger",    
+    "store-location": "22-12-2022",   
+    "created-date": "15-11-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 5,
+    "name": "Hanumanthu Maddisetti",
+    "user-name": "hanumanthu",
+    "mobile": "9147852025",    
+    "role": "QA",    
+    "store-location": "25-01-2023",   
+    "created-date": "25-12-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 6,
+    "name": "Sasidhar Amaraneni",
+    "user-name": "sasi",
+    "mobile": "9871234560",    
+    "role": "QA",    
+    "store-location": "25-12-2022",   
+    "created-date": "25-12-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 7,
+    "name": "Boby Ganesh",
+    "user-name": "boby",
+    "mobile": "9145827632",    
+    "role": "Fullstack Developer",    
+    "store-location": "08-02-2023",   
+    "created-date": "25-12-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 8,
+    "name": "Rakesh Reddy",
+    "user-name": "rakesh",
+    "mobile": "9638527410",    
+    "role": "Fullstack Developer",    
+    "store-location": "25-12-2022",   
+    "created-date": "25-12-2022",
+    "created-by": "admin",
+    "active": ""
+  },
+  {
+    "id": 9,
+    "name": "Ramsey Cummings",
+    "user-name": "ramsey",
+    "mobile": "9362587410",    
+    "role": "Fullstack Developer",    
+    "store-location": "06-02-2023",   
+    "created-date": "13-08-2022",
+    "created-by": "admin",
+    "active": ""
+  }
+]

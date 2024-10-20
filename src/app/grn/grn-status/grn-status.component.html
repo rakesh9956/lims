@@ -1,0 +1,599 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="items">GRN Status</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-12 stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title d-flex align-items-center justify-content-between gap-2">
+          <div>GOODS RECEIPT NOTES</div>
+          <div class="d-flex align-items-center justify-content-end">
+            <!-- Toggle the value of the property when the toggler button is clicked. -->
+            <button class="d-block ms-auto navbar-toggler filter-button" type="button"
+              (click)="isMenuCollapsed = !isMenuCollapsed">
+              <i class="feather icon-filter size-18"></i>
+            </button>
+            <div class="d-inline-block ms-2" ngbDropdown>
+              <button class="btn btn-primary" id="dropdownButtonPrimary" ngbDropdownToggle
+                *ngIf="roles.toLowerCase().includes('Maker'.toLowerCase())">New GRN</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownButtonPrimary">
+                <button ngbDropdownItem routerLink="/grn/new-grn">Create New GRN</button>
+                <button ngbDropdownItem routerLink="/grn/grn-against-po">GRN Against PO</button>
+              </div>
+            </div>
+          </div>
+        </h6>
+        <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+          <div class="d-flex align-items-xl-center flex-column flex-xl-row flex-wrap gap-2 justify-content-end">
+            <!-- <ng-select (change)="FiltersCheck($event)" [multiple]=true placeholder="Select status"
+              [inputAttrs]="{maxlength: '48'}" [(ngModel)]="selectedStatuses">
+              <ng-option *ngFor="let item of itemOptionsOrders1" [value]="item.status">
+                {{ item.status }}
+              </ng-option>
+            </ng-select> -->
+            <select class="form-control form-select maxw-200" (change)="Getevent($event)" [(ngModel)]="selectedStatus">
+              <option value="" disabled selected>Select status</option>
+              <option value="{{item1}}" *ngFor="let item1 of itemOptionsOrders1">{{item1}}</option>
+            </select>
+            <ng-select [items]="CenterLocationList" bindLabel="CenterLocationName" bindValue="CenterGuid"
+              placeholder="search by grn location" [(ngModel)]="selectedSuppName" (change)="change($event)"
+              [maxlength]="50" class="ng-select-custom-250min">
+            </ng-select>
+            <form class="d-flex align-items-xl-center flex-shrink-0 range-selection flex-column flex-xl-row gap-2">
+              <!-- <div class="form-group hidden">
+                <div class="input-group">
+                  <input name="datepicker" class="form-control" ngbDatepicker #datepicker="ngbDatepicker" 
+                    [autoClose]="'outside'" (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t"
+                    outsideDays="hidden" [startDate]="fromDate!">
+                  <ng-template #t let-date let-focused="focused">
+                    <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
+                      [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date"
+                      (mouseleave)="hoveredDate = null">
+                      {{ date.day }}
+                    </span>
+                  </ng-template>
+                </div>
+              </div> -->
+              <div>
+                <div class="input-group">
+                  <input class="form-control" placeholder="dd-mm-yyyy" name="dp1" ngbDatepicker readonly
+                    [(ngModel)]="removeFromDate" #d1="ngbDatepicker" [maxDate]="selectedDate"
+                    (dateSelect)="selectFromDate($event)">
+                  <button class="input-group-text" type="button" (click)="d1.toggle()">
+                    <i class="feather icon-calendar icon-md text-muted"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="input-group">
+                  <input class="form-control" placeholder="dd-mm-yyyy" name="dp" [minDate]="minDate" readonly
+                    [(ngModel)]="removeTodate" (dateSelect)="selectToDate($event)" ngbDatepicker #d2="ngbDatepicker">
+                  <button class="input-group-text" type="button" (click)="FromDate?d2.toggle():''">
+                    <i class="feather icon-calendar icon-md text-muted"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="d-flex align-items-center flex-column flex-sm-row gap-2">
+                <ng-container *ngIf="!isNoData">
+                  <span
+                    class="text-muted text-small flex-shrink-0 align-self-start align-self-sm-center">{{(rowCount*(pageNumber-1))+1}}-{{totalCount>rowCount*pageNumber?rowCount*pageNumber:totalCount}}
+                    of
+                    {{totalCount}} </span>
+                  <select name="rowLimit" id="rowLimit" class="form-control form-select me-1 h-34 w-100 w-md-75"
+                    (change)="ChangeEvent($event)">
+                    <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                  </select>
+                </ng-container>
+                <input type="text" class="form-control me-1 h-34 search-custom-200min" placeholder="Search"
+                  [maxLength]="50" (keyup)="changeSearch($event)" />
+
+              </div>
+            </form>
+            <!-- <input type="text" class="form-control form-select-sm ms-2" placeholder="Search"
+                            (keyup)="updateFilter($event)" /> -->
+            <!-- <button class="btn btn-outline-primary w-auto btn-sm ms-2" routerLink="/grn/grn-against-po">GRN against PO</button>
+                        <button class="btn btn-primary btn-sm w-100 ms-2">Add GRN</button> -->
+
+          </div>
+          <div class="col-md-12 mb-2 text-end" *ngIf="fromDate || toDate">
+            <button class="btn btn-link btn-sm text-underline px-0" (click)="onDataRemove()">Clear
+              filters</button>
+          </div>
+
+        </div>
+        <div class=" p-0" [rows]="grnstsatusList">
+          <double-scroll>
+            <table class="table" *ngIf="totalCount>0 && !shimmerVisible">
+              <thead>
+                <tr>
+                  <th>Ledger Transaction No</th>
+                  <th>Purchase Order No</th>
+                  <th>Status</th>
+                  <th>Invoice No</th>
+                  <th>Chalan No</th>
+                  <th>Supplier Name</th>
+                  <th>GRN Date</th>
+                  <th>Checked Date</th>
+                  <th>Checked by</th>
+                  <th>Checked by Reason</th>
+                  <th>Approved Date</th>
+                  <th>Approved by</th>
+                  <th>Approved by Reason</th>
+                  <th>Location</th>
+                  <th>Gross Amount</th>
+                  <th>No. of items</th>
+                  <th>Discount Amount</th>
+                  <th>Tax Amount</th>
+                  <th>Net Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let getGRNStatus of grnstsatusList ">
+                  <td>{{getGRNStatus.LedgerTransactionNo}}</td>
+                  <td class="truncate">{{getGRNStatus.PurchaseOrderNo}}</td>
+                  <td>
+                    <span [ngClass]="
+                      getGRNStatus.Iscancel === true ? 'badge bg-danger' :
+                      getGRNStatus.Status === 0 && getGRNStatus.IsPost === false? 'badge bg-warning' :
+                      getGRNStatus.IsPost === true ? 'badge bg-success' :
+                      getGRNStatus.Status === 1 && getGRNStatus.IsPost === false? 'badge bg-info' :
+                      getGRNStatus.Status === 2 && getGRNStatus.IsPost === false? 'badge bg-primary' : ''
+                      ">
+                      {{
+                      getGRNStatus.Iscancel === true ? 'Cancelled' :
+                      getGRNStatus.StatusName === "Maker" && getGRNStatus.IsPost === false? 'Maker' :
+                      getGRNStatus.IsPost === true ? 'Post' :
+                      getGRNStatus.StatusName === "Checked" && getGRNStatus.IsPost === false? 'Checked' :
+                      getGRNStatus.StatusName == "Aproved" && getGRNStatus.IsPost === false? 'Unpost' : ''
+                      }}
+                    </span>
+                  </td>
+                  <td>{{getGRNStatus.InvoiceNo}}</td>
+                  <td>{{getGRNStatus.ChalanNo==''?'N/A':getGRNStatus.ChalanNo}}</td>
+                  <td>{{getGRNStatus.SupplierName}}</td>
+                  <td>{{getGRNStatus.GRNDate | date:'dd-MM-yyyy  HH:mm'}}</td>
+                  <td>{{getGRNStatus.ChekedDate =='0001-01-01T00:00:00'?'N/A': getGRNStatus.ChekedDate | date:"dd-MM-yyyy  HH:mm"}}</td>
+                  <td>{{getGRNStatus.ChekedByName==null?'Not checked':getGRNStatus.ChekedByName}}</td>
+                  <td>
+                    <span class="truncate" [title]="getGRNStatus?.CheckedReason || 'N/A'">
+                     {{ getGRNStatus?.CheckedReason
+                     ? getGRNStatus.CheckedReason.length > 5
+                     ? (getGRNStatus.CheckedReason | slice:0:50) + '...'
+                     : getGRNStatus.CheckedReason
+                     : 'N/A'
+                     }}
+                    </span>
+                  </td>
+                  <td>{{getGRNStatus.AprovedDate=='0001-01-01T00:00:00'?'N/A': getGRNStatus.AprovedDate | date:"dd-MM-yyyy  HH:mm"}}</td>
+                  <td>{{getGRNStatus.ApprovedByName==null?'Not approved':getGRNStatus.ApprovedByName}}</td>
+                  <td>
+                    <span class="truncate" [title]="getGRNStatus?.ApproveReason || 'N/A'">
+                     {{ getGRNStatus?.ApproveReason
+                     ? getGRNStatus.ApproveReason.length > 5
+                     ? (getGRNStatus.ApproveReason | slice:0:50) + '...'
+                     : getGRNStatus.ApproveReason
+                     : 'N/A'
+                     }}
+                    </span>
+                  </td>
+                  <td>{{getGRNStatus.Location}}</td>
+                  <td>{{getGRNStatus.GrossAmount | exactNumbers}}</td>
+                  <td class="text-primary">{{getGRNStatus.ItemQty}}</td>
+                  <td>{{getGRNStatus.DiscountOnTotal}}</td>
+                  <td>{{getGRNStatus.TaxAmount | exactNumbers}}</td>
+                  <td>{{getGRNStatus.NetAmount | exactNumbers}}</td>
+                  <td>
+                    <div ngbDropdown class="d-flex">
+                      <button class="btn btn-outline-primary btn-xs me-1"
+                        (click)="openXlModal(xlModal);ViewGRN(getGRNStatus)">
+                        <span class="feather icon-eye"></span> View
+                      </button>
+                      <button class="btn btn-secondary btn-xs mr-2" id="actionsDropdown" placement="bottom"
+                        container="body" [ngbPopover]="dataTableActions" popoverClass="dataTableActions">Actions <span
+                          class="feather icon-chevron-down"></span></button>
+                      <ng-template #dataTableActions>
+                        <div aria-labelledby="actionsDropdown">
+                          <button class="border-bottom" ngbDropdownItem
+                            [routerLink]="['/grn/grn-against-po',getGRNStatus.Guid]"
+                            *ngIf="getGRNStatus.Iscancel!=true && getGRNStatus.IsPost!=true && roles.toLowerCase().includes('Maker'.toLowerCase())"
+                            (click)="getStatus(getGRNStatus)"><span class="feather icon-edit"></span>
+                            Edit</button>
+                          <div>
+                            <button class="border-bottom" ngbDropdownItem
+                              (click)="openBasicModal(PostGRN);SelectGRN(getGRNStatus)"
+                              *ngIf="roles.toLowerCase().includes('post'.toLowerCase()) && getGRNStatus.Iscancel!=true && getGRNStatus.IsPost!=true && getGRNStatus.Status==2"><span
+                                class="feather icon-file-text"></span>
+                              Post</button>
+                          </div>
+                          <!-- <button class="border-bottom" ngbDropdownItem>Unpost</button> -->
+                          <div>
+                            <button class="border-bottom" ngbDropdownItem
+                              (click)="openBasicModal(CancelGRN);SelectGRN(getGRNStatus)"
+                              *ngIf="roles.toLowerCase().includes('Cancel'.toLowerCase()) && getGRNStatus.Iscancel!=true && getGRNStatus.IsPost!=true"><span
+                                class="feather icon-x"></span>
+                              Cancel</button>
+                          </div>
+                          <div>
+                            <button class="border-bottom"
+                              *ngIf="roles.toLowerCase().includes('Checker'.toLowerCase()) && getGRNStatus.Status==0 && getGRNStatus.Iscancel!=true"
+                              ngbDropdownItem (click)="modal.close('by: close icon')"
+                              (click)="openBasicModal(GRN);Changestaus(getGRNStatus.Guid,'Checker')">
+                              <span class="feather icon-check-square"></span> Mark as
+                              Checked</button>
+                          </div>
+                          <div>
+                            <button class="border-bottom" ngbDropdownItem
+                              *ngIf="roles.toLowerCase().includes('Approval'.toLowerCase()) && getGRNStatus.Status==1 && getGRNStatus.Iscancel!=true"
+                              (click)="modal.close('by: close icon')"
+                              (click)="openBasicModal(GRN);Changestaus(getGRNStatus.Guid,'Aproved')">
+                              <span class="feather icon-thumbs-up"></span> Mark as
+                              Approved</button>
+                          </div>
+                          <button class="border-bottom" ngbDropdownItem
+                            (click)="DownloadPdf(getGRNStatus.Guid,getGRNStatus.Status,'print')"><span
+                              class="feather icon-printer"></span>
+                            Print</button>
+                          <button class="border-bottom" ngbDropdownItem
+                            (click)="DownloadPdf(getGRNStatus.Guid,getGRNStatus.Status,'')"><span
+                              class="feather icon-download"></span>
+                            Download</button>
+                          <button class="border-bottom" ngbDropdownItem (click)="GetPoNumbers(getGRNStatus)">
+                            <span class="feather icon-eye"></span> PO View</button>
+                        </div>
+                      </ng-template>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!--Shimmer UI -->
+            <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="10"></app-shimmers>
+
+          </double-scroll>
+
+
+        </div>
+        <!-- No records found UI -->
+        <ng-container *ngIf="isNoData && !shimmerVisible">
+          <div class="minH-500 d-flex align-items-center justify-content-center">
+            <div class="py-5 text-muted">
+              <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                <i class="feather icon-alert-circle fs-2"></i>
+                <span>No Goods Receipt Notes Found!</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+      <div class="cartd-footer" *ngIf="grnstsatusList.length != 0">
+        <div class="d-flex justify-content-center my-3 pe-3">
+          <!-- <pagination-controls (pageChange)="GetAllData($event)"></pagination-controls> -->
+          <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="totalCount" [pageSize]="itemsPerPage"
+            [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize" [rotate]="false"
+            [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal-->
+<ng-template #xlModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title w-100" id="exampleModalLabel">Goods Receipt Details</h5>
+
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+
+  </div>
+  <div class="container-fluid d-flex justify-content-between mt-4 flex-sm-row flex-column">
+    <div class="col-lg-5 ps-0">
+      <p class="mt-1 mb-1"><span class="fw-bold">Purchase Order No</span>:{{satusList[0]?.PurchaseOrderNo }}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Ledger Transaction No</span>: {{satusList[0]?.LedgerTransactionNo}}
+      </p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Invoice No</span>:{{satusList[0]?.InvoiceNo}}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Challan No</span>:
+        {{satusList[0]?.ChalanNo==""||null?'N/A':satusList[0]?.ChalanNo }}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Supplier Name</span>:{{satusList[0]?.SupplierName }}</p>
+    </div>
+    <div class="col-lg-4 pe-0 text-sm-end">
+      <p class="mt-1 mb-1"><span class="fw-bold">Gross Amount </span>: <span
+          class="rupee">&#8377;</span>{{satusList[0]?.GrossAmount}}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Freight Amount </span>: <span
+          class="rupee">&#8377;</span>{{satusList[0]?.Freight==null?'0':satusList[0]?.Freight}}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">Octori Amount </span>: <span
+          class="rupee">&#8377;</span>{{satusList[0]?.Octori==null?'0':satusList[0]?.Octori}}</p>
+      <p class="mt-1 mb-1"><span class="fw-bold">RoundOff Amount </span>: <span
+          class="rupee">&#8377;</span>{{satusList[0]?.RoundOff==null?'0':satusList[0]?.RoundOff}}</p>
+      <p class="mb-1"><span class="fw-bold">Discount Amount</span>: <span
+          class="rupee">&#8377;</span>{{satusList[0]?.DiscountOnTotal}} </p>
+      <p class="mb-1"><span class="fw-bold">Tax Amount </span>: <span
+          class="rupee">&#8377;</span>{{totalTaxAmount | exactNumbers}}</p>
+      <p class="mb-1"><span class="fw-bold">NET Amount </span>:<span class="rupee">&#8377;</span>
+        {{satusList[0]?.NetAmount | exactNumbers}}</p>
+      <!-- <p class="mb-1"><span class="fw-bold">STATUS:</span></p> -->
+    </div>
+  </div>
+  <hr class="my-2" *ngIf="GrnViewDetails?.CheckedReason || GrnViewDetails?.ApproveReason"/>
+  <div class="container" *ngIf="GrnViewDetails?.CheckedReason || GrnViewDetails?.ApproveReason || GrnViewDetails?.UnpostReason">
+    <div class="col-sm-12"><span class="fw-bold"><u>Reason</u> :</span></div>
+    <div class="col-sm-12" *ngIf="GrnViewDetails?.CheckedReason">
+      <span class="fw-bold">Checked by and reason:</span>
+      <span>{{satusList[0]?.ChekedByName}}</span> 
+      <span title="{{GrnViewDetails?.CheckedReason}}">
+        ({{ GrnViewDetails?.CheckedReason.length > 50 
+            ? (GrnViewDetails?.CheckedReason | slice:0:50) + '...' 
+            : GrnViewDetails?.CheckedReason 
+        }})
+      </span>
+    </div>
+    <div class="col-sm-12" *ngIf="GrnViewDetails?.ApproveReason">
+      <span class="fw-bold">Approved by and reason:</span>
+      <span>{{satusList[0]?.AprovedByName}}</span>
+      <span title="{{GrnViewDetails?.ApproveReason}}">
+        ({{ GrnViewDetails?.ApproveReason.length > 50 
+            ? (GrnViewDetails?.ApproveReason | slice:0:50) + '...' 
+            : GrnViewDetails?.ApproveReason
+        }})
+      </span>
+    </div>  
+    <div class="col-sm-12" *ngIf="GrnViewDetails?.UnpostReason">
+      <span class="fw-bold">Posted by and reason:</span>
+      <span>{{satusList[0]?.PostedByName}} </span> 
+      <span title="{{GrnViewDetails?.UnpostReason}}">
+        ({{ GrnViewDetails?.UnpostReason.length > 50 
+            ? (GrnViewDetails?.UnpostReason | slice:0:50) + '...' 
+            : GrnViewDetails?.UnpostReason
+        }})
+      </span>
+  </div>
+   </div>
+  <hr class="my-2" />
+  <div class="modal-body">
+    <double-scroll>
+      <!-- <div class="table-responsive pt-3"> -->
+      <table class="table table-bordered pt-3">
+        <thead>
+          <tr>
+            <th class="freeze-col">Item Name</th>
+            <th>Vendor Item Name</th>
+            <th>Item Code</th>
+            <th>HSN Code</th>
+            <th>Catalog No</th>
+            <th>Converter</th>
+            <th>Barcode</th>
+            <th>Batch No</th>
+            <th>Expiry On</th>
+            <th>Item Rate <span class="rupee">&#8377;</span></th>
+            <th>Paid QTY</th>
+            <th>Discount %</th>
+            <th>SGST %</th>
+            <th>CGST %</th>
+            <!-- <th>UTGST %</th> -->
+            <th>IGST %</th>
+            <th>Buy Price <span class="rupee">&#8377;</span></th>
+            <!-- <th>SGST Price</th>
+            <th>CGST Price</th>
+            <th>Total Price</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of viewitemDetails">
+            <td class="freeze-col">{{item.ItemName}}</td>
+            <td>{{item.VendorItemName?item.VendorItemName:'N/A'}}</td>
+            <td>{{item.ItemCode!=''?item.ItemCode:'N/A'}}</td>
+            <td>{{item.HsnCode?item.HsnCode:'N/A'}}</td>
+            <td>{{item.CatalogNo?item.CatalogNo:'N/A'}}</td>
+            <td>{{item.Converter}}</td>
+            <td>{{item.BarcodeNo?item.BarcodeNo:'N/A'}}</td>
+            <td>{{item.BatchNumber}}</td>
+            <td>{{item.ExpiryDate==='0001-01-01T00:00:00'|| item.ExpiryDate===null?'N/A':item.ExpiryDate
+              |date:'dd-MM-yyyy'}}</td>
+            <td>{{item.Rate | exactNumbers}}</td>
+            <td>{{item.ReleasedCount}}</td>
+            <td>{{item.DiscountPer}}</td>
+            <td>{{item.SGSTPer}}</td>
+            <td>{{item.CGSTPer}}</td>
+            <!-- <td>{{item.UTGSTPer}}</td> -->
+            <td>{{item.IGSTPer}}</td>
+            <td>{{item.UnitPrice | exactNumbers}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- </div> -->
+    </double-scroll>
+    
+  </div>
+  <div class="card" *ngIf="invoiceDocuments.length>0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table bg-white">
+                <thead>
+                    <tr>
+                        <th>Invoice name</th>
+                        <th >Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let documents of invoiceDocuments">
+                      <td>{{documents.FileName}}
+                      <td >
+                        <button class="btn btn-outline-primary btn-xs me-1"
+                            (click)="openBasicModal(previewItem);PreviewInvoice(documents?.FilePath)"><span
+                                class="feather icon-eye"></span> View
+                        </button>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+  <div class="modal-footer justify-content-center">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Basic mixed styles example">
+      <button type="button" class="btn btn-outline-secondary" [routerLink]="['/grn/grn-against-po',invoiceGuid]"
+        (click)="modal.close('by: close icon')" *ngIf="GrnViewDetails.Iscancel!=true && GrnViewDetails.IsPost!=true && roles.toLowerCase().includes('Maker'.toLowerCase())">
+        <span class="feather icon-edit"></span> Edit
+      </button>
+
+      <button type="button" class="btn btn-outline-secondary"
+        *ngIf="roles.toLowerCase().includes('Cancel'.toLowerCase()) && GrnViewDetails.Iscancel!=true && GrnViewDetails.IsPost!=true"
+        (click)="modal.close('by: close icon')" (click)="openBasicModal(CancelGRN)">
+        <span class="feather icon-x"></span> Cancel</button>
+
+      <button type="button" class="btn btn-outline-secondary"
+        *ngIf="roles.toLowerCase().includes('Checker'.toLowerCase()) && GrnViewDetails.Status==0 && GrnViewDetails.Iscancel!=true"
+        (click)="openBasicModal(GRN);Changestaus(GrnViewDetails.Guid,'Checker')"
+        (click)="modal.close('by: close icon')"><span class="feather icon-check-square"></span> Mark as Checked
+      </button>
+
+      <button type="button" class="btn btn-outline-secondary"
+        *ngIf="roles.toLowerCase().includes('Approval'.toLowerCase()) && GrnViewDetails.Status==1 && GrnViewDetails.Iscancel!=true"
+        (click)="modal.close('by: close icon')"
+        (click)="openBasicModal(GRN);Changestaus(GrnViewDetails.Guid,'Aproved')"><span
+          class="feather icon-check-square"></span> Mark as Approved</button>
+
+      <button type="button" class="btn btn-outline-secondary"
+        *ngIf="roles.toLowerCase().includes('post'.toLowerCase()) && GrnViewDetails.Iscancel!=true && GrnViewDetails.IsPost!=true && GrnViewDetails.Status==2"
+        (click)="modal.close('by: close icon')" (click)="openBasicModal(PostGRN);"><span
+          class="feather icon-file-text"></span> Post</button>
+
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.close('by: close icon')"
+        (click)="DownloadPdf('',GrnViewDetails.Status,'print')"><span class="feather icon-printer"></span>
+        Print</button>
+
+      <button type="button" class="btn btn-secondary" (click)="modal.close('by: close icon')"
+        (click)="DownloadPdf('',GrnViewDetails.Status,'')"><span class="feather icon-download"></span> Download</button>
+    </div>
+    <!-- <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button> -->
+  </div>
+</ng-template>
+<!-- Modal -->
+<ng-template #CancelGRN let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Cancel goods receipt note</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="mb-3">
+          <label for="itemName" class="form-label">Are you sure do you want to cancel
+            <strong>{{GRNnumber}}</strong> GRN?</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+      No
+    </button>
+    <button type="button" class="btn btn-primary submit"
+      (click)="modal.close('by: close icon');UpdateGRNCancel()">Yes</button>
+  </div>
+</ng-template>
+<!-- Modal -->
+<ng-template #PostGRN let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Post goods receipt note</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason='';UserGuid=LoggedInUserGuid" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="mb-3">
+          <label for="itemName" class="form-label">Are you sure do you want to Post
+            <strong>{{GRNnumber}}</strong> GRN?</label>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="mb-22">
+          <label for="reason" class="form-label">Reason:</label>
+          <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+        </div>
+        <div class="col-sm-12">
+          <div class="mb-3">
+              <label for="UserName" class="form-label">Users</label>
+              <ng-select [items]="userList" bindLabel="UserName" bindValue="UserGuid" 
+                placeholder="Search by user name" (change)="onUserGuidChange($event)"
+                [(ngModel)]="UserGuid" [notFoundText]="'No users found!'"
+                class="ng-select-custom-250min" [inputAttrs]="{ maxlength:'50' }" [disabled]="false">
+              </ng-select>
+          </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');reason='';UserGuid=LoggedInUserGuid">
+      No
+    </button>
+    <button type="button" class="btn btn-primary submit"
+      (click)="modal.close('by: close icon');UpdateGRNPostStatus();reason='';">Yes</button>
+  </div>
+</ng-template>
+<ng-template #GRN let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Remarks</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon');reason='';UserGuid=LoggedInUserGuid" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="mb-22">
+          <label for="reason" class="form-label">Reason:</label>
+          <input type="text" class="form-control" id="reason" name="reason" [(ngModel)]="reason">
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="mb-3">
+            <label for="UserName" class="form-label">Users</label>
+            <ng-select [items]="userList" bindLabel="UserName" bindValue="UserGuid" 
+              placeholder="Search by user name" (change)="onUserGuidChange($event)"
+              [(ngModel)]="UserGuid" [notFoundText]="'No users found!'"
+              class="ng-select-custom-250min" [inputAttrs]="{ maxlength:'50' }" [disabled]="false">
+            </ng-select>
+        </div>
+    </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');reason='';UserGuid=LoggedInUserGuid">
+      No
+    </button>
+    <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon');"
+      (click)="UpdateStatus()">
+      Yes
+    </button>
+
+  </div>
+</ng-template>
+<ng-template #previewItem let-modal>
+  <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Preview invoice</h5>
+      <button type="button" class="btn-close" (click)="modal.close('by: close icon');" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+      <div class="widget-content">
+          <div class="default-form">
+              <div class="row form">
+                  <ngx-doc-viewer [url]="Document" viewer="url" style="width:100%;height:75vh;">
+                      <div>Loading</div>
+                  </ngx-doc-viewer>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <!-- <div class="col-sm-12">
+              <div>Preview will displayed here...</div>
+           </div> -->
+      </div>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+  </div>
+</ng-template>

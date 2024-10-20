@@ -1,0 +1,212 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <!-- <li class="breadcrumb-item"><a routerLink="/reports">Reports</a></li> -->
+        <li class="breadcrumb-item active" aria-current="page">PO Report</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Location Details</h6>
+                <div class="row" *ngIf="!shimmerVisible">
+                    <!-- <div class="col-sm-4">
+                            <div class=" mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex">PO
+                                    Type </label>
+                                <select class="form-select" id="purchasedUnit" [(ngModel)]="POType"
+                                    [ngModelOptions]="{standalone: true}" (change)="OnSelectPOType()" #name="ngModel">
+                                    <option selected disabled value=''>Select PO type</option>
+                                    <option value="DirectPO">Direct PO</option>
+                                    <option value="POFromPI">PO from PI</option>
+                                </select>
+                            </div>
+                        </div> -->
+
+
+                    <!--div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="purchasedUnit" class="form-label d-flex justify-content-between">Report Type
+                                    In Excel</label>
+                                <select class="form-select" id="purchasedUnit">
+                                    <option selected disabled>Select report type</option>
+                                    <option value="1">Unit 1</option>
+                                    <option value="2">Unit 2</option>
+                                    <option value="3">Unit 3</option>
+                                </select>
+                            </div>
+                        </div>-->
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+
+                        <div class="mb-3">
+                            <div class="mb-3">
+                                <label class="form-label">Supplier</label>
+                                <ng-select [items]="suppliersList" [closeOnSelect]="true" [searchable]="true"
+                                    [notFoundText]="'No supplier found'" bindLabel="SupplierName"
+                                    bindValue="SupplierGuid" placeholder="Select supplier name"
+                                    [formControl]="clearControls" (change)="ChangeLocation($event,'supplier')">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                        <div class="mb-3">
+                            <label for="purchasedUnit" class="form-label d-flex justify-content-between">Center</label>
+                            <ng-select [items]="CenterTypeList" bindLabel="CenterName" bindValue="CenterGuid"
+                                [notFoundText]="'No center found!'" placeholder="Select Center"
+                                (change)="ChangeLocation($event,'')" [formControl]="clearCenterControl">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                        <div class="mb-3">
+                            <label for="purchasedUnit"
+                                class="form-label d-flex justify-content-between">Location</label>
+                            <ng-select [items]="locationtypelist" bindLabel="CenterLocationName"
+                                bindValue="CenterLocationGuid" [notFoundText]="'No location found!'"
+                                placeholder="Select Location" (change)="ChangeLocation($event,'')" (clear)="Onremove()"
+                                [formControl]="clearControl">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                        <div class="mb-3">
+                            <label for="itemExpiryDate" class="form-label d-flex">From Date <span
+                                    [ngClass]="{'text-danger':FromDate==''}">&nbsp;*</span>
+                            </label>
+                            <div class="input-group">
+                                <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                    [formControl]="ClearDateControl" (dateSelect)="SelectFromDate($event)" ngbDatepicker
+                                    #d="ngbDatepicker" [maxDate]="calender.getToday()">
+                                <button class="input-group-text" type="button" (click)="d.toggle()">
+                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+                        <div class="mb-3">
+                            <label for="itemExpiryDate" class="form-label d-flex">To Date <span
+                                    [ngClass]="{'text-danger':ToDate==''}">&nbsp;*</span>
+                            </label>
+                            <div class="input-group">
+                                <input class="form-control" placeholder="dd-mm-yyyy" name="dp" readonly
+                                    [formControl]="cleardateControl" ngbDatepicker #d2="ngbDatepicker"
+                                    [minDate]="selectfromDate" (dateSelect)="OnSelectToDate($event)"
+                                    [maxDate]="calender.getToday()">
+                                <button class="input-group-text" type="button" (click)="FromDate?d2.toggle():''">
+                                    <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-2 text-end">
+                            <button class="btn btn-link btn-sm text-underline p-0" (click)="removeDates()"
+                                *ngIf="FromDate">Clear
+                                filters</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="!shimmerVisible">
+                    <div class="col-sm-12 text-end flex-wrap">
+                        <button type="button" class="btn btn-primary submit me-2 mt-2 mt-sm-0"
+                            (click)="OnSelectPOType()" [disabled]="isDisable || noDataFound">Get Report Data</button>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+                <ng-template [ngIf]="noDataFound">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                                d="M12.865 3.00017L22.3912 19.5002C22.6674 19.9785 22.5035 20.5901 22.0252 20.8662C21.8732 20.954 21.7008 21.0002 21.5252 21.0002H2.47266C1.92037 21.0002 1.47266 20.5525 1.47266 20.0002C1.47266 19.8246 1.51886 19.6522 1.60663 19.5002L11.1329 3.00017C11.4091 2.52187 12.0206 2.358 12.4989 2.63414C12.651 2.72191 12.7772 2.84815 12.865 3.00017ZM10.9989 16.0002V18.0002H12.9989V16.0002H10.9989ZM10.9989 9.00017V14.0002H12.9989V9.00017H10.9989Z"
+                                fill="rgba(234,59,46,1)"></path>
+                        </svg>
+                        <div>
+                            No records found!
+                        </div>
+                    </div>
+                </ng-template>
+
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-container *ngIf="PODetails?.length != 0">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="card-title">{{ 'PO Report' | uppercase }} </h6>
+                        <div class="row">
+                            <div class="col-sm-12 text-end">
+                                <button type="button" class="btn btn-outline-primary submit me-2 btn-sm mt-sm-0"
+                                    [disabled]="isDisable || noDataFound" (click)="OnSelectPOType('pdf')">Get Report
+                                    PDF</button>
+                                <button type="button" class="btn btn-primary submit btn-sm mt-sm-0"
+                                    [disabled]="isDisable || noDataFound" (click)="OnSelectPOType('xl')">Get Report
+                                    Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 border bg-light">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <double-scroll>
+                                    <div style="max-height: 600px; overflow-y: auto;">
+                                        <div class="table-responsive table bg-white"
+                                            style="position: sticky; top: 0; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);z-index: 12;">
+                                            <ngx-datatable [scrollbarH]="true" #table class="bootstrap"
+                                                [rows]="PODetails" [loadingIndicator]="loadingIndicator"
+                                                [columnMode]="ColumnMode.force" rowHeight="auto">
+                                                <ngx-datatable-column [width]="50" name="s.No">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+                                                        <span>{{ rowIndex + 1 }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Deliverlocation"
+                                                    prop="Location"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="CreatedBy"
+                                                    prop="CreatedBy"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="PurchaseOrderNO"
+                                                    prop="PurchaseOrderNo"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="SupplierName"
+                                                    prop="VendorName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="IndentNo"
+                                                    prop="IndentNo"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="GrossTotal"
+                                                    prop="GrossTotal">
+                                                    <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                                                        <span>{{ row.GrossTotal  | number:'1.2-2' }}</span>
+                                                    </ng-template>
+                                                </ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="TotalDis"
+                                                    prop="DiscountOnTotal"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="TotalTax"
+                                                    prop="TaxAmount"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="NetTotal"
+                                                    prop="NetTotal"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="POType"
+                                                    prop="POType"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="CheckedDate"
+                                                    prop="CheckedDate"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="CheckedBy"
+                                                    prop="CheckedByName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="ApprovedDate"
+                                                    prop="ApprovedDate"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="ApprovedBy"
+                                                    prop="AppprovedByName"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="Created On"
+                                                    prop="CreatedDt"></ngx-datatable-column>
+                                                <ngx-datatable-column [width]="120" name="TotalItems"
+                                                    prop="ItemsCount"></ngx-datatable-column>
+                                            </ngx-datatable>
+                                        </div>
+                                    </div>
+                                </double-scroll>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="card-footer">
+            </div>

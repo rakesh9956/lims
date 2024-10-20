@@ -1,0 +1,1109 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/stores">Locations</a></li>
+        <li class="breadcrumb-item"><a routerLink="/stores/centers">Center</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{this.locGuid!=null && this.addNewCentre==null? 'Edit center':'Add center'}}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Center details</h6>
+                <form [formGroup]="centreForm" *ngIf="!shimmerVisible">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemType" class="form-label">Center type <span [ngClass]="{'text-danger': CentreTypeGuid.length == '' }">*</span></label>
+                                <ng-select [items]="lstPanelCentreType" [closeOnSelect]="true" [searchable]="true"
+                                [ngClass]="{'is-invalid': centreForm.get('CentreTypeGuid')?.hasError('required') && centreForm.get('CentreTypeGuid')?.touched}"                               
+                                bindValue="CentreTypeGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="CentreType"
+                                placeholder="Processing lab type" formControlName="CentreTypeGuid"
+                                (change)="getType()">
+                     </ng-select>
+                     
+                                <!-- <select class="form-select" formControlName="CentreTypeGuid" id="itemType" (change)="getType()" required
+                                >
+                                    <option value="" selected disabled>Processing lab type</option>
+                                    <option *ngFor="let lpct of lstPanelCentreType" value="{{lpct.CentreTypeGuid}}">{{lpct.CentreType}}</option>                                    
+                                </select> -->
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('CentreTypeGuid')?.hasError('required') && centreForm.get('CentreTypeGuid')?.touched">
+                              Center type is required!
+                          </span>   
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Type <span [ngClass]="{'text-danger': centreTypeGuid.length == ''}">*</span></label>
+                                <ng-select [items]="types" [closeOnSelect]="true" [searchable]="true"  
+                                [ngClass]="{'is-invalid': centreForm.get('centreTypeGuid')?.hasError('required') && centreForm.get('centreTypeGuid')?.touched}"                              
+                                bindValue="CentreTypeGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="category"
+                                placeholder="Type" formControlName="centreTypeGuid" >
+                            </ng-select>
+                                <!-- <select class="form-select" formControlName="Category" required
+                                [ngClass]="(centreForm.get('Category')?.hasError('required')) && centreForm.get('Category')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Type</option>
+                                    <option *ngFor="let t of types" value="{{t.category}}">{{t.category}}</option>
+                                    <option>CC</option>
+                                </select> -->
+                                <span class="text-danger position-absolute"
+                                *ngIf="centreForm.get('centreTypeGuid')?.hasError('required') && centreForm.get('centreTypeGuid')?.touched">
+                                Type is required!
+                            </span>   
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3" >
+                                <label class="form-label" >Patient type <span [ngClass]="{'text-danger': PatientType.length == ''}">*</span></label>
+                                <select class="form-select" formControlName="PatientType" [attr.disabled]="isDisabled ? '' : null"  required
+                                [ngClass]="(centreForm.get('PatientType')?.hasError('required')) && centreForm.get('PatientType')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Patient type</option>
+                                    <option  *ngFor="let lp of lisPanel" value="{{lp.PanelGroupGuid}}">{{lp.PanelGroup}}</option>                                
+                                </select>
+                                <span class="text-danger position-absolute"
+                                *ngIf="centreForm.get('PatientType')?.hasError('required') && centreForm.get('PatientType')?.touched?'is-invalid' : ''">
+                                Patient type is required!
+                            </span>  
+                            </div>
+                        </div> -->
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Center name <span [ngClass]="{'text-danger': CenterName.length == ''}">*</span></label>
+                                <input type="text" class="form-control" maxlength="60" formControlName="CenterName" placeholder="Enter center name" required
+                                [ngClass]="(centreForm.get('CenterName')?.hasError('required')) && centreForm.get('CenterName')?.touched? 'is-invalid' : ''"
+                                on-focusout="centerDuplicateCheck($event)" [readOnly]="this.locCentre != null && this.addNewCentre == null">
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('CenterName')?.hasError('required') && centreForm.get('CenterName')?.touched">
+                              Center name is required!
+                          </span>   
+                          <span class="text-danger position-absolute"
+                              *ngIf="centreForm.value.CenterName && centerExists">
+                              Center already exists!
+                          </span> 
+                            </div>                            
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Center code </label>
+                                <input type="text" class="form-control" formControlName="CenterCode" placeholder="Enter center code">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">UHID Abb. code </label>
+                                <input type="text" class="form-control" formControlName="UHIDAbbCode" placeholder="Enter Uhid abb code">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+                    <h6 class="card-title">Address details</h6>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">Address <span [ngClass]="{'text-danger': Address.length == '' }">*</span></label>
+                                <input type="text" id="manufacturerConverter" class="form-control" placeholder="Enter location" required
+                                formControlName="Address" maxlength="160" [ngClass]="(centreForm.get('Address')?.hasError('required')) && centreForm.get('Address')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                                *ngIf="centreForm.get('Address')?.hasError('required') && centreForm.get('Address')?.touched">
+                                Address is required!
+                            </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Country <span [ngClass]="{'text-danger': Country.length == ''}">*</span></label>
+                                <select class="form-select" formControlName="Country" required 
+                                [ngClass]="(centreForm.get('Country')?.hasError('required')) && centreForm.get('Country')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select country</option>
+                                    <option value="{{lstPanelCountry.Country}}">{{lstPanelCountry.Country}}</option>
+                                    <!-- <option value="3">UK</option> -->
+                                </select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('Country')?.hasError('required') && centreForm.get('Country')?.touched">
+                              Country name is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3"> 
+                                <label class="form-label">Business zone <span [ngClass]="{'text-danger': BusinessZoneGuid.length == ''}">*</span></label>
+                                <select class="form-select" formControlName="BusinessZoneGuid" (change)="getBusinessGuid('change')"  required
+                                [ngClass]="(centreForm.get('BusinessZoneGuid')?.hasError('required')) && centreForm.get('BusinessZoneGuid')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select zone</option>
+                                    <option *ngFor="let lpb of lstPanelBusinesszone" value="{{lpb.BusinesszoneGuid}}">{{lpb.BusinessZoneName}}</option>
+                                    <!-- <option value="3">NORTH</option>
+                                    <option value="4">SOUTH</option> -->
+                                </select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('BusinessZoneGuid')?.hasError('required') && centreForm.get('BusinessZoneGuid')?.touched">
+                              Business zone is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">State <span [ngClass]="{'text-danger': StateGuid.length== ''}">*</span></label>
+                                <!-- <span>State</span><span
+                                [ngClass]="{'text-danger': !centreForm.value.StateGuid}"
+                                class="ms-1">*</span> -->
+                                <!-- <select class="form-select" formControlName="StateGuid" (change)="getStateGuid()" required
+                                [ngClass]="(centreForm.get('StateGuid')?.hasError('required')) && centreForm.get('StateGuid')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled >Select state</option>
+                                    <option *ngFor="let lps of stateLoc" value="{{lps.StateGuid}}">{{lps.State}}</option>
+                                </select> -->
+                                <ng-select [items]="lstPanelState" [closeOnSelect]="true" [searchable]="true"  
+                                [ngClass]="{'is-invalid':centreForm.get('StateGuid')?.hasError('required') && centreForm.get('StateGuid')?.touched}"                             
+                                bindValue="StateGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="State"
+                                placeholder="Select state" formControlName="StateGuid" required
+                                (change)="getStateGuid()" >
+                            </ng-select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('StateGuid')?.hasError('required') && centreForm.get('StateGuid')?.touched">
+                             State is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">City <span [ngClass]="{'text-danger':CityGuid.length == ''}">*</span></label>
+                                <!-- <span>City</span><span
+                                [ngClass]="{'text-danger': !centreForm.value.CityGuid}"
+                                class="ms-1">*</span> -->
+                                <!-- <select class="form-select" formControlName="CityGuid" (change)="getCityGuid()" required
+                                [ngClass]="(centreForm.get('CityGuid')?.hasError('required')) && centreForm.get('CityGuid')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select city</option>
+                                    <option *ngFor="let lpc of stateCitys" value="{{lpc.CityGuid}}">{{lpc.City}}</option>
+                                </select> -->
+                                <ng-select [items]="lstPanelCity" [closeOnSelect]="true" [searchable]="true" 
+                                [ngClass]="{'is-invalid':centreForm.get('CityGuid')?.hasError('required') && centreForm.get('CityGuid')?.touched}"                               
+                                bindValue="CityGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="City"
+                                placeholder="Select city" formControlName="CityGuid" required
+                                (change)="getCityGuid()">
+                            </ng-select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('CityGuid')?.hasError('required') && centreForm.get('CityGuid')?.touched">
+                              City is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Select city zone <span [ngClass]="{'text-danger': ZoneGuid.length == ''}">*</span></label>
+                                <!-- <span>Select city zone</span><span
+                                [ngClass]="{'text-danger': !centreForm.value.ZoneGuid}"
+                                class="ms-1">*</span> -->
+                                <!-- <select class="form-select" formControlName="ZoneGuid" (change)="getLocationGuid()" required
+                                [ngClass]="(centreForm.get('ZoneGuid')?.hasError('required')) && centreForm.get('ZoneGuid')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select city zone</option>
+                                    <option *ngFor="let lpz of cityLocations" value="{{lpz.ZoneGuid}}">{{lpz.Zone}}</option>
+                                </select> -->
+                                <ng-select [items]="lstPanelzone" [closeOnSelect]="true" [searchable]="true"
+                                [ngClass]="{'is-invalid':centreForm.get('ZoneGuid')?.hasError('required') && centreForm.get('ZoneGuid')?.touched}"                                
+                                bindValue="ZoneGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="Zone"
+                                placeholder="Select city zone" formControlName="ZoneGuid" required
+                                (change)="getLocationGuid()">
+                            </ng-select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('ZoneGuid')?.hasError('required') && centreForm.get('ZoneGuid')?.touched">
+                              Zone is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Select locality </label>
+                                <!-- <select class="form-select" formControlName="LocalityGuid">
+                                    <option value="" selected disabled>Select locality</option>
+                                    <option *ngFor="let lpl of locLocations" value="{{lpl.LocalityGuid}}">{{lpl.LocalityName}}</option>
+                                </select> -->
+                                <ng-select [items]="lstPanelLocality" [closeOnSelect]="true" [searchable]="true"
+                                [ngClass]="{'is-invalid':centreForm.get('LocalityGuid')?.hasError('required') && centreForm.get('LocalityGuid')?.touched}"                                
+                                bindValue="LocalityGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="LocalityName"
+                                placeholder="Select locality" formControlName="LocalityGuid" 
+                                (change)="getLocalityGuid($event)">
+                            </ng-select>
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('LocalityGuid')?.hasError('required') && centreForm.get('LocalityGuid')?.touched">
+                              Locality is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Landline No.</label>
+                                <input type="text" class="form-control" [maxlength]="11" formControlName="LandlineNo" placeholder="Landline no."
+                                (input)="phoneNoValidator($event)">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile No. <span [ngClass]="{'text-danger': MobileNo.length == ''}">*</span></label>
+                                <input type="text" class="form-control" maxlength="10" formControlName="MobileNo" placeholder="Mobile no." required (keypress)="phoneNoValidator($event)"
+                                [ngClass]="(centreForm.get('MobileNo')?.hasError('required')) && centreForm.get('MobileNo')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                              *ngIf="(centreForm.get('MobileNo')?.hasError('required')) && centreForm.get('MobileNo')?.touched">
+                              Mobile no. is required!
+                          </span> 
+                          <span class="text-danger position-absolute"
+                              *ngIf="MobileNo.length <=9 && MobileNo.length !=''">
+                               Please enter valid mobile number!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Email <span [ngClass]="{'text-danger': Email.length == ''}">*</span></label>
+                                <input type="text" class="form-control" formControlName="Email" placeholder="Email" required [maxlength]="50" 
+                                [ngClass]="(centreForm.get('Email')?.hasError('required')) && centreForm.get('Email')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                              *ngIf="(centreForm.get('Email')?.hasError('required')) && centreForm.get('Email')?.touched">
+                              Email is required!
+                          </span>
+                          <span class="text-danger position-absolute"
+                              *ngIf="Email.length <=9 && Email.length !=''">
+                              Enter valid email!
+                          </span>  
+                          <span class="text-danger position-absolute" 
+                                 *ngIf="centreForm.value.Email.length!='' && c.Email.errors">
+                                    Enter valid email
+                                </span>  
+                            </div>
+                        </div> -->
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                            <div class="mb-3">
+                                <label for="itemCode" class="form-label">Email<span [ngClass]="{'text-danger': !Email}">
+                                        *</span></label>
+                                <input type="text" id="itemCode" class="form-control" placeholder="Enter Email"
+                                    (keyup)="EmailKeyup($event)" formControlName="Email" required maxlength="40"
+                                    on-focusout="focusOutFunction();defaultEmail($event);"
+                                    [ngClass]="centreForm.get('Email')?.hasError('required') && centreForm.get('Email')?.touched? 'is-invalid' : ''">
+                               
+                                <ng-container
+                                    *ngIf="centreForm.get('Email')?.hasError('required') && centreForm.get('Email')?.touched">
+                                    <span class="text-danger mt-4px d-block">Email is required!</span>
+                                </ng-container>
+                               
+                                <ng-container
+                                    *ngIf="(!centreForm.get('Email')?.hasError('required'))  && centreForm.get('Email')?.invalid &&(centreForm.get('Email') || centreForm.get('Email')?.dirty);">
+                                    <span class="text-danger mt-4px d-block">Enter a valid email!</span>
+                                </ng-container>
+                                <ng-container *ngIf="centreForm.value.Email && DuplicateCheck">
+                                    <span class="form-error-message"
+                                        [ngClass]="{'text-success': EmailValid, 'text-danger': !EmailValid}">
+                                        {{EmailResponse}}
+                                    </span>
+                                </ng-container>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+                    <h6 class="card-title">Contact person details</h6>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Name  <span [ngClass]="{'text-danger': ContactPerson.length == ''}">*</span></label>
+                                <input type="text" class="form-control" formControlName="ContactPerson" placeholder="person name" required [maxlength]="50" 
+                                [ngClass]="(centreForm.get('ContactPerson')?.hasError('required')) && centreForm.get('ContactPerson')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('ContactPerson')?.hasError('required') && centreForm.get('ContactPerson')?.touched">
+                             Name is required!
+                          </span>  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile <span [ngClass]="{'text-danger': ContactPersonMobile.length == ''}">*</span></label>
+                                <input type="text" class="form-control" maxlength="10" formControlName="ContactPersonMobile" placeholder="Contact person mobile no." required (keypress)="phoneNoValidator($event)"
+                                [ngClass]="(centreForm.get('ContactPersonMobile')?.hasError('required')) && centreForm.get('ContactPersonMobile')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                              *ngIf="centreForm.get('ContactPersonMobile')?.hasError('required') && centreForm.get('ContactPersonMobile')?.touched">
+                               Mobile no. is required!
+                          </span>  
+                          <span class="text-danger position-absolute"
+                              *ngIf="ContactPersonMobile.length <=9 && ContactPersonMobile.length !=''">
+                               Please enter valid mobile number!
+                          </span> 
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Email </label>
+                                <input type="text" class="form-control" formControlName="ContactPersonEmail" placeholder="Contact person email" [maxlength]="50">
+                                <span class="text-danger position-absolute" 
+                          *ngIf="centreForm.value.ContactPersonEmail!='' && c.ContactPersonEmail.errors">
+                         Enter valid email!
+                      </span>  
+                        <!-- <span class="text-danger position-absolute" 
+                            *ngIf="Email.length <=9 && Email.length !=''">
+                           Enter valid email!
+                        </span>   -->
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Designation </label>
+                                <!-- <select class="form-select" formControlName="Designation" required 
+                                [ngClass]="(centreForm.get('Designation')?.hasError('required')) && centreForm.get('Designation')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select Designation</option>
+                                    <option value="{{dg.DesignationGuid}}" *ngFor="let dg of lstDesignation">{{dg.DesignationName}}</option>
+                                </select> -->
+                                <ng-select [items]="lstDesignation" [closeOnSelect]="true" [searchable]="true"
+                                bindValue="DesignationGuid" [inputAttrs]="{maxlength: '48'}" bindLabel="DesignationName"
+                                placeholder="Select designation" formControlName="Designation" >
+                            </ng-select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Owner Name</label>
+                                <input type="text" class="form-control" formControlName="OwnerName" placeholder="Owner name" [maxlength]="50" > 
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Pan card no </label>
+                                <input type="text" class="form-control" formControlName="PanCardNo" placeholder="Pancard no."  maxlength="10">
+                                <span class="text-danger position-absolute" 
+                          *ngIf="centreForm.value.PanCardNo!='' && c.PanCardNo.errors">
+                         Enter valid pan card no!
+                      </span> 
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Name on pan card </label>
+                                <input type="text" class="form-control" formControlName="PancardName" placeholder="Pancard name" maxlength="20">  
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <!-- <div class="mb-3">
+                                <label class="form-label">Sales manager</label>
+                                <select class="form-select" formControlName="SalesManager">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div> -->
+                        </div>
+
+                        <div class="col-sm-4">
+                            <!-- <div class="mb-3">
+                                <label class="form-label">Pro master</label>
+                                <select class="form-select" formControlName="ProMaster">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div> -->
+                        </div>
+
+
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+                    <!-- <h6 class="card-title">Type</h6>
+
+                    <div class="row">
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Mode</label>
+                                <select class="form-select" formControlName="PaymentMode">
+                                    <option value="0">Credit</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-8 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder" formControlName="RollingAdvance">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                      Rolling Advance
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Email ID(Invoice)</label>
+                                <input type="text" class="form-control" formControlName="InvoiceEmailID">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Email ID(Report)</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Security Amount Comment</label>
+                                <input type="text" class="form-control" formControlName="SecurityAmountComment">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Min Business Com.</label>
+                                <input type="text" class="form-control" formControlName="MinBusinessCom">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">GST TIN</label>
+                                <input type="text" class="form-control" formControlName="GSTTIN">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice Billing Cycle</label>
+                                <select class="form-select" formControlName="InvoiceBillingCycle">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Bank Name</label>
+                                <select class="form-select" formControlName="BankName">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Account No.</label>
+                                <input type="text" class="form-control" formControlName="AccountNo">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">IFSC Code</label>
+                                <input type="text" class="form-control" formControlName="IFSCCode">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice To</label>
+                                <select class="form-select" formControlName="InvoiceTo">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice Display Name</label>
+                                <input type="text" class="form-control" formControlName="InvoiceDisplayName">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice Display No.</label>
+                                <input type="text" class="form-control" formControlName="InvoiceDisplayNo">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-8">
+                            <div class="mb-3">
+                                <label class="form-label">Invoice Display Address</label>
+                                <input type="text" class="form-control" formGroupName="InvoiceDisplayAddress">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Min Cash Booking(%)</label>
+                                <input type="text" class="form-control" formControlName="MinCashBooking">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tag Processing Lab</label>
+                                <select class="form-select" formControlName="TagProcessingLabGuid">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tag Business Unit</label>
+                                <select class="form-select" formControlName="TagBusinessUnitGuid">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Security Deposit</label>
+                                <input type="text" class="form-control" formControlName="SecurityDeposit">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Intimation Limit</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <select class="form-select" formControlName="IntimationLimit">
+                                            <option value="0">-</option>
+                                            <option value="0">+</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Reporting Limit</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <select class="form-select" formControlName="ReportingLimit">
+                                            <option value="0">-</option>
+                                            <option value="0">+</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Booking Limit</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <select class="form-select" formControlName="BookingLimit">
+                                            <option value="0">-</option>
+                                            <option value="0">+</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="ShowIntimation">
+                                    <label class="form-check-label">
+                                      Show Intimation
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="LockPrinting">
+                                    <label class="form-check-label">
+                                      Lock Printing
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="LockBooking">
+                                    <label class="form-check-label">
+                                      Lock Booking
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Expiry Date</label>
+                                <select class="form-select" formControlName="PaymentExpiryDate">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Bar Code Type <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="BarCodeType">
+                                    <option value="0">Select</option>
+                                    <option value="1">System</option>
+                                    <option value="2">Pre-Printed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Set of Bar Code <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="SetofBarCode">
+                                    <option value="0">Select</option>
+                                    <option value="1">SampleType</option>
+                                    <option value="2">Sequence</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="SampleCollectionOnRegistration">
+                                    <label class="form-check-label">
+                                      Sample Collection On Registration
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="BarcodePrintedCenterVisit">
+                                    <label class="form-check-label">
+                                      Barcode Printed Center Visit
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="BarcodePrintedHomecollectionVisit">
+                                    <label class="form-check-label">
+                                        Barcode Printed Homecollection Visit
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="HideAmountInBooking">
+                                    <label class="form-check-label">
+                                        Hide Amount In Booking
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" formControlName="SampleReCollectAfterReject">
+                                    <label class="form-check-label">
+                                        Show Balance Amount
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked formControlName="HideReceiptRate">
+                                    <label class="form-check-label">
+                                        Hide Receipt Rate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked formControlName="SampleReCollectAfterReject">
+                                    <label class="form-check-label">
+                                        Sample ReCollect After Reject
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked formControlName="AllowDoctorShare">
+                                    <label class="form-check-label">
+                                        Allow Doctor Share
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked formControlName="MRPBill">
+                                    <label class="form-check-label">
+                                        MRPBill
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" >
+                                    <label class="form-check-label">
+                                        Co-Payment Applicable
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" disabled>
+                                    <label class="form-check-label">
+                                        Co-Payment Edit on Registration
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Receipt/TRF/Department Slip</label>
+                                <select class="form-select">
+                                    <option value="0">Select</option>
+                                    <option value="1">All</option>
+                                    <option value="2">TRF</option>
+                                    <option value="2">Receipt</option>
+                                    <option value="3">Department Slip</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input">
+                                    <label class="form-check-label">
+                                        Lab Reference No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked>
+                                    <label class="form-check-label">
+                                        Batch Required
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div>
+
+                    <h6 class="card-title">Rate Type</h6>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">MRP</label>
+                                <select class="form-select">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Patient Net Rate</label>
+                                <select class="form-select">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" checked>
+                                    <label class="form-check-label">
+                                        Logistic Expense
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Logistic Rate</label>
+                                <select class="form-select">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Expense To</label>
+                                <select class="form-select">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Sample Collection Charges</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label class="form-label">Report Delivery Charge</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                    </div> -->
+
+                    <h6 class="card-title">Center login details</h6>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">User name<span
+                                        [ngClass]="{'text-danger': centreForm.get('userName')?.invalid && centreForm.get('userName')?.errors}">
+                                        *</span></label>
+                                <input type="text" id="manufacturerConverter" class="form-control"
+                                    class="form-control pr-35px"   [attr.disabled]="locGuid? '' :null" 
+                                    placeholder="Enter user name" formControlName="userName"  readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                    <label for="manufacturerPackSize" class="form-label">Password <span
+                                        [ngClass]="{'text-danger': !centreForm.value.UserPassword}" value=''>
+                                        *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isPsVisible ? 'text' : 'password'" type="password" (input)="getPassswordValidation($event)"
+                                    id="password" class="form-control pr-40"  minlength="8" maxlength="16"
+                                        class="form-control" placeholder="Enter password" formControlName="UserPassword" required
+                                        [readonly]="this.locGuid!=null && this.addNewCentre==null" 
+                                        [ngClass]="{'is-invalid': (centreForm.get('UserPassword')?.hasError('required') && centreForm.get('UserPassword')?.touched?'is-valid': '')}"> 
+                                        <span class="help-block form-error-message"
+                                            *ngIf="centreForm.get('UserPassword')?.errors"> 
+                                            <span class="text-danger mt-4px d-block"
+                                              *ngIf="centreForm.get('UserPassword')?.hasError('required') && centreForm.get('UserPassword')?.touched">
+                                               password is required!
+                                           </span>  
+                                        </span>                                    
+                                    <div class="invalid-feedback">
+                                    </div>
+                                    <button class="btn password-visibility-icon" type="button"
+                                        (click)="this.locCentre != null && this.addNewCentre == null ?null:togglePsVisibility()">
+                                        <ng-container *ngIf="isPsVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                        <ng-template #isNotVisible>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M17.882 19.297A10.949 10.949 0 0 1 12 21c-5.392 0-9.878-3.88-10.819-9a10.982 10.982 0 0 1 3.34-6.066L1.392 2.808l1.415-1.415 19.799 19.8-1.415 1.414-3.31-3.31zM5.935 7.35A8.965 8.965 0 0 0 3.223 12a9.005 9.005 0 0 0 13.201 5.838l-2.028-2.028A4.5 4.5 0 0 1 8.19 9.604L5.935 7.35zm6.979 6.978l-3.242-3.242a2.5 2.5 0 0 0 3.241 3.241zm7.893 2.264l-1.431-1.43A8.935 8.935 0 0 0 20.777 12 9.005 9.005 0 0 0 9.552 5.338L7.974 3.76C9.221 3.27 10.58 3 12 3c5.392 0 9.878 3.88 10.819 9a10.947 10.947 0 0 1-2.012 4.592zm-9.084-9.084a4.5 4.5 0 0 1 4.769 4.769l-4.77-4.769z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-template>
+                                    </button>
+                                    <div class="pwValidPopover">
+                                        <div class="pwValidPopover_Header">Passwords must be at least eight characters long and
+                                          contain at least one lowercase letter, one uppercase letter, one number, and one special
+                                          character.</div>
+                                        <span></span>
+                                        <div class="pwValidPopover_Body">
+                                          <ul class="pwValidPopover_Body_list">  
+                                                <li
+                                                   [ngClass]="{'active':!c['UserPassword'].hasError('hasSmallCase')&& (c['UserPassword'].dirty||c['UserPassword'].touched)&&c['UserPassword'].value}">
+                                                   <span></span> Lowercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!c['UserPassword'].hasError('hasCapitalCase')&& (c['UserPassword'].dirty||c['UserPassword'].touched)&&c['UserPassword'].value}">
+                                                    <span></span> Uppercase letter
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!c['UserPassword'].hasError('hasNumber')&& (c['UserPassword'].dirty||c['UserPassword'].touched)&& c['UserPassword'].value}">
+                                                    <span></span> Number
+                                                </li>
+                                                <li
+                                                    [ngClass]="{'active':!c['UserPassword'].hasError('hasSpecialCharacter')&& (c['UserPassword'].dirty||c['UserPassword'].touched)&&c['UserPassword'].value}">
+                                                    <span></span> Special character
+                                               </li>
+                                               <li
+                                                   [ngClass]="{'active':!c['UserPassword'].errors?.minlength && (c['UserPassword'].dirty||c['UserPassword'].touched)&&c['UserPassword'].value}">
+                                                   <span></span> # of characters
+                                               </li>
+                                           </ul>
+                                        </div>
+                                    </div>
+                                </div>                            
+                                <div *ngIf="c['UserPassword'].errors?.minlength" class="text-danger mt-4px d-block">
+                                    Password must be at least 8 characters!
+                                </div>
+                                <span class="text-danger mt-4px d-block"
+                                 *ngIf="!centreForm.get('UserPassword')?.hasError('required') && centreForm.get('UserPassword')?.invalid && !c['UserPassword'].errors?.minlength">
+                                  Password is invalid!
+                                </span>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerIssueMulti" class="form-label">Confirm password<span
+                                    [ngClass]="{'text-danger': !centreForm.value.LedgerPassword}" value=''>
+                                    *</span></label>
+                                <div class="password-visibility-block position-relative">
+                                    <input [type]="isCpVisible ? 'text' : 'password'" type="password"
+                                        id="Confirm password" class="form-control pr-40"
+                                        placeholder="Enter confirm password" formControlName="LedgerPassword"
+                                        (input)="onFocusOutEvent($event)" 
+                                        [readonly]="this.locGuid!=null && this.addNewCentre==null"  minlength="8" maxlength="16" 
+                                        [ngClass]="{'is-invalid':c['LedgerPassword'].hasError('notEquivalent') && c['LedgerPassword'].value && c['LedgerPassword'].touched,'is-valid':(!c['LedgerPassword'].errors && c['LedgerPassword'].touched && c['LedgerPassword'].value)}" />   
+                                    <span class="text-danger form-error-message"
+                                      *ngIf="(!c['LedgerPassword'].value && (centreForm.get('LedgerPassword')?.touched || LedgerPassword))">
+                                      Confirm password is required!
+                                    </span>
+                                    <div class="invalid-feedback"
+                                        [ngClass]="{'d-block':c['LedgerPassword'].hasError('notEquivalent')&&(c['LedgerPassword'].touched)&& c['LedgerPassword'].value}">
+                                        Password and confirm password must match!
+                                    </div>
+
+                                    <button class="btn password-visibility-icon" type="button"
+                                        (click)="this.locCentre != null && this.addNewCentre == null ?null:toggleCpVisibility()">
+                                        <ng-container *ngIf="isCpVisible; else isNotVisible">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20"
+                                                height="20">
+                                                <path fill="none" d="M0 0h24v24H0z" />
+                                                <path
+                                                    d="M12 3c5.392 0 9.878 3.88 10.819 9-.94 5.12-5.427 9-10.819 9-5.392 0-9.878-3.88-10.819-9C2.121 6.88 6.608 3 12 3zm0 16a9.005 9.005 0 0 0 8.777-7 9.005 9.005 0 0 0-17.554 0A9.005 9.005 0 0 0 12 19zm0-2.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+                                                    fill="rgba(143,143,143,1)" />
+                                            </svg>
+                                        </ng-container>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" (click)="openXlModal(consumptionUnit)"
+                            [disabled]="!onCentreForm">Reset</button>
+                            <button type="button" class="btn btn-primary submit" (click)="saveNewCentre()"
+                            [disabled]="centreForm.invalid || !onCentreForm">
+                            {{ this.locCentre != null && this.addNewCentre == null ? 'Update' : 'Create' }}
+                          </button>
+                          <!-- [disabled]="centreForm.invalid || (!addNewCentre && centreForm.pristine && !onCentreForm)"> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p>{{this.locGuid!=null && this.addNewCentre==null? 'Do you want to reset edit center details?':'Do you want to reset add center details?'}} </p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="resetCentre();modal.close('by: close icon')">Yes</button>
+    </div>
+</ng-template>

@@ -1,0 +1,88 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Quotations</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Compare Quotations</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>Compare Quotations</div>
+                    <div class="d-flex align-items-center flex-shrink-0">
+                        <!-- <ng-select [items]="itemNames" bindLabel="name" bindValue="id" placeholder="filter by item name"
+                            [(ngModel)]="selectedItemName" class="ng-select-custom">
+                        </ng-select> -->
+                        <input type="text" class="form-control form-select-sm" placeholder="Search" />
+                    </div>
+                </h6>
+                <double-scroll>
+                <!-- <div class="table-responsive w-100"> -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th [width]="50">#</th>
+                                <th [width]="80">Item name</th>
+                                <th [width]="200" class="text-center">Supplier #</th>
+                                <th [width]="200" class="text-center">Supplier #</th>
+                                <th [width]="200" class="text-center">Supplier #</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="text-center">
+                                <td class="text-start">1</td>
+                                <td class="text-start font-weight-semibold">Item 1</td>
+                                <td>₹110</td>
+                                <!-- Conditionally apply the below class, when the price is lowest compared to other suppliers -->
+                                <td class="font-weight-bold text-success">₹55</td>
+                                <td>₹110</td>
+                            </tr>
+                            <tr class="text-center">
+                                <td class="text-start">2</td>
+                                <td class="text-start font-weight-semibold">Item 2</td>
+                                <td>₹150</td>
+                                <!-- Conditionally apply the below class, when the price is lowest compared to other suppliers -->
+                                <td class="font-weight-bold text-success">₹34</td>
+                                <td>₹272</td>
+                            </tr>
+                            <tr class="text-center">
+                                <td class="text-start">3</td>
+                                <td class="text-start font-weight-semibold">Item 3</td>
+                                <!-- Conditionally apply the below class, when the price is lowest compared to other suppliers -->
+                                <td class="font-weight-bold text-success">₹1100</td>
+                                <td>---</td>
+                                <td>₹1500</td>
+                            </tr>
+                            <tr class="text-center">
+                                <td class="text-start">4</td>
+                                <td class="text-start font-weight-semibold">Item 4</td>
+                                <!-- Conditionally apply the below class, when the price is lowest compared to other suppliers -->
+                                <td class="font-weight-bold text-success">₹210</td>
+                                <td>₹300</td>
+                                <td>---</td>
+                            </tr>
+                            <tr class="text-center">
+                                <td colspan="2"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                        routerLink="/purchase-orders/new-purchase-order">Generate PO</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                        routerLink="/purchase-orders/new-purchase-order">Generate PO</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                        routerLink="/purchase-orders/new-purchase-order">Generate PO</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <!-- </div> -->
+                </double-scroll>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,114 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items/item-types">Item Types</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{this.SelectedItemTypeDetails!=null?'Edit item
+            type':'New Item type'}} </li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Item Type</h6>
+                <ng-container *ngIf="!shimmerVisible">
+                    <form [formGroup]="ItemTypeForm">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="mb-3">
+                                    <label for="categoryType" class="form-label">Sub category name <span
+                                            [ngClass]="{'text-danger': !ItemTypeForm.value.SubCategoryTypeGuid}">*</span></label>
+                                    <ng-select [items]="SubCategoryList" [closeOnSelect]="true" [searchable]="true"
+                                        [inputAttrs]="{maxlength: '48'}" [notFoundText]="'No subcategory name found'"
+                                        formControlName="SubCategoryTypeGuid"
+                                        [ngClass]="(ItemTypeForm.get('SubCategoryTypeGuid')?.hasError('required')) && ItemTypeForm.get('SubCategoryTypeGuid')?.touched ? 'is-invalid' : ''"
+                                        bindLabel="SubCategoryTypeName" bindValue="SubCategoryTypeGuid"
+                                        placeholder="Select sub category name">
+                                    </ng-select>
+                                    <ng-container
+                                        *ngIf="ItemTypeForm.get('SubCategoryTypeGuid')?.hasError('required') && ItemTypeForm.get('SubCategoryTypeGuid')?.touched">
+                                        <span class="text-danger mt-4px d-block">Sub category name is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="mb-3">
+                                    <label for="itemMakeModel" class="form-label">Item type name <span
+                                            [ngClass]="{'text-danger': !ItemTypeName}">*</span></label>
+                                    <input type="text" id="itemMakeModel" class="form-control" [maxlength]="50" (input)="GetItemTypes($event)"
+                                        [ngClass]="(ItemTypeForm.get('ItemTypeName')?.hasError('required')) && ItemTypeForm.get('ItemTypeName')?.touched || duplicateItem==true ? 'is-invalid' : ''"
+                                        formControlName="ItemTypeName" placeholder="Enter item type name">
+                                    <ng-container
+                                        *ngIf="ItemTypeForm.get('ItemTypeName')?.hasError('required') && ItemTypeForm.get('ItemTypeName')?.touched">
+                                        <span class="text-danger mt-4px d-block">Item type name is required!</span>
+                                    </ng-container>
+                                    <span class="text-danger mt-4px d-block" *ngIf="duplicateItem==true">
+                                        Item type already exists!
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="mb-3">
+                                    <label for="itemName" class="form-label">Item type code
+                                        <!-- <span [ngClass]="{'text-danger': !ItemTypeForm.value.ItemTypeCode}">*</span> -->
+                                    </label>
+                                    <input type="text" id="itemMakeModel" class="form-control" [maxlength]="50"
+                                        formControlName="ItemTypeCode" placeholder="Enter item type code">
+                                    <!-- <ng-container
+                                        *ngIf="ItemTypeForm.get('ItemTypeCode')?.hasError('required') && ItemTypeForm.get('ItemTypeCode')?.touched">
+                                        <span class="text-danger mt-4px d-block">Item type code is required!</span>
+                                    </ng-container> -->
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="itemDescription" class="form-label">Description <span
+                                            [ngClass]="{'text-danger': !Description}">*</span></label>
+                                    <textarea id="itemDescription" rows="3" placeholder="Enter description" maxlength="150"
+                                        [ngClass]="(ItemTypeForm.get('Description')?.hasError('required')) && ItemTypeForm.get('Description')?.touched ? 'is-invalid' : ''"
+                                        class="form-control" formControlName="Description"></textarea>
+                                    <ng-container
+                                        *ngIf="ItemTypeForm.get('Description')?.hasError('required') && ItemTypeForm.get('Description')?.touched">
+                                        <span class="text-danger mt-4px d-block">Description is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <!-- <div class="col-sm-4 align-items-end">
+                                <label class="form-check-label mb-2" for="itemFIFOorder">
+                                    Status
+                                </label>
+                                <div class="mb-3 d-flex ">
+                                    <div class="form-check me-2 mb-2">
+                                        <input type="checkbox" class="form-check-input" id="itemFIFOorder"
+                                            formControlName="Status">
+                                        <label class="form-check-label" for="itemFIFOorder">
+                                            Active
+                                        </label>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+                    </form>
+                </ng-container>
+                <!--Shimmer UI -->
+                    <app-shimmers *ngIf="shimmerVisible" [type]="'form'"></app-shimmers>
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!FormChanged"
+                            (click)="formReset()">Reset</button>
+                        <button type="reset" class="btn btn-primary submit"
+                            [disabled]="ItemTypeForm.invalid || !FormChanged || duplicateItem"
+                            (click)="SaveItemTypes()">{{SelectedItemTypeDetails !=null?'Update':'Save'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

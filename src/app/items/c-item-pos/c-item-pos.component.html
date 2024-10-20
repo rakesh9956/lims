@@ -1,0 +1,101 @@
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body" *ngIf="itemPurchaseData.length != 0">
+                <double-scroll>
+                    <table class="table">
+                        <thead >
+                            <tr>
+                                <th>Purchase order number</th>
+                                <th>Supplier name</th>
+                                <th>Store name</th>
+                                <th>No.of items</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Created date</th>
+                                <th>Created by</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="itemPurchaseData !=null">
+                                <tr *ngFor="let po of itemPurchaseData">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.PurchaseOrderNo}}">{{po.PurchaseOrderNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.SupplierName}}">{{po.SupplierName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 120px;">
+                                        <span title="{{po.LocationName}}">{{po.LocationName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{po.ItemsCount}}">{{po.ItemsCount}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.Price}}">{{po.Price}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.Status}}"
+                                            [ngClass]="{ 'text-info': po.Status=='Checked', 'text-success': po.Status== 'Approved'}">{{po.Status}}
+                                        </span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.CreatedDate}}">{{po.CreatedDate | date:'dd-MM-yyyy'}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{po.CreatedBy}}">{{po.CreatedBy}}</span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <ng-container *ngIf="itemPurchaseData.length == 0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                <div  class="py-5 text-muted">
+                    <div class="d-flex flex-column justify-content-center gap-1 align-items-center  fs-4">
+                        <i class="feather icon-alert-circle fs-2"></i>
+                        <span>No POs found!</span>
+                    </div>
+                </div>
+                </div>
+            <!-- </ng-container>
+            <div class="cartd-footer" *ngIf="itemPurchaseData.length != 0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- Modal -->
+<ng-template #deletePurchaseOrder let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete purchse order</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Are you sure do you want to delete
+                        <strong>{{PurchaseOrderName}}</strong> purchase order?</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon');DeletePurchaseOrder()">Yes</button>
+    </div>
+</ng-template>
+<!-- Modal -->

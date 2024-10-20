@@ -1,0 +1,55 @@
+// Right Card Side 
+// .container {
+//      width: 70%;
+//     margin: 0 auto;
+//     padding: 40px;
+// }
+.verify-card{
+    height: 100vh;
+}
+.verified-icon {
+    font-size: 3rem;
+    color:#339933
+}
+
+.verified-title {
+    font-weight: 500;
+    color:#339933
+}
+
+.verified-message {
+    text-align: center;
+
+    p {
+        font-size: 1rem;
+        color: #1A1A1A;
+    }
+}
+
+.verified-login-btn {
+    text-align: center;
+}
+
+.image-side.verification {
+    background-position: center center;
+}
+
+// Mobile & Tablet Responsive
+// @media screen and (max-width: 768px) {
+//     .card {
+//         width: 80vw !important;
+//     }
+
+//     .container {
+//         width: 90%;
+//         margin: 0 auto;
+//         padding: 10px;
+//     }
+// }
+
+// .logo-single {
+//     @media screen and (max-width: 425px) {
+//        height: 30px;
+//        width: 30px;
+//     }
+// }

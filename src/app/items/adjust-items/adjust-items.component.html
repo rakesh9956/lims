@@ -1,0 +1,371 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items">Items</a></li>
+        <li class="breadcrumb-item active" aria-current="items">Adjust Items</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>ADJUST ITEMS</div>
+                    <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0">
+                        <!-- Toggle the value of the property when the toggler button is clicked. -->
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-shrink-0 ms-1"
+                        (click)="newStockAdjestmentForm.reset();openBasicModal(adjustItems);IsSelect=true"><span
+                        class="feather icon-sliders"></span> Adjust Items</button>
+                    </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end">                            
+                            <span *ngIf="this.stockAdjestment.length!==0" class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0">
+                                {{(rowCount*(pageNumber-1))+1}}-{{totalcount>rowCount*pageNumber?rowCount*pageNumber:totalcount}}
+                            of
+                            {{totalcount}} </span>
+                                <select *ngIf="this.stockAdjestment.length!==0" name="rowLimit" id="rowLimit"
+                            class="form-select form-select-sm mb-1 mb-sm-0"
+                            (change)="ChangeEvent($event)">
+                            <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                          
+                            <input type="text" class="form-control form-select-sm mb-2 mb-sm-0 ms-sm-2 ms-0 mw-200" [(ngModel)]="searchItem" (keyup)="Search($event)" placeholder="Search" />
+                        </div>                       
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Vendor Item Name </th>
+                                <th>Batch Number</th>
+                                <th>Quantity</th>
+                                <th>Tax %</th>
+                                <th>Discount %</th>
+                                <th>Unit Price</th>
+                                <th>Total Amount</th>
+                                <th>Expiry Date</th>
+                                <th>Adjust Location Name</th>
+                                <th>Store Location Name</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="!shimmerVisible">
+                                <tr *ngFor="let stock of stockAdjestment">
+                                    <td>{{stock.ItemName}}</td>
+                                    <td>{{stock.VendorItemName ? stock.VendorItemName : 'N/A'}}</td>
+                                    <td>{{stock.BatchNumber}}</td>
+                                    <td>{{stock.ItemQuantity.toFixed(2)}}</td>
+                                    <td>{{stock.TaxPer}}</td>
+                                    <td>{{stock.DiscountPer}}</td>
+                                    <td>{{stock.UnitPrice.toFixed(2)}}</td> 
+                                    <td>{{stock.TotalAmount.toFixed(2)}}</td>
+                                    <td>{{stock.ExpiryDate=='0001-01-01T00:00:00'?'N/A':stock.ExpiryDate | date:'dd-MM-yyyy'}}</td>
+                                    <td>{{stock.Location}}</td>
+                                    <td>{{stock.StoreLocation?stock.StoreLocation:'N/A'}}</td>
+                                    <td>{{stock.reson==null?'N/A':stock.reson}}</td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                            <ng-container *ngIf="shimmerVisible">
+                                <tr *ngFor="let dummyLoop of [].constructor(10)">
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                  <td>
+                                    <div class="shimmerBG line"></div>
+                                  </td>
+                                </tr>
+                            </ng-container>
+                            <!--Shimmer UI -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- No records found UI -->
+                <ng-container *ngIf="this.stockAdjestment.length == 0 && !shimmerVisible">
+                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                        <div class="py-5 text-muted">
+                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                <i class="feather icon-alert-circle fs-2"></i>
+                                <span> No adjustable items found!</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="cartd-footer" *ngIf="this.stockAdjestment.length != 0">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table"
+                        [pageSize]="rowCount" [(page)]="currentPage" (pageChange)="onPageChange($event)" [collectionSize]="totalcount"
+                        [maxSize]="maxSize" [rotate]="false" [boundaryLinks]="boundaryLinks"
+                        [size]="size"></ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <ng-template #adjustItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Adjust Item</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newStockAdjestmentForm">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <ng-select  placeholder="Select adjust item"  [items]="allLocations"  
+                    bindLabel="CenterLocationName" bindValue="CenterLocationGuid" formControlName="Location">
+                       
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName"  class="form-label">Item list</label>
+                    <ng-select  placeholder="Select adjust item"  [items]="ItemsData" 
+                    bindLabel="ItemName" bindValue="ItemGuid"  formControlName="ItemGuid" >
+                       
+                </ng-select>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Batch number</label>
+                    <input type="text" id="itemName" class="form-control" placeholder="Enter Batch number"  formControlName="BatchNumber">
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Quantity</label>
+                    <input type="text" id="itemName" class="form-control" placeholder="Enter Quantity" formControlName="ItemQuantity" (input)="enterNumbers()">
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="itemName" class="form-label">Expiry date</label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="dd-mm-yyyy" name="dob"   formControlName="ExpiryDate" [minDate]="selectedDate" 
+                        ngbDatepicker #d1="ngbDatepicker">
+                        <button class="input-group-text" type="button" (click)="d1.toggle()">
+                            <i class="feather icon-calendar icon-md text-muted"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="Reason" class="form-label">Reason</label>
+                    <input type="text" id="Reason" class="form-control" placeholder="Enter reason" formControlName="Reason">
+                </div>
+            </div>
+
+        </div>
+       </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Close</button>
+        <button type="button" class="btn btn-primary submit" [disabled]="this.newStockAdjestmentForm.invalid" (click)="saveStockAdjestmentItems()">Save</button>
+    </div>
+</ng-template> -->
+
+<ng-template #adjustItems let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Adjust Item</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');newStockAdjestmentForm.reset();" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newStockAdjestmentForm">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-6 col-xl-2 align-items-center d-flex">
+                    <div class="form-check mb-2">
+                        <input type="radio" name="radioDefault" id="radioDefault" (change)="SelectLocationtype('Department')" class="form-check-input">
+                        <label for="radioDefault" class="form-check-label" > Department </label>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-2  align-items-center d-flex">
+                    <div class="form-check mb-2">
+                        <input type="radio" name="radioDefault" id="radioDefault" (change)="SelectLocationtype('Store')" class="form-check-input">
+                        <label for="radioDefault" class="form-check-label" > Store </label>
+                    </div>
+                </div>                
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Department/Store<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.LocationGuid}"> *</span></label>
+                        <ng-select placeholder="Search by Department/Store" [readonly]="IsSelect" [items]="allLocations" [(ngModel)]="Location"
+                            bindLabel="CenterLocationName" bindValue="CenterLocationGuid" formControlName="LocationGuid" (change)="ChangeLocations($event)" >
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Items<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.ItemGuid}"> *</span></label>
+                            <span  class="small text-primary cursor-pointer float" routerLink="/items/new-item" (click)="modal.close('by: close icon')">Add
+                            Item</span>
+                            <ng-select placeholder="Search by item name" [readonly]="!Location" 
+                            [items]="ItemsData" 
+                            bindLabel="ItemfullName" bindValue="ItemGuid" (change)="getItemsByGuid($event)"  
+                            [multiple]="false" 
+                            [(ngModel)]="Item" 
+                            formControlName="ItemGuid">
+                            <ng-template ng-option-tmp let-item="item">
+                                <span title="{{ item.ItemfullName }}">{{ item.ItemfullName }}</span>
+                            </ng-template>
+                          </ng-select>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4" *ngIf="BatchItems.length!==0">
+                    <div class="mb-3">
+                        <label for="BatchNumber" class="form-label">Batch Number<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.BatchNumber}"> *</span></label>
+                            <ng-select placeholder="Search by BatchNumber" [readonly]="!newStockAdjestmentForm.value.ItemGuid" 
+                            [items]="BatchItems" (change)="ChangeBatchNumber($event)" 
+                            bindLabel="BatchNumber" bindValue="BatchNumber" 
+                            [multiple]="false" 
+                            formControlName="BatchNumber">
+                          </ng-select>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4" *ngIf="BatchItems.length==0">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">BatchNumber<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.BatchNumber}"> *</span></label>
+                        <input type="text" [min]="0" id="BatchNumber" class="form-control"  placeholder="Enter BatchNumber" 
+                         formControlName="BatchNumber" (keyup)="event($event)">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Vendor Item Name
+                        </label>
+                        <input type="text"  id="VendorItemName" class="form-control"  
+                         placeholder="Enter Vendor Item Name"
+                         formControlName="VendorItemName" [readOnly]="newStockAdjestmentForm.value.StockGuid">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.ItemQuantity}"> *</span></label>
+                        <input type="text"  id="ItemQuantity" class="form-control"  
+                         placeholder="Enter quantity" (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46 || $event.charCode === 45"
+                        (keyup)="ChangeQuantity($event);" formControlName="ItemQuantity">
+                    </div>
+                </div>    
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4"> 
+                    <div class="mb-3">
+                        <label for="ExpiryDate" class="form-label">Expiry Date<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Expiredate}"> *</span></label>
+                    <div class="input-group">
+                        <input class="form-control" placeholder="dd-mm-yyyy" [minDate]="selectedDate" name="dp" ngbDatepicker  [required]="this.IsExpire==false"
+                       [readonly]="IsExpire==false" [disabled]="IsExpire==true" #d1="ngbDatepicker" formControlName="Expiredate" 
+                       (dateSelect)="onDateSelect($event)">
+                      <button class="input-group-text" type="button" (click)="(IsExpire==true)?'':d1.toggle()">
+                       <i class="feather icon-calendar icon-md text-muted"></i>
+                   </button>
+                    </div>
+                </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Unit Price<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Unitprice}"> *</span></label>
+                        <input type="number"   (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46" id="Unitprice"  (keyup)="newStockAdjestmentForm.value.StockGuid?'':ChangePrice($event)" class="form-control" placeholder="Enter unit price" 
+                          formControlName="Unitprice"  [readOnly]="newStockAdjestmentForm.value.StockGuid && !newStockAdjestmentForm.value.IsAdjust" >
+                    </div>
+                </div>               
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="rate" class="form-label">GST %<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.GSTper}"> *</span></label>
+                        <input type="text" type="text" [min]="0"  [max]="100" id="GSTper" formControlName="GSTper" (keyup)="newStockAdjestmentForm.value.StockGuid?'':OnGSTChange($event)"  class="form-control" placeholder="Enter GST"
+                        [readOnly]="newStockAdjestmentForm.value.StockGuid"  >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="rate" class="form-label">Discount %<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Discountper}"> *</span></label>
+                        <input type="text" type="text" [min]="0" [max]="100" id="Discountper" formControlName="Discountper" (keyup)="newStockAdjestmentForm.value.StockGuid?'':onDiscountChange($event)"  class="form-control" placeholder="Enter discount"
+                        [readOnly]="newStockAdjestmentForm.value.StockGuid"  >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="rate" class="form-label">Discount Amount<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Discoutamount}"> *</span></label>
+                        <input type="number" id="Discoutamount" readonly  formControlName="Discoutamount"  class="form-control" placeholder="Enter discount amount"
+                           >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="rate" class="form-label">GST Amount<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.GSTamount}"> *</span></label>
+                        <input type="number" id="GSTamount" readonly  formControlName="GSTamount"  class="form-control" placeholder="Enter GST amount"
+                           >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-4">
+                    <div class="mb-3">
+                        <label for="rate" class="form-label">Total Price<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Totalprice}"> *</span></label>
+                        <input type="number" id="Totalprice" readonly formControlName="Totalprice"  class="form-control" placeholder="Enter total price"
+                           >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-xl-8">
+                    <div class="mb-3">
+                        <label for="Reson" class="form-label">Reason<span
+                            [ngClass]="{'text-danger': !newStockAdjestmentForm.value.Reson}"> *</span></label>
+                        <input type="text" id="Reson" class="form-control"  placeholder="Enter reason" formControlName="Reson">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon');newStockAdjestmentForm.reset();IsExpire=true">Close</button>
+        <button type="button" class="btn btn-primary submit"  [disabled]="newStockAdjestmentForm.invalid"
+            (click)="saveStockAdjestmentItems();modal.close('by: close icon');newStockAdjestmentForm.reset();">Save</button>
+    </div>
+</ng-template>
+

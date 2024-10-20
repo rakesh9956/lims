@@ -1,0 +1,290 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/stores"> All Location</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{this.locGuid!=null && this.addNew==null? 'Edit location':'Add location'}}</li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Center details</h6>
+                <form [formGroup]="locationForm" *ngIf="!shimmerVisible">
+                    <div class="row">
+                        <!-- <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="categoryType" class="form-label">Center Type</label>
+                                <select class="form-select" id="categoryType" name="categoryTypes" formControlName="categoryTypes">
+                                    <option value="" disabled selected>Select center type</option>
+                                    <option *ngFor="let data of centerType" [value]="data.Guid">{{data.CenterTypeName}}</option>                                   
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="departmentType" class="form-label">QR Zone</label>
+                                <select class="form-select" id="departmentType" formControlName="businessJone">
+                                    <option value="" selected disabled>Select QR zone</option>
+                                    <option *ngFor="let data of businessJone" [value]="data.Guid">{{data.BusinessZoneName}}</option>                                  
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemType" class="form-label">State</label>
+                                <select class="form-select" id="itemType" formControlName="stateName">
+                                    <option value="" selected disabled>Select state</option>
+                                    <option *ngFor="let data of state" [value]="data.Guid">{{data.StateName}}</option>                                   
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="itemType" class="form-label">City</label>
+                                <select class="form-select" id="itemType" formControlName="cityName">
+                                    <option value="" selected disabled>Select city</option>
+                                    <option *ngFor="let data of city" [value]="data.Guid">{{data.CityName}}</option>                                   
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="col-sm-4" >
+                            <div class="mb-3">
+                                <label for="itemType" class="form-label">Center <span [ngClass]="{'text-danger': !locationForm.value.Guid   }">*</span></label>
+                                <!-- <select class="form-select" id="itemType" formControlName="Guid" required
+                                [ngClass]="(locationForm.get('Guid')?.hasError('required')) && locationForm.get('Guid')?.touched? 'is-invalid' : ''">
+                                    <option value="" selected disabled>Select center</option>
+                                    <option *ngFor="let data of center" value="{{data.Guid}}">{{data.CompanyName}}</option>                                   
+                                </select> -->
+                                <ng-select [items]="center" [closeOnSelect]="true" [searchable]="true" 
+                                [ngClass]="(locationForm.get('Guid')?.hasError('required')) && locationForm.get('Guid')?.touched? 'is-invalid' : ''"
+                                bindValue="Guid" [inputAttrs]="{maxlength: '48'}" bindLabel="CompanyName"  
+                                    placeholder="Select center" formControlName="Guid">
+                                </ng-select>
+                                <span class="text-danger position-absolute"
+                                    *ngIf="locationForm.get('Guid')?.hasError('required') && locationForm.get('Guid')?.touched">
+                                    Centre is required!
+                                </span>     
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-xl-3 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check form-switch mb-2">
+                                    <input type="checkbox" id="formSwitch1" formControlName="IsStore"  class="form-check-input">
+                                    <label for="formSwitch1" class="form-check-label">Would you like this location to function as a store?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                    Store not created
+                                    </label>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+
+                    </div>
+
+                    <h6 class="card-title">Location Details</h6>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                              <label for="manufacturerConverter" class="form-label">Location <span [ngClass]="{'text-danger':!Location}">*</span></label>
+                              <input type="text" id="manufacturerConverter" class="form-control" placeholder="Enter location" [maxlength]="48"
+                              [ngClass]="(locationForm.get('Location')?.hasError('required')) && locationForm.get('Location')?.touched? 'is-invalid' : ''"
+                              formControlName="Location" required>
+                              <span class="text-danger position-absolute"
+                              *ngIf="locationForm.get('Location')?.hasError('required') && locationForm.get('Location')?.touched">
+                              Location is required!
+                          </span>     
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label visbility-none">Location2</label>
+                                <input type="text" id="manufacturerPackSize" formControlName="Locations" class="form-control" placeholder="Enter location2">
+                            </div>
+                        </div>
+                        <!-- <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                    Active
+                                    </label>
+                                    <span class="ml-2 text-bold">(Exmaple : Bio, IMUNO, HEMA, STORE)</span>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerConverter" class="form-label">Contact Person <span [ngClass]="{'text-danger': !ContactPerson }">*</span></label>
+                                <input type="text" id="manufacturerConverter" class="form-control" placeholder="Contact person name" [maxlength]="48"
+                                [ngClass]="(locationForm.get('ContactPerson')?.hasError('required')) && locationForm.get('ContactPerson')?.touched? 'is-invalid' : ''"
+                                formControlName="ContactPerson" required>
+                                <span class="text-danger position-absolute"
+                                    *ngIf="locationForm.get('ContactPerson')?.hasError('required') && locationForm.get('ContactPerson')?.touched">
+                                    Contact person name is required!
+                                </span>   
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Contact mobile No. <span [ngClass]="{'text-danger': !ContactPersonNo}">*</span></label>
+                                <input type="text" id="manufacturerPackSize" class="form-control" placeholder="Enter Contact mobile No." [maxlength]="10"
+                                    formControlName="ContactPersonNo" required (input)="phoneNoValidator($event)" 
+                                     [ngClass]="(locationForm.get('ContactPersonNo')?.hasError('required') || locationForm.value.ContactPersonNo?.length < 10) && locationForm.get('ContactPersonNo')?.touched ? 'is-invalid' : ''">                                    
+                                    <span class="text-danger position-absolute"
+                                    *ngIf="locationForm.get('ContactPersonNo')?.hasError('required') && locationForm.get('ContactPersonNo')?.touched ; else validphoneno "  >
+                                    Phone number is required!
+                                </span>  
+                                <ng-template #validphoneno >
+                                <ng-container class="text-danger position-absolute"
+                                   *ngIf="(locationForm.get('ContactPersonNo')?.hasError('required') || locationForm.value.ContactPersonNo?.length < 10)&& locationForm.get('ContactPersonNo')?.touched">
+                                       <span class="text-danger position-absolute"> Enter valid phone number! </span>
+                                           </ng-container>
+                                        </ng-template>                           
+                             </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Address <span [ngClass]="{'text-danger': !Address}">*</span></label>
+                                <input type="text" id="manufacturerPackSize" class="form-control" placeholder="Enter address" [maxlength]="150"
+                                formControlName="Address" required
+                                [ngClass]="(locationForm.get('Address')?.hasError('required')) && locationForm.get('Address')?.touched? 'is-invalid' : ''">
+                                <span class="text-danger position-absolute"
+                                *ngIf="locationForm.get('Address')?.hasError('required') && locationForm.get('Address')?.touched">
+                                Address is required!
+                            </span>    
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-4">
+                            <div class="mb-3">
+                                <label for="manufacturerPackSize" class="form-label">Email <span [ngClass]="{'text-danger': !Email}">*</span></label>
+                                <input type="text" id="manufacturerPackSize" class="form-control" placeholder="Enter email"  [maxlength]="48"
+                                [ngClass]="(locationForm.get('Email')?.hasError('required')) && locationForm.get('Email')?.touched? 'is-invalid' : ''"
+                                formControlName="Email" required>
+                                <span class="text-danger position-absolute"
+                                    *ngIf="locationForm.get('Email')?.hasError('required') && locationForm.get('Email')?.touched">
+                                    Email is required!
+                                </span>    
+                                <span class="text-danger position-absolute" 
+                                  *ngIf="locationForm.value.Email?.length && locationForm.get('Email')?.errors">
+                                   Enter valid email!
+                                </span>
+                            </div>                             
+                        </div>
+                        
+                        <!-- <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-check mb-2 justify-content-between d-flex">
+                                            <input type="checkbox" class="form-check-input" id="itemFIFOorder">
+                                            <label class="form-check-label" for="itemFIFOorder">
+                                                Auto SI Recived (In Days)
+                                            </label>
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="text" id="manufacturerPackSize" class="form-control ml-2" placeholder="In days">
+                                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <div class="col-sm-4 align-items-end d-flex">
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="itemFIFOorder">
+                                    <label class="form-check-label" for="itemFIFOorder">
+                                    Auto Consume On
+                                    </label>                                  
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </form>
+                <!--Shimmer UI -->
+                <!-- <ng-container>
+                    <label for="itemName" class="form-label">Accepted only excel file</label>
+                    <span class="text-muted float small">Accepted only excel file.</span>
+                    <input class="form-control pr-40" #fileInput type="file" id="upload-resume" fileToUpload 
+                        (change)="uploadData($event)" accept=".excel" placeholder="Enter consumption unit">
+                    <span class="text-muted text-end">You can download sample file from <button
+                            class="btn btn-link p-0 align-baseline">here</button>.</span>
+                            <br>
+                            <button (click)="SaveLocationEMployee()" class="btn btn-primary"  >Submit</button>
+                </ng-container> -->
+                <ng-container *ngIf="shimmerVisible">
+                    <div class="row">
+                        <!-- <div class="mb-3">
+                            <div class="shimmerBG" style="width:150px;height: 15px;"></div>
+                        </div> -->
+                        <div class="col-sm-6 col-md-4" *ngFor="let dummyLoop of [].constructor(1)">
+                            <div class="mb-3">
+                            <label class="label mb-1">
+                                <div class="shimmerBG formLable"></div>
+                            </label>
+                            <div class="form-control form-control-sm">
+                                <div class="shimmerBG formInput"></div>
+                            </div>
+                            </div>                                
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <label class="label"></label>
+                            <div class="line shimmerBG mt-0 mt-sm-2"></div>
+                        </div>
+                    </div>
+                </ng-container>
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end">
+                        <button type="button" class="btn btn-secondary me-2" [disabled]="!this.onLocationForm" (click)="openXlModal(consumptionUnit)">Reset</button>
+                        <button type="button" class="btn btn-primary submit" [disabled]="locationForm.invalid || !this.onLocationForm" (click)="saveLocationDetails()">{{this.locGuid!=null && this.addNew==null?'Update':'Create'}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #consumptionUnit let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <p>{{this.locGuid!=null && this.addNew==null?'Do you want to reset edit location details?':'Do you want to reset add location details?'}} </p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit" (click)="resetStore();modal.close('by: close icon')">Yes</button>
+    </div>
+</ng-template>

@@ -1,0 +1,11 @@
+diff --git a/node_modules/ngx-doc-viewer/lib/document-viewer.component.d.ts b/node_modules/ngx-doc-viewer/lib/document-viewer.component.d.ts
+index 8058e5a..212b0bf 100644
+--- a/node_modules/ngx-doc-viewer/lib/document-viewer.component.d.ts
++++ b/node_modules/ngx-doc-viewer/lib/document-viewer.component.d.ts
+@@ -30,5 +30,5 @@ export declare class NgxDocViewerComponent implements OnChanges, OnDestroy, Afte
+     private reloadIframe;
+     iframeLoaded(): void;
+     static ɵfac: i0.ɵɵFactoryDeclaration<NgxDocViewerComponent, never>;
+-    static ɵcmp: i0.ɵɵComponentDeclaration<NgxDocViewerComponent, "ngx-doc-viewer", never, { "url": "url"; "queryParams": "queryParams"; "viewerUrl": "viewerUrl"; "googleCheckInterval": "googleCheckInterval"; "googleMaxChecks": "googleMaxChecks"; "disableContent": "disableContent"; "googleCheckContentLoaded": "googleCheckContentLoaded"; "viewer": "viewer"; "overrideLocalhost": "overrideLocalhost"; }, { "loaded": "loaded"; }, never, never, false, never>;
++    static ɵcmp: i0.ɵɵComponentDeclaration<NgxDocViewerComponent, "ngx-doc-viewer", never, { "url": "url"; "queryParams": "queryParams"; "viewerUrl": "viewerUrl"; "googleCheckInterval": "googleCheckInterval"; "googleMaxChecks": "googleMaxChecks"; "disableContent": "disableContent"; "googleCheckContentLoaded": "googleCheckContentLoaded"; "viewer": "viewer"; "overrideLocalhost": "overrideLocalhost"; }, { "loaded": "loaded"; }, never, never, false>;
+ }

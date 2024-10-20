@@ -1,0 +1,1367 @@
+
+<ng-container *ngIf="this.authservice.LoggedInUser.STORE==true || this.authservice.LoggedInUser.STORE=='true'">
+  <div
+    class="d-flex justify-content-between align-items-center flex-wrap grid-margin"
+  >
+    <div>
+      <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
+    </div>
+    <!-- <div class="d-flex align-items-center flex-wrap text-nowrap">
+      <div class="input-group wd-200 me-2 mb-2 mb-md-0">
+        <button class="btn btn-outline-primary btn-icon calendar" type="button" (click)="d.toggle()">
+          <i data-feather="calendar" appFeatherIcon></i>
+        </button>
+        <input class="form-control border-primary bg-transparent" placeholder="yyyy-mm-dd"
+            name="dp" [(ngModel)]="currentDate" ngbDatepicker #d="ngbDatepicker">
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-icon-text me-2 mb-2 mb-md-0">
+        <i class="btn-icon-prepend" data-feather="printer" appFeatherIcon></i>
+        Print
+      </button>
+      <button type="button" class="btn btn-primary btn-icon-text mb-2 mb-md-0">
+        <i class="btn-icon-prepend" data-feather="download-cloud" appFeatherIcon></i>
+        Download Report
+      </button>
+    </div> -->
+  </div>
+  
+  <!-- Shimmer Loading UI -->
+  <div class="row" *ngIf="shimmerVisible">
+    <div
+      class="col-12 col-sm-6 col-md-6 col-xl-3 grid-margin"
+      *ngFor="let dummyLoop of [].constructor(4)"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 col-xl-5">
+              <div>
+                <div
+                  class="shimmerBG"
+                  style="
+                    width: 110px;
+                    height: 15px;
+                    border-radius: 5px;
+                    margin-bottom: 3px;
+                  "
+                ></div>
+              </div>
+              <div>
+                <div
+                  class="shimmerBG"
+                  style="width: 30px; height: 40px; border-radius: 5px"
+                ></div>
+              </div>
+            </div>
+            <div class="col-md-12 col-xl-7">
+              <div class="text-end">
+                <div
+                  class="shimmerBG"
+                  style="
+                    width: 110px;
+                    height: 70px;
+                    border-radius: 5px;
+                    float: right;
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Shimmer Loading UI -->
+  
+  <ng-container *ngIf="!shimmerVisible">
+    <div class="row">
+      <div class="col-12 col-xl-12 stretch-card">
+        <div class="row flex-grow-1">
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container *ngIf="newItemsList.length != 0">
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">Received Items</h6>
+                    <!-- <div ngbDropdown class="mb-2">
+                      <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton">
+                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">
+                        {{ this.TotalItemCount}}
+                      </h3>
+                      <!-- <div class="d-flex align-items-baseline">
+                        <p class="text-success">
+                          <span>+3.3%</span>
+                          <i
+                            data-feather="arrow-up"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div> -->
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <apx-chart
+                          [series]="customersChartOptions.series"
+                          [chart]="customersChartOptions.chart"
+                          [colors]="customersChartOptions.colors"
+                          [xaxis]="customersChartOptions.xaxis"
+                          [stroke]="customersChartOptions.stroke"
+                          [markers]="customersChartOptions.markers"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+  
+              <!-- No Data UI -->
+              <ng-container *ngIf="newItemsList.length == 0">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No items found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container *ngIf="newrequestsList.length != 0">
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">New Requests</h6>
+                    <!-- <div ngbDropdown class="mb-2">
+                      <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton1">
+                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton1">
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">{{ IndentRecived }}</h3>
+                      <!-- <div class="d-flex align-items-baseline">
+                        <p class="text-danger">
+                          <span>-2.8%</span>
+                          <i
+                            data-feather="arrow-down"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div> -->
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <!-- [plotOptions]="ordersChartOptions.plotOptions" -->
+                        <apx-chart
+                          [series]="ordersChartOptions.series"
+                          [chart]="ordersChartOptions.chart"
+                          [colors]="ordersChartOptions.colors"
+                          [stroke]="customersChartOptions.stroke"
+                          [xaxis]="ordersChartOptions.xaxis"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+              <!-- No Data UI -->
+              <ng-container *ngIf="newrequestsList.length == 0">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No requests found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container>
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">Dispatch Items</h6>
+                    <!-- <div ngbDropdown class="mb-2">
+                      <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton2">
+                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton2">
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">{{Dispatch}}</h3>
+                      <!-- <div class="d-flex align-items-baseline">
+                        <p class="text-success">
+                          <span>+2.8%</span>
+                          <i
+                            data-feather="arrow-up"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div> -->
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <apx-chart
+                          [series]="growthChartOptions.series"
+                          [chart]="growthChartOptions.chart"
+                          [colors]="growthChartOptions.colors"
+                          [xaxis]="growthChartOptions.xaxis"
+                          [stroke]="growthChartOptions.stroke"
+                          [markers]="growthChartOptions.markers"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+              <!-- No Data UI -->
+              <ng-container *ngIf="!isVisible">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No growth found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- row -->
+  
+    <div class="row">
+      <div class="col-12 col-lg-6 col-xl-6 grid-margin stretch-card">
+        <div class="card overflow-hidden">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3"
+              >
+                <h6 class="card-title mb-0">Expenses</h6>
+                <!-- <div ngbDropdown>
+                  <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton3">
+                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton3">
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                  </div>
+                </div> -->
+              </div>
+              <div class="row align-items-start">
+                <div class="col-md-12">
+                  <p class="text-muted tx-13 mb-3 mb-md-1">
+                    Revenue is the income that a business has from its normal
+                    business activities, usually from the sale of goods and
+                    services to customers.
+                  </p>
+                </div>
+                <div class="col-md-12 d-flex justify-content-md-end">
+                  <div
+                    class="btn-group mb-3 mb-md-0"
+                    role="group"
+                    aria-label="Basic example"
+                  >
+                    <!-- <button
+                      type="button"
+                      [class]="
+                        selectedDate === 'today'
+                          ? 'btn btn-primary'
+                          : 'btn btn-outline-primary'
+                      "
+                      (click)="changeData('today')"
+                    >
+                      Today
+                    </button> -->
+                    <button
+                      type="button"
+                      [class]="
+                        selectedDate === 'week'
+                          ? 'btn btn-primary'
+                          : 'btn btn-outline-primary'
+                      "
+                      (click)="changeData('week')"
+                    >
+                      Weekly
+                    </button>
+                    <button
+                      type="button"
+                      [class]="
+                        selectedDate === 'month'
+                          ? 'btn btn-primary'
+                          : 'btn btn-outline-primary'
+                      "
+                      (click)="changeData('month')"
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      [class]="
+                        selectedDate === 'year'
+                          ? 'btn btn-primary'
+                          : 'btn btn-outline-primary'
+                      "
+                      (click)="changeData('year')"
+                    >
+                      Yearly
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="flot-wrapper" *ngIf="expencesCountsList.length >= 1">
+                <apx-chart
+                  [series]="revenueChartOptions.series"
+                  [chart]="revenueChartOptions.chart"
+                  [colors]="revenueChartOptions.colors"
+                  [grid]="revenueChartOptions.grid"
+                  [xaxis]="revenueChartOptions.xaxis"
+                  [yaxis]="revenueChartOptions.yaxis"
+                  [markers]="revenueChartOptions.markers"
+                  [stroke]="revenueChartOptions.stroke"
+                ></apx-chart>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="expencesCountsList.length == 0">
+            <div
+              class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No expenses found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Monthly Wise Requests</h6>
+                <!-- <div ngbDropdown class="mb-2">
+                  <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton4">
+                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton4">
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                  </div>
+                </div> -->
+              </div>
+              <p class="text-muted">
+                Sales are activities related to selling or the number of goods or
+                services sold in a given time period.
+              </p>
+              <apx-chart
+                *ngIf="monthlyWiseRquestsList.length != 0"
+                [series]="monthlySalesChartOptions.series"
+                [chart]="monthlySalesChartOptions.chart"
+                [colors]="monthlySalesChartOptions.colors"
+                [fill]="monthlySalesChartOptions.fill"
+                [grid]="monthlySalesChartOptions.grid"
+                [xaxis]="monthlySalesChartOptions.xaxis"
+                [yaxis]="monthlySalesChartOptions.yaxis"
+                [legend]="monthlySalesChartOptions.legend"
+                [stroke]="monthlySalesChartOptions.stroke"
+                [dataLabels]="monthlySalesChartOptions.dataLabels"
+                [plotOptions]="monthlySalesChartOptions.plotOptions"
+              ></apx-chart>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="monthlyWiseRquestsList.length == 0">
+            <div
+              class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No requests found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+    </div>
+    <!-- row -->
+  
+    <div class="row">
+      <div class="col-12 col-lg-4 col-xl-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container
+              *ngIf="
+                (dashboardCountsData.TotalPOCount != 0 ||
+                  dashboardCountsData.ApprovedPOCount != 0) &&
+                dashboardCountsData.length != 0
+              "
+            >
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Purchase Orders</h6>
+                <!-- <div ngbDropdown class="mb-2">
+                  <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton5">
+                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton5"> -->
+                <!-- <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a> -->
+                <!-- <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a> -->
+                <!-- </div>
+                </div> -->
+              </div>
+              <apx-chart
+                [series]="cloudStorageChartOptions.series"
+                [chart]="cloudStorageChartOptions.chart"
+                [colors]="cloudStorageChartOptions.colors"
+                [plotOptions]="cloudStorageChartOptions.plotOptions"
+                [fill]="cloudStorageChartOptions.fill"
+                [stroke]="cloudStorageChartOptions.stroke"
+                [labels]="cloudStorageChartOptions.labels"
+              ></apx-chart>
+              <div class="row mb-3">
+                <div class="col-6 d-flex justify-content-end">
+                  <div>
+                    <label
+                      class="d-flex align-items-center justify-content-end tx-10 text-uppercase fw-bold"
+                      >Total Orders
+                      <span class="p-1 ms-1 rounded-circle bg-secondary"></span
+                    ></label>
+                    <h5 class="fw-bolder mb-0 text-end">
+                      {{ dashboardCountsData.TotalPOCount }}
+                    </h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div>
+                    <label
+                      class="d-flex align-items-center tx-10 text-uppercase fw-bold"
+                      ><span class="p-1 me-1 rounded-circle bg-primary"></span>
+                      Approved Orders</label
+                    >
+                    <h5 class="fw-bolder mb-0">
+                      {{ dashboardCountsData.ApprovedPOCount }}
+                    </h5>
+                  </div>
+                </div>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary" routerLink="/purchase-orders">
+                  View All
+                </button>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container
+            *ngIf="
+              (dashboardCountsData.TotalPOCount == 0 &&
+                dashboardCountsData.ApprovedPOCount == 0) ||
+              dashboardCountsData.length == 0
+            "
+          >
+            <div
+              class="card-body h-100 w-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No purchase orders found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+      <div class="col-12 col-lg-4 col-xl-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Suppliers</h6>
+                <div ngbDropdown class="mb-2" *ngIf="suppliersList.length != 0">
+                  <button
+                    ngbDropdownToggle
+                    class="btn p-0 no-dropdown-toggle-icon"
+                    type="button"
+                    id="dropdownMenuButton4"
+                  >
+                    <i
+                      class="icon-lg text-muted pb-3px"
+                      data-feather="more-horizontal"
+                      appFeatherIcon
+                    ></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton4">
+                    <a
+                      ngbDropdownItem
+                      class="d-flex align-items-center"
+                      href=""
+                      (click)="(false)"
+                      routerLink="/suppliers"
+                      ><i
+                        data-feather="eye"
+                        appFeatherIcon
+                        class="icon-sm me-2"
+                      ></i>
+                      <span class="">View</span></a
+                    >
+                    <!-- <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a> -->
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead *ngIf="suppliersList.length != 0">
+                    <tr>
+                      <!-- <th class="pt-0">ID</th> -->
+                      <th class="pt-0">Supplier Name</th>
+                      <th class="pt-0">Supplier Category</th>
+                      <th class="pt-0">Supplier Code</th>
+                      <th class="pt-0">Supplier Type</th>
+                      <th class="pt-0">Address</th>
+                      <th class="pt-0">Primary Contact</th>
+                      <th class="pt-0">Contact No</th>
+                      <th class="pt-0">Email</th>
+                      <!-- <th class="pt-0">Checked</th>
+                      <th class="pt-0">Approved</th> -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let suplliers of suppliersList">
+                      <!-- <td>1</td> -->
+                      <td>{{ suplliers.SupplierName }}</td>
+                      <td>{{ suplliers.SupplierCategory }}</td>
+                      <td>{{ suplliers.SupplierCode }}</td>
+                      <td>{{ suplliers.SupplierTypeName }}</td>
+                      <td>{{ suplliers.Street }}</td>
+                      <td>{{ suplliers.PrimaryContactPerson }}</td>
+                      <td>{{ suplliers.PrimaryContactPersonMobileNo }}</td>
+                      <td>{{ suplliers.PrimaryContactPersonEmailId }}</td>
+                      <!-- <td>Checked</td> -->
+                      <!-- <td><span class="badge bg-success">Approved</span></td> -->
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="suppliersList.length == 0">
+            <div
+              class="card-body h-100 w-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No suppliers found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+      <div class="col-12 col-lg-4 col-xl-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container
+              *ngIf="
+                (dashboardCountsData.TotalQuotationCount != 0 ||
+                  dashboardCountsData.QuotationApprovedCount != 0) &&
+                dashboardCountsData.length != 0
+              "
+            >
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Quotations</h6>
+                <!-- <div ngbDropdown class="mb-2">
+                  <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton5">
+                    <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton5">
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                  </div>
+                </div> -->
+              </div>
+              <apx-chart
+                [series]="cloudStorageChartOptions.series1"
+                [chart]="cloudStorageChartOptions.chart"
+                [colors]="cloudStorageChartOptions.colors"
+                [plotOptions]="cloudStorageChartOptions.plotOptions"
+                [fill]="cloudStorageChartOptions.fill"
+                [stroke]="cloudStorageChartOptions.stroke"
+                [labels]="cloudStorageChartOptions.labels1"
+              ></apx-chart>
+              <div class="row mb-3">
+                <div class="col-6 d-flex justify-content-end">
+                  <div>
+                    <label
+                      class="d-flex align-items-center justify-content-end tx-10 text-uppercase fw-bold"
+                      >Total quotations
+                      <span class="p-1 ms-1 rounded-circle bg-secondary"></span
+                    ></label>
+                    <h5 class="fw-bolder mb-0 text-end">
+                      {{ dashboardCountsData.TotalQuotationCount }}
+                    </h5>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div>
+                    <label
+                      class="d-flex align-items-center tx-10 text-uppercase fw-bold"
+                      ><span class="p-1 me-1 rounded-circle bg-primary"></span>
+                      Approved quotations</label
+                    >
+                    <h5 class="fw-bolder mb-0">
+                      {{ dashboardCountsData.QuotationApprovedCount }}
+                    </h5>
+                  </div>
+                </div>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary" routerLink="/quotations">
+                  View All
+                </button>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container
+            *ngIf="
+              (dashboardCountsData.TotalQuotationCount == 0 &&
+                dashboardCountsData.QuotationApprovedCount == 0) ||
+              dashboardCountsData.length == 0
+            "
+          >
+            <div
+              class="card-body h-100 w-100 align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No quotations found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+    </div>
+    <!-- row -->
+  
+    <div class="row">
+      <div class="col-lg-5 col-xl-4 grid-margin grid-margin-xl-0">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Recent Quotations</h6>
+                <div ngbDropdown class="mb-2" *ngIf="QuotaionsList.length != 0">
+                  <button
+                    ngbDropdownToggle
+                    class="btn p-0 no-dropdown-toggle-icon"
+                    type="button"
+                    id="dropdownMenuButton6"
+                  >
+                    <i
+                      class="icon-lg text-muted pb-3px"
+                      data-feather="more-horizontal"
+                      appFeatherIcon
+                    ></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton6">
+                    <a
+                      ngbDropdownItem
+                      class="d-flex align-items-center"
+                      href=""
+                      (click)="(false)"
+                      routerLink="/quotations"
+                      ><i
+                        data-feather="eye"
+                        appFeatherIcon
+                        class="icon-sm me-2"
+                      ></i>
+                      <span class="">View</span></a
+                    >
+                    <!-- <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                     -->
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead *ngIf="QuotaionsList.length != 0">
+                    <tr>
+                      <!-- <th class="pt-0">Item #</th> -->
+                      <!-- <th class="pt-0">Print</th> -->
+                      <th class="pt-0">Quotation No</th>
+                      <th class="pt-0">From Date</th>
+                      <th class="pt-0">To Date</th>
+                      <th class="pt-0">Supplier Name</th>
+                      <th class="pt-0">Supplier Address</th>
+                      <th class="pt-0">GSTN No</th>
+                      <!-- <th class="pt-0">Delivery State</th> -->
+                      <th class="pt-0">Delivery Location</th>
+                      <th class="pt-0">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let quotations of QuotaionsList">
+                      <!-- <td>1</td> -->
+                      <!-- <td>{{quotations}}</td> -->
+                      <td>{{ quotations.QuotationNo }}</td>
+                      <td>{{ quotations.FromDate | date : "dd-MM-yyy" }}</td>
+                      <td>{{ quotations.ToDate | date : "dd-MM-yyy" }}</td>
+                      <td>{{ quotations.SupplierName }}</td>
+                      <td>{{ quotations.SupplierAddress }}</td>
+                      <td>{{ quotations.GSTNNo }}</td>
+                      <!-- <td>Telangana</td> -->
+                      <td>{{ quotations.DeliveryLocationCount }}</td>
+                      <td>
+                        <span class="badge bg-info">{{
+                          quotations.ApprovalStatus == "0"
+                            ? "Maker"
+                            : quotations.ApprovalStatus == "1"
+                            ? "Checked"
+                            : quotations.ApprovalStatus == "2"
+                            ? "Approved"
+                            : ""
+                        }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="QuotaionsList.length == 0">
+            <div
+              class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No recent quotations found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+      <div class="col-lg-7 col-xl-8 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">GRNs</h6>
+                <div ngbDropdown class="mb-2" *ngIf="grnList.length != 0">
+                  <button
+                    ngbDropdownToggle
+                    class="btn p-0 no-dropdown-toggle-icon"
+                    type="button"
+                    id="dropdownMenuButton7"
+                  >
+                    <i
+                      class="icon-lg text-muted pb-3px"
+                      data-feather="more-horizontal"
+                      appFeatherIcon
+                    ></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton7">
+                    <a
+                      ngbDropdownItem
+                      class="d-flex align-items-center"
+                      href=""
+                      (click)="(false)"
+                      routerLink="/grn"
+                      ><i
+                        data-feather="eye"
+                        appFeatherIcon
+                        class="icon-sm me-2"
+                      ></i>
+                      <span class="">View</span></a
+                    >
+                    <!-- <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                    <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a> -->
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead *ngIf="grnList.length != 0">
+                    <tr>
+                      <!-- <th class="pt-0">Item #</th> -->
+                      <th class="pt-0">GRN No</th>
+                      <th class="pt-0">PO No</th>
+                      <th class="pt-0">Invoice No</th>
+                      <th class="pt-0">Challan No</th>
+                      <th class="pt-0">Supplier</th>
+                      <th class="pt-0">GRN Date</th>
+                      <!-- <th class="pt-0">GRN Amt</th> -->
+                      <th class="pt-0">Discount Amt</th>
+                      <th class="pt-0">Tax Amt</th>
+                      <th class="pt-0">GRN/Net Amt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let grns of grnList">
+                      <!-- <td>{{grns}}</td> -->
+                      <td>{{ grns.LedgerTransactionNo }}</td>
+                      <td>{{ grns.PurchaseOrderNo }}</td>
+                      <td>{{ grns.InvoiceNo }}</td>
+                      <td>{{ grns.ChalanNo }}</td>
+                      <td>{{ grns.SupplierName }}</td>
+                      <td>{{ grns.GRNDate | date : "dd-MM-yyyy" }}</td>
+                      <!-- <td>{{grns.NetAmount}}</td> -->
+                      <td>{{ grns.DiscountOnTotal }}</td>
+                      <td>{{ grns.TaxAmount }}</td>
+                      <td>{{ grns.NetAmount }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="grnList.length == 0">
+            <div
+              class="d-flex align-items-center justify-content-center h-100 w-100"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No grns found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <!-- row -->
+</ng-container>
+
+
+<ng-container *ngIf="this.authservice.LoggedInUser.STORE==false|| this.authservice.LoggedInUser.STORE=='false'">
+  <div
+    class="d-flex justify-content-between align-items-center flex-wrap grid-margin"
+  >
+    <div>
+      <h4 class="mb-3 mb-md-0">Welcome to Department Dashboard</h4>
+    </div>
+  </div>
+  
+  <!-- Shimmer Loading UI -->
+  <div class="row" *ngIf="shimmerVisible">
+    <div
+      class="col-12 col-sm-6 col-md-6 col-xl-3 grid-margin"
+      *ngFor="let dummyLoop of [].constructor(4)"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 col-xl-5">
+              <div>
+                <div
+                  class="shimmerBG"
+                  style="
+                    width: 110px;
+                    height: 15px;
+                    border-radius: 5px;
+                    margin-bottom: 3px;
+                  "
+                ></div>
+              </div>
+              <div>
+                <div
+                  class="shimmerBG"
+                  style="width: 30px; height: 40px; border-radius: 5px"
+                ></div>
+              </div>
+            </div>
+            <div class="col-md-12 col-xl-7">
+              <div class="text-end">
+                <div
+                  class="shimmerBG"
+                  style="
+                    width: 110px;
+                    height: 70px;
+                    border-radius: 5px;
+                    float: right;
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Shimmer Loading UI -->
+  
+  <ng-container *ngIf="!shimmerVisible">
+    <div class="row">
+      <div class="col-12 col-xl-12 stretch-card">
+        <div class="row flex-grow-1">
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container *ngIf="newItemsList.length != 0">
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">New Requests </h6>
+                    <!-- <div ngbDropdown class="mb-2">
+                      <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton">
+                        <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="eye" appFeatherIcon class="icon-sm me-2"></i> <span class="">View</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="edit-2" appFeatherIcon class="icon-sm me-2"></i> <span class="">Edit</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="trash" appFeatherIcon class="icon-sm me-2"></i> <span class="">Delete</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="printer" appFeatherIcon class="icon-sm me-2"></i> <span class="">Print</span></a>
+                        <a ngbDropdownItem class="d-flex align-items-center" href="" (click)="false"><i data-feather="download" appFeatherIcon class="icon-sm me-2"></i> <span class="">Download</span></a>
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">
+                        {{requesttotal}}
+                      </h3>
+                      <!-- <div class="d-flex align-items-baseline">
+                        <p class="text-success">
+                          <span>+3.3%</span>
+                          <i
+                            data-feather="arrow-up"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div> -->
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <apx-chart
+                          [series]="RequestCountChartOptions.series"
+                          [chart]="RequestCountChartOptions.chart"
+                          [colors]="RequestCountChartOptions.colors"
+                          [xaxis]="RequestCountChartOptions.xaxis"
+                          [stroke]="RequestCountChartOptions.stroke"
+                          [markers]="RequestCountChartOptions.markers"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+  
+              <!-- No Data UI -->
+              <ng-container *ngIf="RequestCounts.length == 0">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No request found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container>
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">Received Quantity</h6>
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">{{recivedtotal}}</h3>
+                      <!-- <div class="d-flex align-items-baseline">
+                        <p class="text-danger">
+                          <span>-2.8%</span>
+                          <i
+                            data-feather="arrow-down"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div> -->
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <!-- [plotOptions]="ordersChartOptions.plotOptions" -->
+                        <apx-chart
+                          [series]="RecivedChartOptions.series"
+                          [chart]="RecivedChartOptions.chart"
+                          [colors]="RecivedChartOptions.colors"
+                          [stroke]="RecivedChartOptions.stroke"
+                          [xaxis]="RecivedChartOptions.xaxis"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+              <!-- No Data UI -->
+              <ng-container *ngIf="RecivedCounts.length == 0">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No received quantity found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+          <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <ng-container>
+                  <div
+                    class="d-flex justify-content-between align-items-baseline"
+                  >
+                    <h6 class="card-title mb-0">Consumed Quantity</h6>
+                  </div>
+                  <div class="row">
+                    <div class="col-6 col-md-12 col-xl-5">
+                      <h3 class="mb-2">{{consumetotal}}</h3>
+                      <div class="d-flex align-items-baseline">
+                        <p class="text-success">
+                          <span>+2.8%</span>
+                          <i
+                            data-feather="arrow-up"
+                            appFeatherIcon
+                            class="icon-sm mb-1"
+                          ></i>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-6 col-md-12 col-xl-7">
+                      <div class="mt-md-3 mt-xl-0">
+                        <apx-chart
+                          [series]="ConsumeChartOptions.series"
+                          [chart]="ConsumeChartOptions.chart"
+                          [colors]="ConsumeChartOptions.colors"
+                          [xaxis]="ConsumeChartOptions.xaxis"
+                          [stroke]="ConsumeChartOptions.stroke"
+                          [markers]="ConsumeChartOptions.markers"
+                        ></apx-chart>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+              <!-- No Data UI -->
+              <ng-container *ngIf="ConsumeQuantity.length==0">
+                <div
+                  class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+                >
+                  <div class="text-muted">
+                    <div
+                      class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                    >
+                      <i class="feather icon-alert-circle fs-2"></i>
+                      <span>No consumed quantity found!</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- No Data UI -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- row -->
+  
+    <div class="row">
+      <div class="col-12 col-lg-6 col-xl-6 grid-margin grid-margin-xl-0">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Latest Requests</h6>
+                <div ngbDropdown class="mb-2" *ngIf="AllRequests.length != 0">
+                  <button
+                    ngbDropdownToggle
+                    class="btn p-0 no-dropdown-toggle-icon"
+                    type="button"
+                    id="dropdownMenuButton6"
+                  >
+                    <i
+                      class="icon-lg text-muted pb-3px"
+                      data-feather="more-horizontal"
+                      appFeatherIcon
+                    ></i>
+                  </button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownMenuButton6">
+                    <a
+                      ngbDropdownItem
+                      class="d-flex align-items-center"
+                      href=""
+                      (click)="(false)"
+                      routerLink="/items/si-pending-items"
+                      ><i
+                        data-feather="eye"
+                        appFeatherIcon
+                        class="icon-sm me-2"
+                      ></i>
+                      <span class="">View SI pending items</span></a
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th class="pt-0">Indent No</th>
+                      <th class="pt-0">Indent from Location</th>
+                      <th class="pt-0">Indent to Location</th>
+                      <th class="pt-0">Status</th>
+                      <th class="pt-0">Item Count</th>
+                      <th class="pt-0">Request Quantity</th>
+                      <th class="pt-0">Received Quantity</th>
+                      <th class="pt-0">Created By</th>
+                      <th class="pt-0">Created Date</th>
+                      <th class="pt-0">Checked By</th>
+                      <th class="pt-0">Checked Date</th>
+                      <th class="pt-0">Approved By</th>
+                      <th class="pt-0">Approved Date</th>
+                      <th class="pt-0">Expected Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let i of AllRequests">
+                      <td class="py-2">{{i.IndentNo}}</td>
+                      <td class="py-2">{{i.FromLocation}}</td>
+                      <td class="py-2">{{i.ToLocation}}</td>
+                      <td class="py-2">
+                        <span 
+                      [ngClass]="i.FromRights=='Checked'? 'badge bg-info': i.FromRights=='Maker'? 'badge bg-warning': i.FromRights=='Approved'? 'badge bg-success':''"    
+                      >
+                      {{i.FromRights}}
+                      </span>
+                      </td>
+                      <td class="py-2">{{i.ItemCount}}</td>
+                      <td class="py-2">{{i.ReqQty}}</td>
+                      <td class="py-2">{{i.ReceiveQty}}</td>
+                      <td class="py-2">{{i.CreatedBy}}</td>
+                      <td class="py-2">{{i.CreatedDt | date : "dd-MM-yyy"}}</td>
+                      <td class="py-2">{{i.CheckedUserName}}</td>
+                      <td class="py-2">{{i.CheckedDate=='0001-01-01T00:00:00'?'N/A':i.CheckedDate | date : "dd-MM-yyy"}}</td>
+                      <td class="py-2">{{i.ApprovedUserName}}</td>
+                      <td class="py-2">{{i.ApprovedDate=='0001-01-01T00:00:00'?'N/A':i.ApprovedDate | date : "dd-MM-yyy"}}</td>
+                      <td class="py-2">{{i.ExpectedDate=='0001-01-01T00:00:00'?'N/A':i.ExpectedDate | date : "dd-MM-yyy"}}</td>
+                      <td class="py-2">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="AllRequests.length == 0">
+            <div
+              class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No recent request found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+      <div class="col-12 col-lg-6 col-xl-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <ng-container>
+              <div
+                class="d-flex justify-content-between align-items-baseline mb-2"
+              >
+                <h6 class="card-title mb-0">Monthly Wise Requests</h6>
+              </div>
+              <apx-chart
+                [series]="monthlySIChartOptions.series"
+                [chart]="monthlySIChartOptions.chart"
+                [colors]="monthlySIChartOptions.colors"
+                [fill]="monthlySIChartOptions.fill"
+                [grid]="monthlySIChartOptions.grid"
+                [xaxis]="monthlySIChartOptions.xaxis"
+                [yaxis]="monthlySIChartOptions.yaxis"
+                [legend]="monthlySIChartOptions.legend"
+                [stroke]="monthlySIChartOptions.stroke"
+                [dataLabels]="monthlySIChartOptions.dataLabels"
+                [plotOptions]="monthlySIChartOptions.plotOptions"
+              ></apx-chart>
+            </ng-container>
+          </div>
+          <!-- No Data UI -->
+          <ng-container *ngIf="MonthlyWiseSIrequests.length == 0">
+            <div
+              class="card-body w-100 h-100 d-flex align-items-center justify-content-center"
+            >
+              <div class="text-muted">
+                <div
+                  class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4"
+                >
+                  <i class="feather icon-alert-circle fs-2"></i>
+                  <span>No requests found!</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!-- No Data UI -->
+        </div>
+      </div>
+    </div>
+    <!-- row -->
+  </ng-container>
+  <!-- row -->
+</ng-container>

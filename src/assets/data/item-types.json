@@ -1,0 +1,26 @@
+[
+    {
+        "id": 0,
+        "category": "Capex",
+        "itemTypeCode": 78988,
+        "itemTypeName": "AMC admin",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci aliquam sunt, corrupti obcaecati quasi consequuntur.",
+        "status": "Active"
+    },
+    {
+        "id": 1,
+        "category": "Service",
+        "itemTypeCode": 78988,
+        "itemTypeName": "AMC admin",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci aliquam sunt, corrupti obcaecati quasi consequuntur.",
+        "status": "Active"
+    },
+    {
+        "id": 2,
+        "category": "Capex",
+        "itemTypeCode": 78988,
+        "itemTypeName": "AMC admin",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci aliquam sunt, corrupti obcaecati quasi consequuntur.",
+        "status": "Active"
+    }
+]

@@ -1,0 +1,77 @@
+.shimmerBG {
+  animation-duration: 2.2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  background: #ddd;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 1200px 100%;
+}
+
+.rect1 {
+  height: 15px;
+  width: 70px;
+  border-radius: 6px;
+}
+.rect2 {
+  height: 10px;
+  width: 120px;
+  border-radius: 6px;
+}
+
+.formLable{
+  height: 10px;
+  width: 100px;
+  border-radius: 6px;
+}
+.formInput{
+  height: 15px;
+  width: 80%;
+  border-radius: 6px;
+  line-height: 56px;
+}
+
+.media {
+  min-height: 240px;
+}
+
+.title-line {
+  height: 20px;
+  width: 100%;
+  margin-bottom: 12px;
+  border-radius: 20px;
+}
+
+.content-line {
+  height: 8px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.end {
+  width: 40%;
+}
+
+.mtb {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+@-webkit-keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1200px 0;
+  }
+  100% {
+    background-position: 1200px 0;
+  }
+}

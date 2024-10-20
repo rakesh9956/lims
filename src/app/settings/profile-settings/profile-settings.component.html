@@ -1,0 +1,134 @@
+<div class="row inbox-wrapper">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-5 col-md-4 col-xl-3 border-end-0 border-end-sm order-end-lg min-h-75">
+                        <!-- border-bottom pb-3 mb-3 -->
+                        <div class="d-flex align-items-center justify-content-between">
+                            <button class="navbar-toggle btn btn-icon border d-inline-flex d-none" type="button"
+                                aria-controls="asideNav">
+                                <i class="feather icon-chevron-down"></i>
+                            </button>
+                            <div class="order-first">
+                                <h4>Settings</h4>
+                                <p class="text-muted">{{this.Email }}</p>
+                            </div>
+                            <hr>
+                        </div>
+                        <div class="email-aside-nav mt-5" id="asideNav">
+                            <ul class="nav flex-column">
+                                <li class="nav-item active">
+                                    <a class="nav-link d-flex align-items-center">
+                                        <i class="feather icon-user icon-lg me-2"></i>
+                                        Profile Settings
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2 mb-3 mb-sm-0">
+                                    <a class="nav-link d-flex align-items-center"
+                                        routerLink="/settings/account-settings">
+                                        <i class="feather icon-lock icon-lg me-2"></i>
+                                        Account Settings
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-7 col-md-8 col-xl-9">
+                        <div class="card shadow-none border-0 h-100">
+                            <div class="card-body p-0">
+                                <h6 class="card-title mb-4">Profile Settings</h6>
+                                <form [formGroup]="profileForm">
+                                    <div class="row">
+                                        <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                                            <label for="formLabel">Email id<span
+                                                    [ngClass]="{'text-danger': email.length == 0 }">
+                                                    *</span></label>
+                                            <input type="text" name="emailid" class="form-control" autocomplete="on"
+                                                readonly
+                                                [ngClass]="(profileForm.get('emailid')?.hasError('required')) && profileForm.get('emailid')?.touched ? 'is-invalid' : ''"
+                                                formControlName="emailId" maxlength="150" />
+                                            <div
+                                                *ngIf="profileForm.get('emailid')?.hasError('required') && profileForm.get('emailid')?.touched">
+                                                <span class="text-danger form-error-message">Email id is
+                                                    required!</span>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                                            <label for="formLabel">Full name<span
+                                                    [ngClass]="{'text-danger': profileForm.value.fullName.length == 0 }">
+                                                    *</span></label>
+                                            <input type="text" id="fullName" name="fullName" class="form-control"
+                                                placeholder="Enter full name" autocomplete="on" readonly [ngClass]="(profileForm.get('fullName')?.hasError('required')) &&
+                                            profileForm.get('fullName')?.touched ? 'is-invalid' : ''"
+                                                formControlName="fullName" maxlength="50" />
+                                            <div
+                                                *ngIf="profileForm.get('fullName')?.hasError('required') && profileForm.get('fullName')?.touched">
+                                                <span class="text-danger form-error-message">Full name is
+                                                    required!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="countryCodeWrapper col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                                            <label for="formLabel">Country code<span
+                                                    [ngClass]="{'text-danger': profileForm.value.countrycode.length == 0 }">
+                                                    *</span></label>
+                                            <select id="countryCode" formControlName="countrycode"
+                                                [ngClass]="profileForm.get('countrycode')?.hasError('required') && profileForm.get('countrycode')?.touched? 'is-invalid' : '' "
+                                                class="form-control login-input pl-2 countryCodeBox phone-dropdown"
+                                                (change)="Oncountrychange($event)">
+                                               <option value='+91' selected disabled>+91-(IN)</option>
+                                                <!-- <option value='' selected disabled>Select country code</option>
+                                                <option *ngFor="let option of countrycode" [value]="option.dialCode">
+                                                    {{option.dialCode}} - ({{option.isoCode}}) </option> -->
+                                            </select>
+                                            <div
+                                                *ngIf="profileForm.get('countrycode')?.hasError('required') && profileForm.get('countrycode')?.touched">
+                                                <span class="text-danger form-error-message">Country code is
+                                                    required!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-sm-12 col-md-8 col-xl-6 mb-4">
+                                            <label for="formLabel">Mobile number</label>
+                                            <input type="text" id="mobileNumber" name="mobileNumber"
+                                                class="form-control" placeholder="Enter mobile number" 
+                                                formControlName="mobileNumber" (input)="phoneNoValidator($event)"
+                                                minlength="10" maxlength="10" />
+                                            <!-- <ng-container 
+                                                *ngIf="profileForm.get('mobileNumber')?.hasError('required') && profileForm.get('mobileNumber')?.touched">
+                                                <span class="text-danger form-error-message">Mobile number is
+                                                    required!</span>
+                                            </ng-container> -->
+                                            <span class="text-danger position-absolute"
+                                            *ngIf="profileForm.value.mobileNumber?.length <=9 && profileForm.value.mobileNumber">
+                                            Enter valid mobile number!
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="card-footer text-start">
+                                <div class="d-flex align-items-center justify-content-end">
+                                    <div class="success-message me-2" *ngIf="showSuccessMessage" style="color: green;">
+                                        <p>Profile details updated successfully</p>
+                                    </div>
+                                    <button id="reset" type="button" class="btn btn-outline-primary me-2" [disabled]="onProfileSubmitForm" (click)="formReset()">Reset</button>
+                                    <button id="Update" type="button" class="btn btn-primary submit" (click)="formupdate()" [disabled]="profileForm.invalid || onProfileSubmitForm">Update</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

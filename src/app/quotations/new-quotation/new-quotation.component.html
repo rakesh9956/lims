@@ -1,0 +1,907 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/quotations">Quotations</a></li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="this.quotationsList.length == 0">New quotation
+        </li>
+        <li class="breadcrumb-item active" aria-current="page" *ngIf="this.quotationsList.length > 0">Edit quotation
+        </li>
+    </ol>
+</nav>
+
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title" *ngIf="this.quotationsList.length == 0">New Quotation</h6>
+                <h6 class="card-title" *ngIf="this.quotationsList.length > 0">Edit Quotation</h6>
+                <div class="mb-3" *ngIf="quotationGuid">
+                    <label for="purchaseOrderNo" class="form-label">Quotation No:
+                        <strong>{{this.quotationsList[0]?.QuotationNo}}</strong></label>
+                </div>
+
+                <ng-container *ngIf="!shimmerVisible">
+                    <form [formGroup]="newQuotationForm">
+                        <div class="row">
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="machineName" class="form-label">Supplier name
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('SupplierGuid')?.invalid}">*</span>
+                                        <!-- <span class="text-danger" *ngIf="newQuotationForm.get('SupplierTypeGuid')?.invalid">*</span> -->
+                                    </label>
+                                    <ng-select [items]="supplierDetails" [closeOnSelect]="true" [searchable]="true"
+                                        [ngClass]="{'is-invalid':newQuotationForm.get('SupplierGuid')?.hasError('required') && newQuotationForm.get('SupplierGuid')?.touched}"
+                                        bindValue="SupplierGuid" [inputAttrs]="{maxlength: '48'}"
+                                        bindLabel="SupplierName" placeholder="Select supplier name"
+                                        formControlName="SupplierGuid"
+                                        (change)="onSupplierDetails(this.newQuotationForm.value.SupplierGuid)">
+                                    </ng-select>
+                                    <ng-container
+                                        *ngIf="newQuotationForm.get('SupplierGuid')?.hasError('required') && newQuotationForm.get('SupplierGuid')?.touched?'is-invalid' : ''">
+                                        <span class="text-danger mt-4px d-block">Supplier name is required!</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="machineName" class="form-label">Supplier state</label>
+                                    <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                        placeholder="Enter state name." formControlName="StateGuid"
+                                        [readonly]="quotationGuid || quotationGuid==null">
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerCatalogNo" class="form-label">GSTN No</label>
+                                    <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                        placeholder=" Enter GSTN no." formControlName="GSTNNO"
+                                        [readonly]="quotationGuid || quotationGuid==null">
+                                    <span class="invalid-feedback">
+                                        GSTN no is required!</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerCatalogNo" class="form-label">Address</label>
+                                    <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                        placeholder="Enter address" formControlName="Vendoraddress"
+                                        [readonly]="quotationGuid || quotationGuid==null">
+                                    <span class="invalid-feedback">
+                                        Address is required!</span>
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="machineName" class="form-label">Supplier type
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('SupplierGuid')?.invalid}">*</span>
+                                    </label>
+                                    <ng-select [items]="supplierType" [closeOnSelect]="true" [searchable]="true"
+                                        bindValue="" [inputAttrs]="{maxlength: '48'}" bindLabel="SupplierTypeName"
+                                        placeholder="Select supplier type" formControlName="supplierType">
+                                    </ng-select>
+                                </div>
+                            </div> -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="purchasedUnit" class="form-label">Delivery location
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('lstLocations')?.invalid}">*</span>
+                                    </label>
+                                    <ng-multiselect-dropdown formControlName="lstLocations"
+                                        [placeholder]="'Select delivery location'" [settings]="dropdownSettings"
+                                        [data]="deliverLocation"
+                                        (onSelect)="onchangeToState(this.newQuotationForm.value.lstLocations)"
+                                        (onSelectAll)="onchangeToState(this.newQuotationForm.value.lstLocation)"
+                                        (onDeSelect)="onchangeToState(this.newQuotationForm.value.lstLocations)"
+                                        (onDeSelectAll)="onchangeToState(this.newQuotationForm.value.lstLocation)"
+                                        [class.is-invalid]="newQuotationForm.get('lstLocations')?.hasError('required') && newQuotationForm.get('lstLocations')?.touched"
+                                        (click)="onClickMultiselect('lstLocations')">
+                                    </ng-multiselect-dropdown>
+                                    <span
+                                        *ngIf="(newQuotationForm.get('lstLocations')?.hasError('required')) && newQuotationForm.get('lstLocations')?.touched ? 'is-invalid' : ''"
+                                        class="text-danger form-error-message">Delivery location is required!</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="purchasedUnit"
+                                        class="form-label d-flex justify-content-between">Delivery
+                                        state</label>
+                                    <ng-multiselect-dropdown formControlName="lstStates"
+                                        [placeholder]="'Select delivery state'" [settings]="dropdownDeliveryState"
+                                        [data]="deliveryState"
+                                        (onSelect)="ondDeleiverystate(this.newQuotationForm.value.lstStates)"
+                                        (onSelectAll)="ondDeleiverystate(this.newQuotationForm.value.lstStates)"
+                                        (onDeSelect)="ondDeleiverystate(this.newQuotationForm.value.lstStates)"
+                                        (onDeSelectAll)="ondDeleiverystate(this.newQuotationForm.value.lstStates)">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerName"
+                                        class="form-label d-flex justify-content-between">Center
+                                        type</label>
+                                    <ng-multiselect-dropdown formControlName="CentreType"
+                                        [placeholder]="'Select center type'" [settings]="dropdownCenterType"
+                                        [data]="centerDetails"
+                                        (onSelect)="onchangeCenter(this.newQuotationForm.value.CentreType)"
+                                        (onSelectAll)="onchangeCenter(this.newQuotationForm.value.CentreType)"
+                                        (onDeSelect)="onchangeCenter(this.newQuotationForm.value.CentreType)"
+                                        (onDeSelectAll)="onchangeCenter(this.newQuotationForm.value.CentreType)">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="purchasedUnit"
+                                        class="form-label d-flex justify-content-between">Center</label>
+                                    <ng-multiselect-dropdown formControlName="lstCenters"
+                                        [placeholder]="'Select center'" [settings]="dropdownCenter" [data]="stateList"
+                                        (onSelect)="onCenterLocation(this.newQuotationForm.value.lstCenters)"
+                                        (onSelectAll)="onCenterLocation(this.newQuotationForm.value.lstCenters)"
+                                        (onDeSelect)="onCenterLocation(this.newQuotationForm.value.lstCenters)"
+                                        (onDeSelectAll)="onCenterLocation(this.newQuotationForm.value.lstCenters)">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="purchasedUnit" class="form-label">Delivery location
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('lstLocations')?.invalid}">*</span>
+                                    </label>
+                                    <ng-select [items]="deliverLocation" [closeOnSelect]="true" [searchable]="true"
+                                        [multiple]=true [inputAttrs]="{maxlength: '48'}"
+                                        [ngClass]="{'is-invalid':newQuotationForm.get('lstLocations')?.hasError('required') && newQuotationForm.get('lstLocations')!.touched}"
+                                        bindValue="" bindLabel="CenterLocationName" placeholder="Select delivery location"
+                                        formControlName="lstLocations"
+                                        (change)="onchangeToState(this.newQuotationForm.value.lstLocations)">
+                                    </ng-select>
+                                    <span class="text-danger mt-4px d-block"
+                                        *ngIf="newQuotationForm.get('lstLocations')?.hasError('required') && newQuotationForm.get('lstLocations')?.touched?'is-invalid' : ''">
+                                        Delivery location is required!</span>
+                                </div>
+                            </div> -->
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="machineName" class="form-label">Supplier type
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('SupplierGuid')?.invalid}">*</span>
+                                    </label>
+                                    <input class="form-control " placeholder="Select supplier type" name="dp" readonly
+                                        formControlName="supplierType">
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label ">From date <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('FromDate')?.invalid}">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control datepicker" placeholder="dd-mm-yyyy" name="dp"
+                                            readonly formControlName="FromDate" ngbDatepicker #d="ngbDatepicker"
+                                            [minDate]="minDate" (dateSelect)="onDateSelect($event);"
+                                            [ngClass]="newQuotationForm.get('FromDate')?.hasError('required') && newQuotationForm.get('FromDate')!.touched ? 'is-invalid' : ''"
+                                            (click)="d.toggle()">
+                                        <button class="input-group-text" type="button"
+                                            (click)="newQuotationForm.get('FromDate')?.markAsTouched();d.toggle()">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button>
+                                        <span class="invalid-feedback">
+                                            From date is required!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="itemExpiryDate" class="form-label">To date
+                                        <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('ToDate')?.invalid}">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control datepicker " placeholder="dd-mm-yyyy" name="dp"
+                                            [readonly]="!selectFromDate" formControlName="ToDate" ngbDatepicker
+                                            #d1="ngbDatepicker" [minDate]="selectedDate"
+                                            [ngClass]="newQuotationForm.get('ToDate')?.hasError('required') && newQuotationForm.get('ToDate')!.touched ? 'is-invalid' : ''"
+                                            (click)="d1.toggle();">
+                                        <button class="input-group-text" type="button"
+                                            (click)="newQuotationForm.get('ToDate')?.markAsTouched();selectFromDate?d1.toggle():''">
+                                            <i class="feather icon-calendar icon-md text-muted"></i>
+                                        </button>
+                                        <span class="invalid-feedback">
+                                            To date is required!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                                <div class="mb-3">
+                                    <label for="manufacturerCatalogNo" class="form-label">Ref No. <span
+                                            [ngClass]="{'text-danger': newQuotationForm.get('QuotationRefNo')?.invalid}">*</span></label>
+                                    <input type="text" id="manufacturerCatalogNo" class="form-control"
+                                        placeholder="Enter Ref No." formControlName="QuotationRefNo" [maxlength]="50"
+                                        [ngClass]="newQuotationForm.get('QuotationRefNo')?.hasError('required') && newQuotationForm.get('QuotationRefNo')!.touched ? 'is-invalid' : ''">
+                                    <span class="invalid-feedback">
+                                        Ref no. is required!</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-title">Item Details</h6>
+                            <div class="row" formArrayName="lstItemsDetails">
+                                <ng-container *ngFor="let item of addItemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <div class="col-sm-3">
+                                            <div class="mb-3 position-relative">
+                                                <label for="itemName" class="form-label">Item
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].ItemName == ''}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    placeholder="Enter item name" autocomplete="on"
+                                                    formControlName="ItemName" (keyup)="changeSearch($event,i)"
+                                                    [ngClass]="{'is-invalid':item.get('ItemName')?.touched && item.get('ItemName')?.invalid || isdisable && i || newQuotationForm.get('lstItemsDetails')?.value[i].DuplicateItemCheck } ">
+                                                <div class="spinLoader" *ngIf="SpinnerCheck">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        width="20" height="20">
+                                                        <path fill="none" d="M0 0h24v24H0z" />
+                                                        <path
+                                                            d="M12 2a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v3a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1zm10-5a1 1 0 0 1-1 1h-3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zM7 12a1 1 0 0 1-1 1H3a1 1 0 0 1 0-2h3a1 1 0 0 1 1 1zm12.071 7.071a1 1 0 0 1-1.414 0l-2.121-2.121a1 1 0 0 1 1.414-1.414l2.121 2.12a1 1 0 0 1 0 1.415zM8.464 8.464a1 1 0 0 1-1.414 0L4.93 6.344a1 1 0 0 1 1.414-1.415L8.464 7.05a1 1 0 0 1 0 1.414zM4.93 19.071a1 1 0 0 1 0-1.414l2.121-2.121a1 1 0 1 1 1.414 1.414l-2.12 2.121a1 1 0 0 1-1.415 0zM15.536 8.464a1 1 0 0 1 0-1.414l2.12-2.121a1 1 0 0 1 1.415 1.414L16.95 8.464a1 1 0 0 1-1.414 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="card card-body card-block autocompleteBox p-0">
+                                                    <div class="border-bottom p-2" *ngFor="let item of allItems"
+                                                        (click)="ItemSearch(item,i)">{{item.ItemName}} -
+                                                        ({{item.CatalogNo?(item.CatalogNo):'N/A'}})</div>
+                                                </div>
+                                                <span class="text-danger position-absolute"
+                                                    *ngIf="item.get('ItemName')?.touched && item.get('ItemName')?.invalid && !newQuotationForm.get('lstItemsDetails')?.value[i].DuplicateItemCheck">
+                                                    Item is required!</span>
+                                                <div class="text-danger position-absolute"
+                                                    *ngIf="newQuotationForm.get('lstItemsDetails')?.value[i].DuplicateItemCheck">
+                                                    Please
+                                                    select different item</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3 position-relative">
+                                                <label for="itemName" class="form-label">Vendor Item Name
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].VendorItemName == ''}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    formControlName="VendorItemName"
+                                                    placeholder="Enter vendor item name"
+                                                    [ngClass]="{'is-invalid':item.get('VendorItemName')?.touched && item.get('VendorItemName')?.invalid}">
+                                                <span class="invalid-feedback">
+                                                    Vendor item name is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="manufacturerName"
+                                                    class="form-label d-flex justify-content-between">Machine
+                                                </label>
+                                                <!-- <select class="form-select" id="manufacturerName">
+                                                <option value="" selected disabled *ngIf="this.newQuotationForm.get('lstItemsDetails')?.value[i].Machine==''">Select Machine </option>
+                                                <option *ngFor="let machine of MachineDetails"
+                                                    value="{{machine.Guid}}">{{this.newQuotationForm.get('lstItemsDetails')?.value[i].Machine}}</option>
+                                            </select> -->
+                                                <input type="text" id="MachineName"
+                                                    class="form-control autocompleteInput"
+                                                    [readonly]="quotationGuid || quotationGuid==null"
+                                                    placeholder="Enter machine name" autocomplete="on"
+                                                    formControlName="Machine">
+                                                <span class="invalid-feedback">
+                                                    Machine is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="manufacturerName"
+                                                    class="form-label d-flex justify-content-between">Manufacturer</label>
+                                                <ng-select [items]="lstManufacturers" [closeOnSelect]="true"
+                                                    [searchable]="true" bindValue="ManufactureGuid"
+                                                    [inputAttrs]="{maxlength: '48'}" bindLabel="ManufactureName"
+                                                    [notFoundText]="'No manufacturer found'"
+                                                    placeholder="Select manufacturer" formControlName="ManufactureGuid"
+                                                    (change)="changeManufacture($event,i)">
+                                                </ng-select>
+                                                <span class="invalid-feedback">
+                                                    Manufacturer is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="manufacturerName" class="form-label d-flex">Pack Size
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].PackSize == ''}">*</span></label>
+                                                <input type="text" id="MachineName"
+                                                    class="form-control autocompleteInput" placeholder="Enter pack size"
+                                                    autocomplete="on"
+                                                    [ngClass]="{'is-invalid':item.get('PackSize')?.touched && item.get('PackSize')?.invalid}"
+                                                    formControlName="PackSize" (keypress)="restrictCharectors($event)">
+                                                <span class="invalid-feedback">
+                                                    Pack size is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">Rate Rs
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].Rate == ''}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" [maxLength]="8"
+                                                    class="form-control autocompleteInput"
+                                                    (keypress)="restrictCharectorsInTax($event)" formControlName="Rate"
+                                                    (input)="changeRate($event,i)"
+                                                    [ngClass]="{'is-invalid':item.get('Rate')?.touched && item.get('Rate')?.invalid}"
+                                                    placeholder="Enter rate">
+                                                <span class="invalid-feedback">
+                                                    Rate is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">Discount %
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].Discount == ''}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" [maxLength]="8"
+                                                    class="form-control autocompleteInput"
+                                                    (keypress)="restrictCharectors($event)" formControlName="Discount"
+                                                    (input)="changeRate($event,i)"
+                                                    [ngClass]="{'is-invalid':item.get('Discount')?.touched && item.get('Discount')?.invalid}"
+                                                    placeholder="Enter discount">
+                                                <span class="invalid-feedback">
+                                                    Discount % is required!</span>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-lg col-md-3 col-sm-4">
+                                        <div class="mb-3">
+                                            <label for="itemName" class="form-label">Paid Qty</label>
+                                            <input type="text" id="itemName" class="form-control autocompleteInput"  formControlName="PaidQty"
+                                            [ngClass]="newQuotationForm.get('PaidQty')?.hasError('PaidQty') && newQuotationForm.get('PaidQty')!.touched ? 'is-invalid' : ''"
+                                                placeholder="Enter paid qty">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg col-md-3 col-sm-4">
+                                        <div class="mb-3">
+                                            <label for="itemName" class="form-label">Extra Free Qty</label>
+                                            <input type="text" id="itemName" class="form-control autocompleteInput"  formControlName="FreeQty"
+                                            [ngClass]="newQuotationForm.get('PaidQty')?.hasError('required') && newQuotationForm.get('PaidQty')!.touched ? 'is-invalid' : ''"
+                                                placeholder="Enter extra free qty">
+                                        </div>
+                                    </div> -->
+                                        <!-- <div class="col-lg col-md-3 col-sm-4">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">UTGST %
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].UTGST == ''}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" [maxLength]="8"
+                                                    class="form-control autocompleteInput"
+                                                    (keypress)="restrictCharectors($event)" formControlName="UTGST"
+                                                    (input)="changeRate($event,i)"
+                                                    [ngClass]="{'is-invalid':item.get('UTGST')?.touched && item.get('UTGST')?.invalid}"
+                                                    placeholder="Enter UTGST ">
+                                                <span class="invalid-feedback">
+                                                    UTGST % is required!</span>
+                                            </div>
+                                        </div> -->
+                                        <div class="col-sm-3">
+                                            <div class="row position-relative">
+                                                <div class="col-lg col-md-6 col-sm-6 pe-sm-0">
+                                                    <div class="mb-3">
+                                                        <label for="itemName" class="form-label">CGST %
+                                                            <span
+                                                                [ngClass]="{'text-danger': (this.newQuotationForm.get('lstItemsDetails')?.value[i].CGST === '') }">*</span>
+                                                        </label>
+                                                        <input type="text" id="itemName" [maxLength]="8"
+                                                            class="form-control autocompleteInput cgst-radius"
+                                                            (keypress)="restrictCharectorsInTax($event)"
+                                                            formControlName="CGST" (input)="changeRate($event,i)"
+                                                            [ngClass]="{'is-invalid':item.get('CGST')?.touched && item.get('CGST')?.invalid}"
+                                                            placeholder="Enter CGST">
+                                                        <span class="invalid-feedback">
+                                                            CGST % is required!</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg col-md-6 col-sm-6 ps-sm-0">
+                                                    <span class="divider d-none d-sm-block"></span>
+                                                    <div class="mb-3">
+                                                        <label for="itemName" class="form-label">SGST %
+                                                            <span
+                                                                [ngClass]="{'text-danger': (this.newQuotationForm.get('lstItemsDetails')?.value[i].SGST === '')}">*</span>
+                                                        </label>
+                                                        <input type="text" id="itemName1" [maxLength]="8"
+                                                            class="form-control autocompleteInput sgst-radius"
+                                                            formControlName="SGST"
+                                                            (keypress)="restrictCharectorsInTax($event)"
+                                                            (input)="changeRate($event,i)"
+                                                            [ngClass]="{'is-invalid':item.get('SGST')?.touched && item.get('SGST')?.invalid}"
+                                                            placeholder="Enter SGST">
+                                                        <span class="invalid-feedback">
+                                                            SGST % is required!</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label"> IGST%
+                                                    <span
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstItemsDetails')?.value[i].IGST == '' &&
+                                                        (this.newQuotationForm.get('lstItemsDetails')?.value[i].SGST == '' || this.newQuotationForm.get('lstItemsDetails')?.value[i].CGST == '')}">*</span>
+                                                </label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    [ngClass]="{'is-invalid':item.get('IGST')?.touched && item.get('IGST')?.invalid}"
+                                                    (input)="changeIgst(i); igstEntered = true;" formControlName="IGST"
+                                                    placeholder="Enter Total IGST"
+                                                    (keypress)="restrictCharectorsInTax($event)">
+                                                <span class="invalid-feedback"> IGST % is required!</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">Discount Amt
+                                                </label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    formControlName="DiscountAmount"
+                                                    [readonly]="quotationGuid || quotationGuid==null"
+                                                    [ngClass]="newQuotationForm.get('DiscountAmount')?.hasError('required') && newQuotationForm.get('DiscountAmount')!.touched ? 'is-invalid' : ''"
+                                                    placeholder="Enter discount Amt">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">Total GST Amt</label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    formControlName="TotalGSTAmount"
+                                                    [readonly]="quotationGuid || quotationGuid==null"
+                                                    [ngClass]="newQuotationForm.get('TotalGSTAmount')?.hasError('required') && newQuotationForm.get('TotalGSTAmount')!.touched ? 'is-invalid' : ''"
+                                                    placeholder="Enter Total GST Amt">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="mb-3">
+                                                <label for="itemName" class="form-label">Buy Price</label>
+                                                <input type="text" id="itemName" class="form-control autocompleteInput"
+                                                    formControlName="BuyPrice"
+                                                    [readonly]="quotationGuid || quotationGuid==null"
+                                                    [ngClass]="newQuotationForm.get('BuyPrice')?.hasError('required') && newQuotationForm.get('BuyPrice')!.touched ? 'is-invalid' : ''"
+                                                    placeholder="Enter Buy Price ">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="mb-3" (click)="removeItems(i)"
+                                                    *ngIf="(!this.addItemslist.invalid || this.addItemslist.length>1) && this.addItemslist.value[i].ApprovalStatus!=2">
+                                                    <button class="btn-danger btn" type="button">
+                                                        <span class="feather icon-close"> </span> Remove item
+                                                    </button>
+                                                </div>
+                                                <div class="mb-3" (click)="AddItems()"
+                                                    *ngIf="this.addItemslist.length==0 || i == addItemslist.controls.length - 1">
+                                                    <button class="btn-primary btn" type="button">
+                                                        <span class="feather icon-plus"> </span> Add item
+                                                    </button>
+                                                </div>
+                                                <div class="mb-3" *ngIf="quotationGuid &&  this.authservice.LoggedInUser.DEFAULTROLES.toLowerCase().includes('ADMIN'.toLowerCase())">
+                                                    <button class="btn btn-secondary" [disabled]="this.addItemslist.value[i].ItemCancel"
+                                                        type="button"
+                                                        (click)="openBasicModal(CancelQuotation);selectQuotation(addItemslist.value[i]);ItemCancelReason=''">
+                                                        Cancel Item
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </ng-container>
+                                </ng-container>
+                                <div class="mb-3" (click)="AddItems()" *ngIf="this.addItemslist.length==0">
+                                    <button class="btn-primary btn" type="button">
+                                        <span class="feather icon-plus"> </span> Add item
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="card-title">Terms & Conditions</h6>
+                            <div class="row" formArrayName="lstTermCondition">
+                                <ng-container *ngFor="let term of addTermConditionlist.controls; let ii = index">
+                                    <ng-container [formGroupName]="ii">
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label for="itemDescription" class="form-label">Terms<span
+                                                        ngClass="text-danger"
+                                                        [ngClass]="{'text-danger': this.newQuotationForm.get('lstTermCondition')?.value[ii].TermCondition == ''}">
+                                                        *</span></label>
+                                                <textarea class="form-control" id="itemDescription" rows="3"
+                                                    maxlength="2000" formControlName="TermCondition"
+                                                    [ngClass]="{'is-invalid':term.get('TermCondition')?.touched && term.get('TermCondition')?.invalid}"
+                                                    placeholder="Enter terms and condtions"></textarea>
+                                                <span class="invalid-feedback">
+                                                    Terms and Conditions are required!
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="mb-3" (click)="removeTermCondition(ii)" *ngIf="ii > 0">
+                                                    <button class="btn-danger btn" type="button">
+                                                        <span class="feather icon-close"> </span> Remove term Condition
+                                                    </button>
+                                                </div>
+                                                <div class="mb-3" (click)="AddTermCondition()"
+                                                    *ngIf="ii == addTermConditionlist.controls.length - 1">
+                                                    <button class="btn-primary btn" type="button">
+                                                        <span class="feather icon-plus"> </span> Add term Condition
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-sm-12 text-end">
+                                <div class="mb-3" (click)="AddTermCondition()"
+                                *ngIf="ii == addTermConditionlist.controls.length - 1">
+                                    <button class="btn-primary btn"><span class="feather icon-plus"></span> Add</button>
+                                </div>
+                            </div> -->
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <hr>
+                        </div>
+                        <div>
+                            <h6 class="card-title">Add Invoice</h6>
+                            <div class="mb-3">
+                                <!-- <button class="btn-primary btn" type="button" (click)="openBasicModal(invoiceItem)">
+                                <span class="feather icon-plus"> </span> Add Invoice
+                            </button> -->
+                                <div class="mb-3 col-md-6">
+                                    <label for="itemName" class="mb-2">Upload Invoice</label>
+                                    <input #fileInput type="file" id="upload-resume" fileToUpload class="form-control"
+                                        accept=".docx, .doc, .pdf, application/pdf" (change)="UplodeInvoice($event);"
+                                        placeholder="Enter consumption unit">
+                                    <span class="text-danger" *ngIf="isFileUplodad">{{ShowPdfFile}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table bg-white">
+                                            <thead>
+                                                <tr>
+                                                    <th>File type</th>
+                                                    <th>Invoice name</th>
+                                                    <th [width]="20">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr formArrayName="ListInvoiceDocuments"
+                                                    *ngFor="let document of InvoiceDocuments.controls; let i = index">
+                                                    <ng-container [formGroupName]="i">
+                                                        <td
+                                                            *ngIf="!this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">
+                                                            {{this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].OriginalFileName}}
+                                                        </td>
+                                                        <td
+                                                            *ngIf="!this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">
+                                                            {{this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].FileName}}
+                                                        </td>
+                                                        <td
+                                                            *ngIf="!this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].IsDeleted">
+                                                            <button class="btn btn-outline-primary btn-xs me-1"
+                                                                (click)="openBasicModal(previewItem);PreviewInvoice(this.newQuotationForm.get('ListInvoiceDocuments')?.value[i].FilePath)"><span
+                                                                    class="feather icon-eye"></span> View
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-xs me-1"
+                                                                (click)="remove(i)"><span
+                                                                    class="feather icon-trash-2"></span> Delete
+                                                            </button>
+                                                        </td>
+                                                    </ng-container>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </ng-container>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'form-2'"></app-shimmers>
+                <!--Shimmer UI -->
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-end ">
+                        <button type="button" class="btn btn-secondary me-2" (click)="quotationFormReset()"
+                            [disabled]="!FormChanged">Reset</button>
+                        <button type="button" class="btn btn-primary submit" (click)="saveQuotationsDetails()"
+                            *ngIf="this.quotationsList.length == 0"
+                            [disabled]="this.newQuotationForm.invalid  || this.addItemslist.length==0">Save</button>
+                        <button type="button" class="btn btn-primary submit" (click)="saveQuotationsDetails()"
+                            *ngIf="this.quotationsList.length > 0"
+                            [disabled]="this.newQuotationForm.invalid ||!FormChanged || this.addItemslist.length==0">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row full view-->
+    <ng-template #rowFullView let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Change Tax Details</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="table-responsive">
+                            <ngx-datatable [scrollbarH]="true" [rows]="rows" #table class="bootstrap"
+                                [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force"
+                                [footerHeight]="50" [limit]="10" rowHeight="auto">
+
+                                <ngx-datatable-column name="Item Category"></ngx-datatable-column>
+                                <ngx-datatable-column name="Item Id"></ngx-datatable-column>
+                                <ngx-datatable-column name="Item Name "></ngx-datatable-column>
+                                <ngx-datatable-column name="HSN Code"></ngx-datatable-column>
+                                <ngx-datatable-column name="Manufacturer"></ngx-datatable-column>
+                                <ngx-datatable-column name="Catelog No"></ngx-datatable-column>
+                                <ngx-datatable-column name="Machine"></ngx-datatable-column>
+                                <ngx-datatable-column name="purchased Unit"></ngx-datatable-column>
+                                <ngx-datatable-column name="Pack Size"></ngx-datatable-column>
+                                <ngx-datatable-column name="addConsumption Unit"></ngx-datatable-column>
+                                <ngx-datatable-column name="Rate"></ngx-datatable-column>
+                                <ngx-datatable-column name="Discount %"></ngx-datatable-column>
+                                <ngx-datatable-column name="Paid Qty"></ngx-datatable-column>
+                                <ngx-datatable-column name="Extra Free Qty"></ngx-datatable-column>
+                                <ngx-datatable-column name="IGST %"></ngx-datatable-column>
+                                <ngx-datatable-column name="CGST %"></ngx-datatable-column>
+                                <ngx-datatable-column name="SGST %"></ngx-datatable-column>
+                                <ngx-datatable-column name="Total GST%"></ngx-datatable-column>
+                                <ngx-datatable-column name="Change Tax">
+                                    <ng-template ngx-datatable-cell-template>
+                                        <button class="btn btn-outline-primary btn-xs me-1"><span
+                                                class="feather icon-edit"></span></button>
+
+                                    </ng-template>
+                                </ngx-datatable-column>
+                                <ngx-datatable-column name="Discount Amt"></ngx-datatable-column>
+                                <ngx-datatable-column name="Total GST Amt."></ngx-datatable-column>
+                                <ngx-datatable-column name="Action">
+                                    <ng-template ngx-datatable-cell-template>
+                                        <button class="btn  btn-xs me-1"><span
+                                                class="mdi text-danger mdi-close-eye"></span></button>
+                                    </ng-template>
+                                </ngx-datatable-column>
+                            </ngx-datatable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </ng-template>
+    <!-- Modal -->
+
+    <!-- Change Tax-->
+    <ng-template #changeTax let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Change Tax Percentage</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter item name">
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Old Tax Percentage</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter old tax percentage">
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">New Tax Percentage</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter new tax percentage">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Close</button>
+            <button type="button" class="btn btn-primary submit">Change Tax</button>
+        </div>
+    </ng-template>
+    <!-- Modal -->
+
+    <!-- Machine -->
+    <ng-template #machine let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add All Items</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Machine</label>
+                        <input type="text" id="itemName" class="form-control" placeholder="Enter consumption unit">
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+            <button type="button" class="btn btn-primary submit">Save</button>
+        </div>
+    </ng-template>
+    <!-- Modal -->
+
+    <!-- invoiceItem -->
+    <!-- <ng-template #invoiceItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add invoice</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Upload Invoice</label>
+                        <input #fileInput type="file" id="upload-resume" fileToUpload class="form-control"
+                            accept=".docx, .doc, .pdf, application/pdf" (change)="UplodeInvoice($event);"
+                            placeholder="Enter consumption unit">
+                        <span class="text-danger" *ngIf="isFileUplodad">{{ShowPdfFile}}</span>
+                    </div>
+                    <h6 class="card-title mb-2">File details</h6>
+                    <div *ngIf="FileName">
+                        <div>
+                            <ng-container>
+                                <ng-container>
+                                    <div class="row">
+                                        <div class="col-md-12 stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table bg-white">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>File type</th>
+                                                                    <th>File name</th>
+                                                                    <th [width]="20">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <ng-container>
+                                                                        <td>{{OriginalFileName?OriginalFileName:''}}</td>
+                                                                        <td>{{FileName?FileName:''}}</td>
+                                                                        <td> <button
+                                                                                class="btn btn-outline-danger btn-xs me-1"
+                                                                                (click)="OriginalFileName='';FileName=''"><span
+                                                                                    class="feather icon-trash-2"
+                                                                                   ></span>
+                                                                            </button></td>
+                                                                    </ng-container>
+                                                                </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary submit"
+            (click)="modal.close('by: close icon')" >Add</button>
+    </div>
+</ng-template> -->
+    <!-- Modal -->
+    <ng-template #previewItem let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Preview invoice</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon');"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="widget-content">
+                <div class="default-form">
+                    <div class="row form">
+                        <ngx-doc-viewer [url]="Document" viewer="url" style="width:100%;height:75vh;">
+                            <div>Loading</div>
+                        </ngx-doc-viewer>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- <div class="col-sm-12">
+                <div>Preview will displayed here...</div>
+             </div> -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">Cancel</button>
+        </div>
+    </ng-template>
+
+    <ng-template #CancelQuotation let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cancel Quotation Item</h5>
+            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Are you sure do you want to Cancel the
+                            <strong>{{QuotationItem}}</strong>
+                            Item?</label>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="mb-22">
+                        <label for="reason" class="form-label">Reason:</label>
+                        <input type="text" class="form-control" id="reason" name="reason"
+                            [(ngModel)]="ItemCancelReason">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+                No
+            </button>
+            <button type="button" class="btn btn-primary submit" (click)="modal.close('by: close icon')"
+                (click)="UpdateQuotationCancel()">Yes</button>
+        </div>
+    </ng-template>

@@ -1,0 +1,55 @@
+.received {
+    border-left: 3px solid #28a745;
+}
+.Issued {
+    border-left: 3px solid #00435d;
+}
+.consumed {
+    border-left: 3px solid #ffc107;
+}
+.return {
+    border-left: 3px solid #ff0707;
+}
+
+.info{
+    .returnBlock{
+        .retunrColor {
+            background: #dc3545;
+            width: 10px;
+            height: 10px;
+            display: inline-flex;
+            border-radius: 30px;
+        }        
+    } 
+    .consumedBlock{
+        .consumedColor {
+            background: #ffc107;
+            width: 10px;
+            height: 10px;
+            display: inline-flex;
+            border-radius: 30px;
+        }
+    }
+    .issueBlock{
+        .issueColor {
+            background: #00435d;
+            width: 10px;
+            height: 10px;
+            display: inline-flex;
+            border-radius: 30px;
+        }
+    }
+    .receviedBlock{
+        .receviedColor {
+            background: #28a745;
+            width: 10px;
+            height: 10px;
+            display: inline-flex;
+            border-radius: 30px;
+        }  
+    }
+    
+    
+     
+}
+

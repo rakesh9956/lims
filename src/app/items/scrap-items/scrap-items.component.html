@@ -1,0 +1,364 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="items">SCRAP ITEMS</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>SCRAP ITEMS</div>
+                    <div class="d-flex align-items-center">
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                            (click)="isMenuCollapsed = !isMenuCollapsed">
+                            <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <button class="btn btn-primary btn-icon-text flex-shrink-0 ms-2"
+                            (click)="openBackDropCustomClass(addScrapItems);ClosePopup();scrapItemForm.reset()"
+                            *ngIf="roles.toLowerCase().includes('Create'.toLowerCase())">
+                            <i class="feather icon-plus link-icon ms-2"></i>
+                            Add scrap item
+                        </button>
+                        <button (click)="GetScrapExcel();" class="btn btn-primary btn-icon-text flex-shrink-0 ms-2" ><span
+                            class="feather icon-arrow-up"></span> Export Scrap</button>
+                    </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div
+                        class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                        <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                            <span *ngIf="filterdScrapItems.length>0"
+                                class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0">
+                                {{(RowCount*(PageNumber-1))+1}}-{{TotalCount>RowCount*PageNumber?RowCount*PageNumber:TotalCount}}
+                                of
+                                {{TotalCount}} </span>
+                            <select *ngIf="filterdScrapItems.length>0" name="rowLimit" id="rowLimit"
+                                class="form-select form-select-sm mb-1 mb-sm-0" (change)="ChangeEvent($event)">
+                                <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                            </select>
+                            <input type="text" class="form-control form-select-sm mb-2 mb-sm-0 ms-sm-2 ms-0 mw-200"
+                                placeholder="Search" (keyup)="changeSearch($event)" [(ngModel)]="Keyword"/>
+                        </div>
+                        <div>
+                            <div class="input-group">
+                              <input class="form-control" placeholder="dd-mm-yyyy" name="dp1" ngbDatepicker readonly
+                                [(ngModel)]="removeFromDate" #d1="ngbDatepicker" [maxDate]="selectedDate" (dateSelect)="selectFromDate($event)">
+                              <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                <i class="feather icon-calendar icon-md text-muted"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div>
+                            <div class="input-group">
+                              <input class="form-control" placeholder="dd-mm-yyyy" name="dp" [minDate]="minDate" readonly
+                                [(ngModel)]="removeTodate" (dateSelect)="selectToDate($event)" ngbDatepicker #d2="ngbDatepicker">
+                              <button class="input-group-text" type="button" (click)="scrapFromDate?d2.toggle():''">
+                                <i class="feather icon-calendar icon-md text-muted"></i>
+                              </button>
+                            </div>
+                          </div>
+                    </div>
+                    <div class="col-md-12 mb-2 text-end" *ngIf="scrapFromDate || scrapEndDate">
+                        <button class="btn btn-link btn-sm text-underline px-0" (click)="ClearFilter()">Clear
+                          filters</button>
+                      </div>
+                </div>
+                <div class="table-responsive">
+
+                    <ng-container>
+                        <div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Scrap Number</th>
+                                        <th>Items count</th>
+                                        <!-- <th>Batch Number</th> -->
+                                        <!--<th>Scrap amount</th> -->
+                                        <th>Scrap Qauntity</th>
+                                        <th>Scrap Unit</th>
+                                        <!-- <th>Reason For Scrap </th> -->
+                                        <th>Scrap By Name</th>
+                                        <th>Approved by</th>
+                                        <th>Scrap Date</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngIf="!shimmerVisible">
+                                        <tr *ngFor="let i of filterdScrapItems">
+                                            <td>{{i.ScrapNumber}}</td>
+                                            <td>{{i.itemCount}}</td>
+                                            <!-- <td>{{i.BatchNumber}}</td> -->
+                                            <!-- <td>{{i.TotalAmountSum}}</td> -->
+                                            <td>{{i.totalScrapQuantity}}</td>
+                                            <td>{{i.totalScrapUnits}}</td>
+                                            <!-- <td>{{i.ScrapReason}}</td> -->
+                                            <td>{{i.ScrapByUserName}}</td>
+                                            <td>{{i.ApprovedByName?i.ApprovedByName:'N/A'}}</td>
+                                            <td>
+                                                {{i.ScrapDate =='0001-01-01T00:00:00'?'N/A': i.ScrapDate | date:
+                                                "dd-MM-yyyy"}}
+                                            </td>
+                                            <td>{{i.Location}}</td>
+                                            <td>
+                                                <button type="button" (click)="DownloadPdf(i,'print')"
+                                                    class="btn btn-outline-primary btn-xs me-1">
+                                                    <i class="feather icon-file-text link-icon"></i>
+                                                    <span>print</span>
+                                                </button>
+                                                <button type="button" (click)="DownloadPdf(i,'')"
+                                                    class="btn btn-outline-primary btn-xs  me-1">
+                                                    <i class="feather icon-file-text link-icon"></i>
+                                                    <span>Download</span>
+                                                </button>
+                                                <button type="button" (click)="SetscrapItems($event,i);openXlModal(AproveItem,'xl')"
+                                                    *ngIf="roles.toLowerCase().includes('Approval'.toLowerCase()) "
+                                                    class="btn btn-outline-primary btn-xs" [disabled]="i.IsScrap">
+                                                    <i class="feather icon-file-text link-icon"></i>
+                                                    <span>{{ i.IsScrap ? 'Approved' : 'Mark As Approved' }}</span>
+                                                </button>
+
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <!-- Shimmer UI  -->
+                                    <ng-container *ngIf="shimmerVisible">
+                                        <tr *ngFor="let dummyLoop of [].constructor(5)">
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <!-- Shimmer UI  -->
+                                </tbody>
+                            </table>
+                            <ng-container *ngIf="ScrapItemsList?.length==0 && !shimmerVisible">
+                                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                                    <div class="py-5 text-muted">
+                                        <div
+                                            class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                            <i class="feather icon-alert-circle fs-2"></i>
+                                            <span> No scrap items found!</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <!-- Pagination UI -->
+                    <div class="d-flex justify-content-center my-3 pe-3" *ngIf="ScrapItemsList?.length!=0">
+                        <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount"
+                            (pageChange)="ChangePageNumber($event)" [maxSize]="maxSize" [rotate]="false"
+                            [pageSize]="RowCount" [(page)]="PageNumber" [boundaryLinks]="boundaryLinks" [size]="size">
+                        </ngb-pagination>
+                    </div>
+                    <!-- Pagination UI -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #addScrapItems let-modal>
+    <div class="modal-header modal-xl">
+        <h5 class="modal-title" id="exampleModalLabel">Add scrap items</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon');ClosePopup();"
+            aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <!-- Filters -->
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <label for="locations" class="label">Locations</label>
+                <ng-select placeholder="Search by location names..." name="locations" class="ng-select-custom-250min"
+                    [items]="CenterLocation" bindValue="CenterLocationGuid" [(ngModel)]="Location"
+                    bindLabel="CenterLocationName" [multiple]="false" (change)="SelectLocation($event)">
+                </ng-select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="items" class="label">Items</label>
+                <ng-select placeholder="Search by item names..." [items]="ReceivedItems" bindValue="ItemGuid"
+                     [multiple]="true" name="items" (change)="SelectItem($event)"
+                     class="ng-select-custom-250min" [(ngModel)]="Items" #name="ngModel">
+                   <ng-template ng-option-tmp let-item="item">
+                     {{ item.ItemName }} ({{ item.VendorItemName?item.VendorItemName:'N/A' }})
+                   </ng-template>
+                   <ng-template ng-multi-label-tmp let-items="items">
+                     <span *ngFor="let item of items; let i = index">
+                       {{ item.ItemName }} ({{ item.VendorItemName?item.VendorItemName:'N/A' }})<span *ngIf="i < items.length - 1">, </span>
+                     </span>
+                   </ng-template>
+                </ng-select>
+            </div>
+        </div>
+        <!-- Filters -->
+        <form [formGroup]="scrapItemForm">
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Batch Number</th>
+                                    <th>Item Name</th>
+                                    <th>Vendor Item Name</th>
+                                    <th>Machine Name</th>
+                                    <th>Receive Qty</th>
+                                    <th>Scrap Quantity<span class="text-danger">*</span></th>
+                                    <th>Scrap Unit<span class="text-danger">*</span></th>
+                                    <th>Scrap amount</th>
+                                    <th>Scrap for reason<span class="text-danger">*</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr formArrayName="LstScrapItemsDetails"
+                                    *ngFor="let item of ScrapItemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <td><input type="checkbox" (change)="selectCheckBox($event,i)"></td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].BatchNumber}}
+                                        </td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].ItemName}}</td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].VendorItemName?this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].VendorItemName:'N/A'}}</td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].MechineName}}
+                                        </td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].ReceivedQuantity}}
+                                        </td>
+                                        <td><input style="width:80px" class="form-control" type="text" [min]="0"
+                                                (ngModelChange)="ChangeUnit($event,i)"
+                                                (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"
+                                                [max]="this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].TotalQuantity"
+                                                formControlName="ScrapQuantity"></td>
+                                        <td><input style="width:80px" class="form-control" type="text"
+                                                formControlName="ScrapUnits" readonly></td>
+                                        <td>{{this.scrapItemForm.get('LstScrapItemsDetails')?.value[i].TotalAmount}}
+                                        </td>
+                                        <td><input style="width:140px" type="text" class="form-control"
+                                                formControlName="ScrapReason"></td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                            <!-- <thead>
+                                <tr>
+                                    <td>Scrap Quantity</td>
+                                    <td><input type="number" class="form-control h-34"
+                                         style="width:70px; padding-inline: 5px;"></td>
+                                    <td></td><td><input type="number" class="form-control h-34"
+                                        style="width:70px; padding-inline: 5px;">Item Name</td>
+                                    <td>Scrap For Reason</td>
+                                </tr>
+                            </thead> -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- <form [formGroup]="scrapItemForm">
+            <div class="row mt-3">
+                <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">Scrap unit<span
+                                [ngClass]="{'text-danger': !scrapItemForm.value.ScrapItemUnits}"> *</span></label>
+                        <input type="number" id="itemCode" class="form-control" placeholder="Enter Scrap unit"
+                            (input)="ChangeUnit($event)"  [min]="0" formControlName="ScrapItemUnits"
+                            >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">Scrap quantity<span
+                                [ngClass]="{'text-danger': !scrapItemForm.value.ScrapItemQuantity}"> *</span></label>
+                        <input type="number" id="itemCode" class="form-control" placeholder="Enter Scrap quantity"
+                            readonly="Scrapquantity"  formControlName="ScrapItemQuantity"
+                            >
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-xl-6">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">Scrap for reason<span
+                                [ngClass]="{'text-danger': !ScrapForReason}"> *</span></label>
+                        <input type="text" id="itemCode" class="form-control" placeholder="Enter Scrap for reason" formControlName="ScrapForReason"
+                            maxlength="100" >
+                    </div>
+                </div>
+            </div>
+        </form> -->
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+            (click)="modal.close('by: close icon');scrapItemForm.reset()" aria-label="Close">Cancel</button>
+        <button type="button" class="btn btn-primary" [disabled]="scrapItemForm.invalid || IsButtonShow || !isChecked"
+            (click)="SaveScrapItem();modal.close('by: close icon')">Save</button>
+    </div>
+</ng-template>
+
+<ng-template #AproveItem let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Approve Item Details</h5>
+        <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <double-scroll>
+            <!-- <div class="table-responsive"> -->
+            <table class="table table-bordered pt-3">
+                <thead>
+                    <tr>
+                        <th>Scrap No.</th>
+                        <th>Item name</th>
+                        <th>Vendor Item name</th>
+                        <th>Batch No.</th>
+                        <th>Scrap Qty</th>
+                        <th>Approve Qty</th>
+                        <th>In Hand Qty</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr *ngFor="let i of AproveItemlist" >
+                        <td>{{i.ScrapNumber}}</td>
+                        <td>{{i.ItemName}}</td>
+                        <td>{{i.VendorItemName?i.VendorItemName:'N/A'}}</td>
+                        <td>{{i.BatchNumber}}</td>
+                        <td>{{i.ScrapQuantity}}</td>
+                        <td><input style="width:80px" class="form-control" type="text" [min]="0"
+                             [(ngModel)]="i.AproveQuantity" disabled
+                            (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"></td>
+                        <td>{{i.InHandQty}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- </div> -->
+        </double-scroll>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.close('by: close icon')">
+            No
+        </button>
+        <button type="button" class="btn btn-primary submit"  [disabled]="isdisable"
+            (click)="modal.close('by: close icon');scrapApproval();">Yes</button>
+    </div>
+</ng-template>

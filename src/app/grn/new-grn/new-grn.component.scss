@@ -1,0 +1,17 @@
+.mr-2{
+    margin-right: 20px;
+
+    @media screen and (max-width:620px){
+        margin-right: 8px;
+    }
+}
+.mb-5{
+    margin-bottom: 50px;
+}
+.ml-auto{
+    margin-left: auto;
+}
+.flex-end{
+   justify-content: flex-end;
+}
+

@@ -1,0 +1,148 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/items/all-cpt">Live Cpt</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Live Cpt</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                
+                    <h6 class="card-title d-flex align-items-center justify-content-between gap-2">
+                      <div>Live CPT</div>
+                      <div class="d-flex align-items-center justify-content-end">
+                        <button class="d-block ms-auto navbar-toggler filter-button" type="button"
+                          (click)="isMenuCollapsed = !isMenuCollapsed">
+                          <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <div class="d-inline-block ms-2">
+                          <button class="btn btn-primary" id="dropdownButtonPrimary"  routerLink="/items/live-cpt"
+                            >Add Live CPT</button>
+                        </div>
+                      </div>
+                    </h6>
+                    <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                        <div class="d-flex align-items-xl-center flex-column flex-xl-row flex-wrap gap-2 justify-content-end">
+                          <form class="d-flex align-items-xl-center flex-shrink-0 range-selection flex-column flex-xl-row gap-2">
+                            <div>
+                              <div class="input-group">
+                                <input class="form-control" placeholder="dd-mm-yyyy" name="dp1" ngbDatepicker readonly
+                                   #d1="ngbDatepicker" (dateSelect)="selectFromDate($event)">
+                                <button class="input-group-text" type="button" (click)="d1.toggle()">
+                                  <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div>
+                              <div class="input-group">
+                                <input class="form-control" placeholder="dd-mm-yyyy" name="dp"  readonly [maxDate]="calendar.getToday()"
+                                    ngbDatepicker #d2="ngbDatepicker" (dateSelect)="selectToDate($event)" [minDate]="selectfromDate">
+                                <button class="input-group-text" type="button" (click)="d2.toggle()">
+                                  <i class="feather icon-calendar icon-md text-muted"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <button class="btn btn-primary w-auto btn-sm ms-2" (click)="CPTReportData('excel')">Get Report Data</button>
+                            <div class="d-flex align-items-center flex-column flex-sm-row gap-2">
+                              <ng-container *ngIf=" allLiveCptList?.length>0 ">
+                                <span
+                                  class="text-muted text-small flex-shrink-0 align-self-start align-self-sm-center">{{(rowCount*(pageNumber-1))+1}}-{{TotalCount>rowCount*pageNumber?rowCount*pageNumber:TotalCount}}
+                                  of
+                                  {{TotalCount}}</span>
+                                <select name="rowLimit" id="rowLimit" class="form-control form-select me-1 h-34 w-100 w-md-75">
+                                  <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                                </select>
+                              </ng-container>
+                              <input type="text" class="form-control me-1 h-34 search-custom-200min" placeholder="Search"
+                                [maxLength]="50" (keyup)="changeSearch($event)" />
+              
+                            </div>
+                          </form>
+              
+                        </div>
+                        <!-- <div class="col-md-12 mb-2 text-end" *ngIf="fromDate || toDate">
+                          <button class="btn btn-link btn-sm text-underline px-0" (click)="onDataRemove()">Clear
+                            filters</button>
+                        </div> -->
+              
+                      </div>
+                <div class="table-responsive" *ngIf="!shimmerVisible">
+                    <ngx-datatable [scrollbarH]="true" class="bootstrap" [rows]="allLiveCptList"
+                        [loadingIndicator]="loadingIndicator" [columnMode]="ColumnMode.force" rowHeight="auto">
+                        <ngx-datatable-column name="LIVE CPT No" prop="LIVCPTNo"></ngx-datatable-column>
+                        <ngx-datatable-column name="Test Code" prop="TestCode">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.TestCode ? row.TestCode : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column name="Test Name" prop="TestName">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.TestName ? row.TestName : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column name="Created By" prop="CreatedBy">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.CreatedBy ? row.CreatedBy : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Created Dt" prop="CreatedDt">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{ row.CreatedDt ? (row.CreatedDt | date:'dd-MM-yyyy HH:mm') : 'N/A' }}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Test Count" prop="TestCount"></ngx-datatable-column>
+                        <ngx-datatable-column name="Actions" [width]="100" [sortable]="false">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                <div ngbDropdown>
+                                    <button class="btn btn-secondary btn-xs" id="actionsDropdown" placement="bottom"
+                                        container="body" popoverClass="dataTableActions"
+                                        [ngbPopover]="dataTableActions">Actions <span
+                                            class="feather icon-chevron-down"></span></button>
+                                    <ng-template #dataTableActions>
+                                        <div aria-labelledby="actionsDropdown">
+                                            <button class="border-bottom" ngbDropdownItem
+                                                [routerLink]="['/items/live-cpt',row.LiveCptGuid]"><span
+                                                    class="feather icon-edit"></span> Edit</button>
+                                            <button class="border-bottom" ngbDropdownItem
+                                                (click)="DownloadPdf(row,'print')"><span
+                                                    class="feather icon-printer"></span>
+                                                Print</button>
+                                            <button class="border-bottom" ngbDropdownItem
+                                                (click)="DownloadPdf(row,'download')"><span
+                                                    class="feather icon-download"></span>
+                                                Download</button>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+                <!--Shimmer UI -->
+                <app-shimmers *ngIf="shimmerVisible" [type]="'table'" [cols]="6" [rows]="5"></app-shimmers>
+                <!--Shimmer UI -->
+                <ng-container *ngIf="IsShow && !shimmerVisible">
+                    <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                        <div class="py-5 text-muted">
+                            <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                <i class="feather icon-alert-circle fs-2"></i>
+                                <span>No Live CPTs found!</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div class="card-footer" *ngIf="!IsShow">
+                <div class="d-flex justify-content-center my-3 pe-3">
+                    <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [pageSize]="itemsPerPage"
+                        [(page)]="pageNumber" (pageChange)="ChangePagenumber($event)" [maxSize]="maxSize"
+                        [rotate]="false" [boundaryLinks]="boundaryLinks" [size]="size"></ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

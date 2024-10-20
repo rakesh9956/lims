@@ -1,0 +1,76 @@
+<!--Shimmer UI Card -->
+<ng-container *ngIf="type == 'card'">
+  <div class="shimmerBG title-line"></div>
+  <div class="shimmerBG content-line mtb"></div>
+  <div class="shimmerBG content-line end"></div>
+</ng-container>
+<!--Shimmer UI Card -->
+
+<!--Shimmer UI Media -->
+<ng-container *ngIf="type == 'media'">
+  <div class="shimmerBG media"></div>
+</ng-container>
+<!--Shimmer UI Media -->
+
+<!--Shimmer UI Table -->
+<ng-container *ngIf="type == 'table'">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <td *ngFor="let dummyLoop of [].constructor(cols)">
+            <div class="rect1 shimmerBG"></div>
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let dummyLoop of [].constructor(rows)">
+          <td *ngFor="let dummyLoop of [].constructor(cols)">
+            <div class="rect2 shimmerBG"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+<!--Shimmer UI Table -->
+
+<!-- Shimmer UI Form -->
+<ng-container *ngIf="type == 'form'">
+  <div class="row">
+    <!-- <div class="mb-3">
+      <div class="shimmerBG" style="width:150px;height: 15px;"></div>
+    </div> -->
+    <div class="col-sm-6 col-md-4" *ngFor="let dummyLoop of [].constructor(inputCount)">
+      <div class="mb-3">
+        <label class="label mb-1">
+          <div class="shimmerBG formLable"></div>
+        </label>
+        <div class="form-control form-control-sm">
+          <div class="shimmerBG formInput"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<!-- Shimmer UI Form -->
+
+<!-- Shimmer UI Form -->
+<ng-container *ngIf="type == 'form-2'">
+  <div class="row">
+    <!-- <div class="mb-3">
+      <div class="shimmerBG" style="width:150px;height: 15px;"></div>
+    </div> -->
+    <div class="col-sm-6 col-md-3" *ngFor="let dummyLoop of [].constructor(inputCount2)">
+      <div class="mb-3">
+        <label class="label mb-1">
+          <div class="shimmerBG formLable"></div>
+        </label>
+        <div class="form-control form-control-sm">
+          <div class="shimmerBG formInput"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<!-- Shimmer UI Form -->

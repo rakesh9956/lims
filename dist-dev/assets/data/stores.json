@@ -1,0 +1,50 @@
+[
+    {
+        "id": 0,
+        "type": "Branch",
+        "state": "Telangana",
+        "center": "Ramsey Cummings",
+        "location": "Hyderabad, Telangana, India",
+        "autoSi": 39,
+        "contactNumber": 124136564,
+        "status": "Ramsey Cummings",
+        "createdDate": "02-Jun-2022",
+        "createdBy": "Ravi Kumar"
+    },
+    {
+        "id": 1,
+        "type": "Branch",
+        "state": "Maharashtra",
+        "center": "Vermoin point",
+        "location": "Mumbai, Maharashtra, India",
+        "autoSi": 0,
+        "contactNumber": 124136564,
+        "status": "Ramsey Cummings",
+        "createdDate": "02-Jun-2022",
+        "createdBy": "Ravi Kumar"
+    },
+    {
+        "id": 2,
+        "type": "Department",
+        "state": "Tamil Nadu",
+        "center": "Ramsey Cummings",
+        "location": "Chennai, Tamil Nadu, India",
+        "autoSi": 5,
+        "contactNumber": 124136564,
+        "status": "Ramsey Cummings",
+        "createdDate": "02-Jun-2022",
+        "createdBy": "Ravi Kumar"
+    },
+    {
+        "id": 3,
+        "type": "Branch",
+        "state": "Telangana",
+        "center": "Ramsey Cummings",
+        "location": "Hyderabad, Telangana, India",
+        "autoSi": 34,
+        "contactNumber": 124136564,
+        "status": "Ramsey Cummings",
+        "createdDate": "02-Jun-2022",
+        "createdBy": "Ravi Kumar"
+    }
+]

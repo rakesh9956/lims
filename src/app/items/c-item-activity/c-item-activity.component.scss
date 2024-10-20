@@ -1,0 +1,10 @@
+.minh-fullscreen{
+    height: calc(100vh - 370px);
+}
+.c-pointer{
+    cursor: pointer;
+
+    &:hover{
+        color:#6571ff
+    }
+}

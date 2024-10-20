@@ -1,0 +1,72 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body" *ngIf="Supplierslist.length!=0">
+                <double-scroll>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Supplier name</th>
+                                <th>Supplier category</th>
+                                <th>Supplier code</th>
+                                <th>Address</th>
+                                <th>Primary contact</th>
+                                <th>Contact no</th>
+                                <th>Office email id</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="Supplierslist !=null">
+                                <tr *ngFor="let supplier of Supplierslist">
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{supplier.SupplierName}}">{{supplier.SupplierName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span title="{{supplier.SupplierTypeName}}">{{supplier.SupplierTypeName}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 120px;">
+                                        <span title="{{supplier.SupplierCode}}">{{supplier.SupplierCode}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 300px;">
+                                        <span title="{{supplier.Street}}">{{supplier.Street}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span
+                                            title="{{supplier.PrimaryContactPerson}}">{{supplier.PrimaryContactPerson}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span
+                                            title="{{supplier.PrimaryContactPersonMobileNo}}">{{supplier.PrimaryContactPersonMobileNo}}</span>
+                                    </td>
+                                    <td class="truncate" style="max-width: 150px;">
+                                        <span
+                                            title="{{supplier.PrimaryContactPersonEmailId}}">{{supplier.SupplierEmailId}}</span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </double-scroll>
+            </div>
+            <!-- No records found UI -->
+            <!-- <ng-container *ngIf="!IsShow">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No Suppliers found!</span>
+                        </div>
+                    </div>
+                </div>
+               
+            </ng-container> -->
+            <ng-container *ngIf="Supplierslist.length == 0">
+                <div class="minh-fullscreen d-flex align-items-center justify-content-center">
+                    <div class="py-5 text-muted">
+                        <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                            <i class="feather icon-alert-circle fs-2"></i>
+                            <span>No Suppliers found!</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>

@@ -1,0 +1,287 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="items">NRDC</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <div>NRDC ITEMS</div>
+                    <div class="d-flex align-items-center justify-content-end mt-2 mt-sm-0">
+                        <button class="ms-auto navbar-toggler filter-button" type="button"
+                          (click)="isMenuCollapsed = !isMenuCollapsed">
+                         <i class="feather icon-filter size-18"></i>
+                        </button>
+                        <button class="btn btn-primary btn-icon-text flex-shrink-0 ms-2"
+                            (click)="openBackDropCustomClass(addNrdcItems);reset();Location=[];this.ReturnItemsDetailForm.reset()">
+                            <i class="feather icon-plus link-icon ms-2"></i>
+                            Add NRDC item
+                        </button>
+                    </div>
+                </h6>
+                <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse mb-3">
+                    <div class="d-flex flex-column flex-sm-row align-items-md-center gap-3 mt-2 mt-md-0 justify-content-end">
+                      <div class="align-items-center d-flex flex-column flex-sm-row text-end">
+                        <span *ngIf="nrdcdetails?.length!=0" class="text-muted me-0 me-sm-2 mb-1 mb-sm-0 text-small flex-shrink-0">
+                          {{(RowCount*(PageNumber-1))+1}}-{{TotalCount>RowCount*PageNumber?RowCount*PageNumber:TotalCount}}
+                          of
+                          {{TotalCount}} </span>
+                        <select *ngIf="nrdcdetails?.length!=0" name="rowLimit" id="rowLimit" class="form-select form-select-sm mb-1 mb-sm-0"
+                          (change)="ChangeEvent($event)">
+                          <option value={{item}} *ngFor="let item of itemOptionsPerPage">{{item}}</option>
+                        </select>
+                        <input type="text" class="form-control form-select-sm mb-2 mb-sm-0 ms-sm-2 ms-0 mw-200"
+                          placeholder="Search" (keyup)="changeSearch($event)" />
+                      </div>
+                    </div>
+                  </div>
+                <div class="table-responsive">
+                    <ng-container>
+                        <div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>Vendor Item Name</th>
+                                        <th>Location</th>
+                                        <th>Vendor name</th>
+                                        <th>Quantity</th>
+                                        <!-- <th>Unit</th> -->
+                                        <th>Buy price</th>
+                                        <th>Total Price</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngIf="!shimmerVisible">
+                                        <tr *ngFor="let nrdcdata of nrdcdetails">
+                                            <td>{{nrdcdata.itemname}}</td>
+                                            <td>{{nrdcdata.VendorItemName?nrdcdata.VendorItemName:'N/A'}}</td>
+                                            <td>{{nrdcdata.LocationName}}</td>
+                                            <td>{{nrdcdata.venderName?nrdcdata.venderName:'N/A'}}</td>
+                                            <td>{{nrdcdata.qty | exactNumbers}}</td>
+                                            <!-- <td>{{nrdcdata.unit}}</td> -->
+                                            <td>{{nrdcdata.unitprice | exactNumbers}}</td>
+                                            <td>{{nrdcdata.TotalPrice | exactNumbers}}</td>
+                                            <td>
+                                                <button type="button" (click)="DownloadPdf(nrdcdata,'print')"
+                                                    class="btn btn-outline-primary btn-xs me-1">
+                                                    <i class="feather icon-file-text link-icon"></i>
+                                                    <span>print</span>
+                                                </button>
+                                                <button type="button" (click)="DownloadPdf(nrdcdata,'')"
+                                                    class="btn btn-outline-primary btn-xs">
+                                                    <i class="feather icon-file-text link-icon"></i>
+                                                    <span>Download</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <!-- Shimmer UI  -->
+                                    <ng-container *ngIf="shimmerVisible">
+                                        <tr *ngFor="let dummyLoop of [].constructor(8)">
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                            <td>
+                                                <div class="shimmerBG line"></div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <!-- Shimmer UI  -->
+                                </tbody>
+                            </table>
+                            <ng-container *ngIf="nrdcdetails?.length==0 && !shimmerVisible">
+                             <div class="minh-fullscreen d-flex align-items-center justify-content-center">      
+                            <div class="py-5 text-muted">
+                                <div class="d-flex flex-column justify-content-center gap-1 align-items-center fs-4">
+                                    <i class="feather icon-alert-circle fs-2"></i>
+                                    <span> No NRDC items found!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                        </div>
+                    <!-- Pagination UI -->
+                    <div class="d-flex justify-content-center my-3 pe-3" *ngIf="nrdcdetails?.length!=0">
+                        <ngb-pagination class="ms-auto d-sm-table" [collectionSize]="TotalCount" [maxSize]="maxSize" (pageChange)="ChangePagenumber($event)"
+                            [rotate]="false" [pageSize]="RowCount" [(page)]="PageNumber" [boundaryLinks]="boundaryLinks"
+                            [size]="size">
+                        </ngb-pagination>
+                    </div>
+                    <!-- Pagination UI -->
+                </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #addNrdcItems let-modal>
+    <div class="modal-header modal-xl">
+        <h5 class="modal-title" id="exampleModalLabel">Add NRDC items</h5>
+        <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.close('by: close icon');Location=[]"></button>
+    </div>
+    <div class="modal-body">
+        <!-- Filters -->
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <label for="locations" class="label">Locations</label>
+                <ng-select placeholder="Search by location names..." [notFoundText]="'No location found!'"
+                    [items]="CenterLocation" bindValue="CenterLocationGuid" [(ngModel)]="Location"
+                    bindLabel="CenterLocationName" [multiple]="false" (change)="SelectLocation($event)" name="locations"
+                    class="ng-select-custom-250min">
+                </ng-select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="items" class="label">Items</label>
+                <ng-select placeholder="Search by item names..." [items]="ReturnItems" bindValue="StockGuid"
+                     [multiple]="true" name="items" (change)="SelectItems($event)"
+                     class="ng-select-custom-250min" [(ngModel)]="items">
+                   <ng-template ng-option-tmp let-item="item">
+                     {{ item.ItemName }} ({{ item.VendorItemName?item.VendorItemName:'N/A' }})
+                   </ng-template>
+                   <ng-template ng-multi-label-tmp let-items="items">
+                     <span *ngFor="let item of items; let i = index">
+                       {{ item.ItemName }} ({{ item.VendorItemName?item.VendorItemName:'N/A' }})<span *ngIf="i < items.length - 1">, </span>
+                     </span>
+                   </ng-template>
+                </ng-select>
+            </div>
+        </div>
+        <!-- Filters -->
+        <form [formGroup]="ReturnItemsDetailForm">
+
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table bg-white">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item Name</th>
+                                    <th>Vendor Name</th>
+                                    <th>Quantity</th>
+                                    <th>Batch Number</th>
+                                    <th>NRDC unit <span class="text-danger">*</span></th>
+                                    <th>Reason for NRDC <span class="text-danger">*</span></th>
+                                    <th>Expiry Date</th>
+                                    <th>Buy price</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr formArrayName="LstNRDCItemDetails"  
+                                    *ngFor="let item of addItemslist.controls; let i = index">
+                                    <ng-container [formGroupName]="i">
+                                        <td><input type="checkbox" (change)="selectCheckBox($event,i)" ></td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].ItemName}}
+                                        </td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].VendorItemName?this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].VendorItemName:'N/A'}}
+                                        </td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].StockinhandQty}}
+                                        </td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].BatchNumber}}
+                                        </td>
+                                        <td ><input style="width:140px" type="text" class="form-control" min="0"
+                                                placeholder="Enter quantity" formControlName="ReturnQuantity"
+                                                (ngModelChange)="Changequantity($event,i)"
+                                                (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.charCode === 46"
+                                                [max]="this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].StockinhandQty"  
+                                                [required]="ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].IsSelectItem">
+                                        </td>
+                                        <td>
+                                            <input style="width:140px" type="text" formControlName="ReturnReason" class="form-control"
+                                                placeholder="Enter reason" maxlength="100" 
+                                                [required]="ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].IsSelectItem">
+                                        </td>
+                                        
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].ExpiryDate=='0001-01-01T00:00:00'?'N/A':this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].ExpiryDate|date:'dd-MM-yyyy'}}
+                                        </td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].Unitprice}}
+                                        </td>
+                                        <td>{{this.ReturnItemsDetailForm.get('LstNRDCItemDetails')?.value[i].Totalprice}}
+                                        </td>   
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-3">
+                <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">NRDC unit<span
+                            [ngClass]="{'text-danger': !ReturnItemsDetailForm.value.ReturnUnit}"> *</span></label>
+                        <input type="number"  formControlName="ReturnUnit" (change)="ChangeQuantity($event)" id="itemCode" class="form-control" placeholder="Enter unit"
+                        [ngClass]="(ReturnItemsDetailForm.get('ReturnUnit')?.hasError('required')) && ReturnItemsDetailForm.get('ReturnUnit')?.touched ? 'is-invalid' : ''">
+                    <span class="text-danger form-error-message"
+                        *ngIf="ReturnItemsDetailForm.get('ReturnUnit')?.hasError('required') && ReturnItemsDetailForm.get('ReturnUnit')?.touched">
+                        NRDC unit is required!
+                    </span>               
+                    </div>
+                </div> -->
+                <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-6">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">NRDC quantity<span
+                                [ngClass]="{'text-danger': !ReturnItemsDetailForm.value.ReturnQuantity}">
+                                *</span></label>
+                        <input type="number" id="itemCode" class="form-control" min="0"
+                            max={{ReturnItemsDetailForm.value.StockinhandQty}} placeholder="Enter quantity"
+                            formControlName="ReturnQuantity" (keyup)="Changequantity($event)"
+                            [ngClass]="(ReturnItemsDetailForm.get('ReturnQuantity')?.hasError('required')) && ReturnItemsDetailForm.get('ReturnQuantity')?.touched ? 'is-invalid' : ''">
+                        <span class="text-danger form-error-message"
+                            *ngIf="ReturnItemsDetailForm.get('ReturnQuantity')?.hasError('required') && ReturnItemsDetailForm.get('ReturnQuantity')?.touched">
+                            NRDC quantity is required!
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-xl-6">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">Reason for NRDC<span
+                                [ngClass]="{'text-danger': !ReturnItemsDetailForm.value.ReturnReason}"> *</span></label>
+                        <input type="text" formControlName="ReturnReason" id="itemCode" class="form-control"
+                            placeholder="Enter reason" maxlength="100"
+                            [ngClass]="(ReturnItemsDetailForm.get('ReturnReason')?.hasError('required')) && ReturnItemsDetailForm.get('ReturnReason')?.touched ? 'is-invalid' : ''">
+                        <span class="text-danger form-error-message"
+                            *ngIf="ReturnItemsDetailForm.get('ReturnReason')?.hasError('required') && ReturnItemsDetailForm.get('ReturnReason')?.touched">
+                            Reason for NRDC is required!
+                        </span>
+                    </div>
+                </div> -->
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" aria-label="Close"
+            (click)="modal.close('by: close icon');Location=[]">Cancel</button>
+        <button type="button" class="btn btn-primary" [disabled]="ReturnItemsDetailForm.invalid ||!isChecked ||!Buttonshow"
+            (click)="Savenrdcitems  ();modal.close('by: close icon');">Save</button>
+    </div>
+</ng-template>
